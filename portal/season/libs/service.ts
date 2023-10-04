@@ -9,6 +9,7 @@ import Loading from './loading';
 import Request from './request';
 import Toast from './toast';
 import Navbar from './navbar';
+import Lang from './lang';
 
 @Injectable({ providedIn: 'root' })
 export class Service {
@@ -19,6 +20,7 @@ export class Service {
     public request: Request;
     public toast: Toast;
     public navbar: Navbar;
+    public lang: Lang;
     public app: ChangeDetectorRef;
 
     constructor() { }
@@ -34,6 +36,8 @@ export class Service {
             this.navbar = new Navbar(this);
             this.request = new Request();
             this.toast = new Toast();
+            this.lang = new Lang(this);
+            this.lang.set((navigator.language || navigator.userLanguage).substring(0, 2).toLowerCase());
             await this.loading.show();
             await this.auth.init();
         }
