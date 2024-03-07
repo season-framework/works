@@ -26,7 +26,7 @@
 
             tbody
                 ng-container(*ngFor="let user of project.member.list()")
-                    tr
+                    tr(*ngIf="user.id")
                         td(*ngIf="user.meta.email")
                             div 
                                 span {{user.meta.name}}

@@ -3,6 +3,7 @@ import datetime
 config = wiz.model("portal/works/config")
 orm = wiz.model("portal/season/orm")
 memberdb = orm.use("member", module="works")
+issuedb = orm.use("issueboard/issue/worker", module="works")
 userdb = orm.use("user")
 
 class Member:
@@ -11,17 +12,39 @@ class Member:
         self.project_id = project.data['id']
         self.ACCESS_LEVELS = ['admin', 'manager', 'user', 'guest', 'visitor']
     
-    def members(self):
+    def members(self, entire=False):
         self.accessLevel(['admin', 'manager', 'user', 'guest'])
-        
+
         project_id = self.project_id
+        workers = userdb.rows(fields="id")
+        workers = [x['id'] for x in workers]
+        # workers = issuedb.rows(fields="user_id", project_id=project_id, groupby="user_id")
+        # workers = [x['user_id'] for x in workers]
+
         users = memberdb.rows(project_id=project_id)
+        curworkers = []
         for i in range(len(users)):
             user = config.get_user_info(wiz, users[i]['user'])
             if user is not None:
                 users[i]['meta'] = user
             else:
                 users[i]['meta'] = dict()
+            curworkers.append(users[i]['user'])
+
+        for user_id in workers:
+            if user_id in curworkers:
+                continue
+            uinfo = dict()
+            uinfo['project_id'] = project_id
+            uinfo['role'] = 'guest'
+            uinfo['user'] = user_id
+            user = config.get_user_info(wiz, user_id)
+            if user is not None:
+                uinfo['meta'] = user
+            else:
+                uinfo['meta'] = dict()
+            users.append(uinfo)
+
         return users
 
     def list(self):

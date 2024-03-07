@@ -37,8 +37,11 @@ export class Component implements OnInit, OnDestroy {
             await this.wikibook.api(`content/update`, data);
         },
         moved: async () => {
-            if (this.wikibook.content.data().id)
-                await this.wikibook.content.load(this.wikibook.content.data().id);
+            if (this.wikibook.content.data().id) {
+                //구현 실패... 폴더가 자기 하위로 이동되면 안됨!! 코드 더 뜯어봐야함...
+                if (this.wiki.book.content.data().id !== this.wiki.book.content.data().root_id)
+                    await this.wikibook.content.load(this.wikibook.content.data().id);
+            }
         },
         select: async (node: any) => {
             this.wikibook.content.node = node;

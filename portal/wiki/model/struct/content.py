@@ -39,6 +39,10 @@ class Model:
             if 'type' in data: del data['type']
             if 'created' in data: del data['created']
             data['updated'] = datetime.datetime.now()
+
+            if data['root_id'] == content_id:
+                del data['root_id']
+
             db.update(data, id=content_id)
         
         revs = self.book.revision.load(content_id)

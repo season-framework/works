@@ -54,11 +54,13 @@ export class Component implements OnInit {
     }
 
     public async updateContent() {
+        this.service.loading.show()
         this.isUpdate = true;
         await this.service.render();
         this.wikibook.content.data().content = this.editor.data.get();
         await this.wikibook.content.update();
         this.isUpdate = false;
+        this.service.loading.hide()
         await this.service.render();
     }
 
