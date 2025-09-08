@@ -1,0 +1,11 @@
+{
+    "type": "app",
+    "mode": "portal",
+    "title": "sp.config",
+    "id": "sp.config",
+    "namespace": "sp.config",
+    "viewuri": "",
+    "category": "",
+    "controller": "base",
+    "template": "wiz-portal-saml-sp-config()"
+}

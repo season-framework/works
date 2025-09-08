@@ -1,0 +1,274 @@
+div(*ngIf="cache.loaded", class="w-full h-full", [ngClass]="containerClass()")
+    .w-full.h-full.overflow-hidden([class.pt-7]="issue.modal")
+        .overflow-hidden([ngClass]="(issue.modal?'mx-auto rounded-xl bg-white max-w-screen-2xl w-5/4 h-[90vh]':'w-full h-full') + (issue.id == 'new'?' max-w-[840px]':'')", role='document', '#body'='')
+            .w-full.h-full.overflow-hidden.flex.flex-col([class.modal-content]="issue.modal")
+                .flex.p-3.border-b.border-gray-300.h-14.shrink-0
+                    input.flex-1.border-0.shadow-0.outline-none.ff-b([(ngModel)]="data.info.title", placeholder="이슈 제목을 입력해주세요", [disabled]="!isRole(['owner', 'manager'])")
+                    button.ml-auto.mr-4.py-1.px-3.text-sm.flex.items-center.justify-center.rounded-md.bg-blue-500.text-white((click)="update()", class="hover:bg-blue-600", *ngIf="!readOnly && isRole(['owner', 'manager'])")
+                        span 저장하기
+                        wiz-component-spinner.ml-1(*ngIf="cache.isUpdate")
+
+                    button.size-8.flex.items-center.justify-center.rounded-lg.mr-3.movable-btn((mousedown)="onStartMoving($event)", (mouseup)="onStopMoving($event)", *ngIf="isMovable")
+                        i.fa-solid.fa-up-down-left-right
+
+                    button.size-8.flex.items-center.justify-center.rounded-lg(class="hover:bg-gray-100", (click)="hide()")
+                        i.fa-solid.fa-xmark
+                
+                div(class="hidden max-sm:!flex")
+                    a.card-btn((click)="switchTab('info')", [class.active]="cache.tab == 'info'")
+                        span 작업정보
+                        i.fa-brands.fa-readme.ml-3
+                    
+                    a.card-btn((click)="switchTab('message')", [class.active]="cache.tab == 'message'")
+                        span 메시지
+                        i.fa-solid.fa-message.ml-3
+
+                .flex-1.flex.m-0.p-0.overflow-hidden
+                    .m-0.p-0(class="max-sm:hidden h-full border-r border-gray-300 flex flex-col overflow-hidden bg-white", [ngClass]="(issue.id == 'new'?'w-full flex-1':'w-7/12') + (cache.tab == 'info'?' max-sm:!flex':'')")
+                        .p-4.h-full.overflow-y-auto.overflow-x-hidden.text-xs
+                            .flex.mb-3(class="last:mb-0 max-sm:block")
+                                span.flex.items-center.justify-center.rounded-md.px-2.w-24.h-6.bg-slate-500.text-white.ff-b.mr-3 이슈제목
+                                .flex-1.flex.items-center
+                                    input.w-full.text-xs.border-gray-300(class="py-0.5 px-2", [(ngModel)]="data.info.title", [disabled]="!isRole(['owner', 'manager'])", placeholder="이슈 제목을 입력해주세요")
+                            
+                            .flex.mb-3(class="last:mb-0 max-sm:block")
+                                span.flex.items-center.justify-center.rounded-md.px-2.w-24.h-6.bg-slate-500.text-white.ff-b.mr-3 프로젝트
+                                .flex-1.flex.items-center
+                                    a(routerLink="/project/{{project.data().namespace}}/issueboard") {{project.data().title}}
+
+                            .flex.mb-3(*ngIf="project.member.map[data.info.user_id]", class="last:mb-0 max-sm:block")
+                                span.flex.items-center.justify-center.rounded-md.px-2.w-24.h-6.bg-slate-500.text-white.ff-b.mr-3 요청자
+                                .flex-1.flex.items-center
+                                    span.mr-1 {{project.member.map[data.info.user_id].name}}
+                                    small.text-gray-500 ({{project.member.map[data.info.user_id].email}})
+                            
+                            .flex.mb-3(class="last:mb-0 max-sm:block")
+                                span.flex.items-center.justify-center.rounded-md.px-2.w-24.h-6.bg-slate-500.text-white.ff-b.mr-3 작업자
+                                .flex-1.flex.items-center
+                                    ng-continaer(*ngFor="let worker of data.info.worker")
+                                        button.border.border-gray-300.px-1.transition-all.mr-2(class="hover:border-black py-0.5", (click)="removeMember(worker)", *ngIf="project.member.map[worker]")
+                                            span {{project.member.map[worker].name}}
+                                            i.fas.fa-times.ml-1(*ngIf="!readOnly && isRole(['owner', 'manager'])")
+
+                                    .relative(*ngIf="!readOnly && isRole(['owner', 'manager'])")
+                                        button.border.border-gray-300.px-1.transition-all(class="hover:border-black py-0.5", (click)="selectMember()")
+                                            i.fas.fa-plus.mr-1
+                                            span 작업자 추가
+                                        
+                                        .absolute.bg-slate-900.text-white.mt-2(*ngIf="cache.worker", class="z-[1000] py-0.5 px-0 m-0 min-w-44 shadow-xl")
+                                            div(class="size-3 absolute left-3 -top-[6px] rotate-45 bg-slate-900")
+                                            div(class="min-w-44 p-2")
+                                                input.flex.items-center.w-full.h-6.text-xs.bg-slate-900.rounded-full(placeholder="사용자 추가", [(ngModel)]="cache.searchMember")
+                                            ng-container(*ngFor="let member of project.member.list()")
+                                                .cursor-pointer(*ngIf="searchMember(member, cache.searchMember)", class="min-w-44 p-2 hover:bg-slate-800", (click)="addMember(member.meta.id)")
+                                                    span {{member.meta.name}}
+                            
+                            .flex.mb-3(class="last:mb-0 max-sm:block")
+                                span.flex.items-center.justify-center.rounded-md.px-2.w-24.h-6.bg-slate-500.text-white.ff-b.mr-3 시작일
+                                .flex-1.flex.items-center
+                                    input.w-36.text-xs.border-gray-300(type="date", class="py-0.5", [(ngModel)]="data.info.planstart", [disabled]="!isRole(['owner', 'manager'])")
+                                
+                            .flex.mb-3(class="last:mb-0 max-sm:block")
+                                span.flex.items-center.justify-center.rounded-md.px-2.w-24.h-6.bg-slate-500.text-white.ff-b.mr-3 종료일
+                                .flex-1.flex.items-center
+                                    input.w-36.text-xs.border-gray-300(type="date", class="py-0.5", [(ngModel)]="data.info.planend", [disabled]="!isRole(['owner', 'manager'])")
+
+                            .flex.mb-3(class="last:mb-0 max-sm:block")
+                                span.flex.items-center.justify-center.rounded-md.px-2.w-24.h-6.bg-slate-500.text-white.ff-b.mr-3 우선순위
+                                .flex-1.flex.items-center
+                                    label.cursor-pointer
+                                        input.sr-only(type="radio", name="level", value=0, class="peer/level", [(ngModel)]="data.info.level", [disabled]="!isRole(['owner', 'manager'])")
+                                        span.border.border-gray-300.rounded-sm.transition-all.text-gray-500.p-1.mr-1(class="peer-checked/level:!text-blue-600 peer-checked/level:!border-blue-600 hover:!text-black")
+                                            i.fas.fa-dot-circle.mr-1
+                                            span 낮음
+                                    label.cursor-pointer
+                                        input.sr-only(type="radio", name="level", value=1, class="peer/level", [(ngModel)]="data.info.level", [disabled]="!isRole(['owner', 'manager'])")
+                                        span.border.border-gray-300.rounded-sm.transition-all.text-gray-500.p-1.mr-1(class="peer-checked/level:!text-blue-600 peer-checked/level:!border-blue-600 hover:!text-black")
+                                            i.fas.fa-circle.mr-1
+                                            span 중간
+                                    label.cursor-pointer
+                                        input.sr-only(type="radio", name="level", value=2, class="peer/level", [(ngModel)]="data.info.level", [disabled]="!isRole(['owner', 'manager'])")
+                                        span.border.border-gray-300.rounded-sm.transition-all.text-gray-500.p-1.mr-1(class="peer-checked/level:!text-blue-600 peer-checked/level:!border-blue-600 hover:!text-black")
+                                            i.fas.fa-exclamation-circle.mr-1
+                                            span 중요
+                                    label.cursor-pointer
+                                        input.sr-only(type="radio", name="level", value=3, class="peer/level", [(ngModel)]="data.info.level", [disabled]="!isRole(['owner', 'manager'])")
+                                        span.border.border-gray-300.rounded-sm.transition-all.text-gray-500.p-1.mr-1(class="peer-checked/level:!text-blue-600 peer-checked/level:!border-blue-600 hover:!text-black")
+                                            i.fas.fa-bullhorn.mr-1
+                                            span 긴급
+
+                            .flex.mb-3(class="last:mb-0 max-sm:block")
+                                span.flex.items-center.justify-center.rounded-md.px-2.w-24.h-6.bg-slate-500.text-white.ff-b.mr-3 진행상태
+                                .flex-1.flex.items-center
+                                    label.cursor-pointer
+                                        input.sr-only(type="radio", name="status", value='noti', class="peer/status", [(ngModel)]="data.info.status", [disabled]="!isRole(['owner', 'manager'])")
+                                        span.border.border-gray-300.rounded-sm.transition-all.text-gray-500.p-1.mr-1(class="peer-checked/status:!text-blue-600 peer-checked/status:!border-blue-600 hover:!text-black")
+                                            i.fas.fa-bell.mr-1
+                                            span 공지/알림
+                                    label.cursor-pointer
+                                        input.sr-only(type="radio", name="status", value='open', class="peer/status", [(ngModel)]="data.info.status", [disabled]="!isRole(['owner', 'manager'])")
+                                        span.border.border-gray-300.rounded-sm.transition-all.text-gray-500.p-1.mr-1(class="peer-checked/status:!text-blue-600 peer-checked/status:!border-blue-600 hover:!text-black")
+                                            i.fas.fa-hourglass-start.mr-1
+                                            span 시작되지 않음
+                                    label.cursor-pointer
+                                        input.sr-only(type="radio", name="status", value='work', class="peer/status", [(ngModel)]="data.info.status", [disabled]="!isRole(['owner', 'manager'])")
+                                        span.border.border-gray-300.rounded-sm.transition-all.text-gray-500.p-1.mr-1(class="peer-checked/status:!text-blue-600 peer-checked/status:!border-blue-600 hover:!text-black")
+                                            i.fas.fa-hourglass-half.mr-1
+                                            span 진행
+                                    label.cursor-pointer
+                                        input.sr-only(type="radio", name="status", value='finish', class="peer/status", [(ngModel)]="data.info.status", [disabled]="!isRole(['owner', 'manager'])")
+                                        span.border.border-gray-300.rounded-sm.transition-all.text-gray-500.p-1.mr-1(class="peer-checked/status:!text-blue-600 peer-checked/status:!border-blue-600 hover:!text-black")
+                                            i.fas.fa-hourglass-end.mr-1
+                                            span 완료
+                                    label.cursor-pointer(*ngIf="isRole(['owner'])")
+                                        input.sr-only(type="radio", name="status", value='close', class="peer/status", [(ngModel)]="data.info.status", [disabled]="!isRole(['owner', 'manager'])")
+                                        span.border.border-gray-300.rounded-sm.transition-all.text-gray-500.p-1.mr-1(class="peer-checked/status:!text-blue-600 peer-checked/status:!border-blue-600 hover:!text-black")
+                                            i.fa-solid.fa-circle-check.mr-1
+                                            span 종료
+                                    label.cursor-pointer(*ngIf="isRole(['owner'])")
+                                        input.sr-only(type="radio", name="status", value='cancel', class="peer/status", [(ngModel)]="data.info.status", [disabled]="!isRole(['owner', 'manager'])")
+                                        span.border.border-gray-300.rounded-sm.transition-all.text-gray-500.p-1.mr-1(class="peer-checked/status:!text-blue-600 peer-checked/status:!border-blue-600 hover:!text-black")
+                                            i.fas.fa-calendar-times.mr-1
+                                            span 취소
+                            
+                            .flex.mb-3(class="last:mb-0 max-sm:block")
+                                span.flex.items-center.justify-center.rounded-md.px-2.w-24.h-6.bg-slate-500.text-white.ff-b.mr-3 진행률
+                                .flex-1.flex.items-center
+                                    label.cursor-pointer
+                                        input.sr-only(type="radio", name="process", value=0, class="peer/process", [(ngModel)]="data.info.process", [disabled]="!isRole(['owner', 'manager'])")
+                                        span.border.border-gray-300.rounded-sm.transition-all.text-gray-500.p-1.mr-1(class="peer-checked/process:!text-blue-600 peer-checked/process:!border-blue-600 hover:!text-black")
+                                            span 0%
+                                    label.cursor-pointer
+                                        input.sr-only(type="radio", name="process", value=20, class="peer/process", [(ngModel)]="data.info.process", [disabled]="!isRole(['owner', 'manager'])")
+                                        span.border.border-gray-300.rounded-sm.transition-all.text-gray-500.p-1.mr-1(class="peer-checked/process:!text-blue-600 peer-checked/process:!border-blue-600 hover:!text-black")
+                                            span 20%
+                                    label.cursor-pointer
+                                        input.sr-only(type="radio", name="process", value=40, class="peer/process", [(ngModel)]="data.info.process", [disabled]="!isRole(['owner', 'manager'])")
+                                        span.border.border-gray-300.rounded-sm.transition-all.text-gray-500.p-1.mr-1(class="peer-checked/process:!text-blue-600 peer-checked/process:!border-blue-600 hover:!text-black")
+                                            span 40%
+                                    label.cursor-pointer
+                                        input.sr-only(type="radio", name="process", value=60, class="peer/process", [(ngModel)]="data.info.process", [disabled]="!isRole(['owner', 'manager'])")
+                                        span.border.border-gray-300.rounded-sm.transition-all.text-gray-500.p-1.mr-1(class="peer-checked/process:!text-blue-600 peer-checked/process:!border-blue-600 hover:!text-black")
+                                            span 60%
+                                    label.cursor-pointer
+                                        input.sr-only(type="radio", name="process", value=80, class="peer/process", [(ngModel)]="data.info.process", [disabled]="!isRole(['owner', 'manager'])")
+                                        span.border.border-gray-300.rounded-sm.transition-all.text-gray-500.p-1.mr-1(class="peer-checked/process:!text-blue-600 peer-checked/process:!border-blue-600 hover:!text-black")
+                                            span 80%
+                                    label.cursor-pointer
+                                        input.sr-only(type="radio", name="process", value=100, class="peer/process", [(ngModel)]="data.info.process", [disabled]="!isRole(['owner', 'manager'])")
+                                        span.border.border-gray-300.rounded-sm.transition-all.text-gray-500.p-1.mr-1(class="peer-checked/process:!text-blue-600 peer-checked/process:!border-blue-600 hover:!text-black")
+                                            span 100%
+                                
+                            .flex.mb-3(*ngIf="data.info.todo.length > 0 || isRole(['owner', 'manager'])", class="last:mb-0 max-sm:block")
+                                span.flex.items-center.justify-center.rounded-md.px-2.w-24.h-6.bg-slate-500.text-white.ff-b.mr-3 TODO
+                                .flex-1.flex.flex-col.border.border-gray-300.px-2.py-1.text-sm
+                                    ng-container(*ngIf="data.info.todo.length > 0")
+                                        .divide-y([sortablejs]="data.info.todo", [sortablejsOptions]="config.todoSorted")
+                                            .flex.items-center.py-1.hover-actions(*ngFor="let todo of data.info.todo")
+                                                i.ti.ti-check.px-1.cursor-pointer.rounded-lg.text-base(class="hover:bg-gray-50", [ngClass]="todo.checked?'text-green-500':'text-gray-500'", (click)="checkTodo(todo)")
+                                                span([class.line-through]="todo.checked", [class.text-muted]="todo.checked") {{todo.title}}
+                                                .ml-auto
+                                                .actions
+                                                    i.ti.ti-arrows-move.px-1.cursor-move.text-black.text-base.todo-handle
+                                                    i.fa-solid.fa-xmark.px-1.cursor-pointer.text-red-500.rounded-lg.text-base.ml-2(*ngIf="!readOnly", class="hover:bg-red-50", (click)="removeTodo(todo)")
+                                    .flex.pt-1(*ngIf="data.info.todo.length < 5 && isRole(['owner', 'manager'])", [ngClass]="data.info.todo.length > 0?'border-t border-gray-200':''")
+                                        input.w-full.text-sm.px-2.shadow-0(class="py-0.5 !border-0", [(ngModel)]="cache.todoText", placeholder="TODO 내용을 입력해주세요", (keyup.enter)="addTodo(cache.todoText)")
+                                        button.bg-blue-500.text-white.px-3(class="py-0.5 hover:bg-blue-600", (click)="addTodo(cache.todoText)")
+                                            i.fa-solid.fa-plus
+
+                            .mb-3(class="last:mb-0")
+                                div.flex.items-center.justify-center.rounded-md.px-2.w-24.h-6.bg-slate-500.text-white.ff-b.mr-3.mb-3 설명
+                                .flex-1.ck-editor-auto.ck-editor-works.height-fit.text-base.prose.max-w-full
+                                    textarea('#description'='', [attr.namespace]="NAMESPACE")
+                            
+                    .flex.flex-col.m-0.p-0(*ngIf="issue.id != 'new'", class="w-5/12 max-sm:hidden", [ngClass]="cache.tab == 'message'?'max-sm:!flex':''")
+                        .flex.divide-x
+                            button.flex-1.py-1.border-b.border-gray-300.transition-all((click)="initMessage('message')", class="hover:bg-blue-600 hover:text-white", [ngClass]="cache.messageTab == 'message'?'border-blue-600 bg-blue-600 text-white':'bg-blue-50 text-blue-600'")
+                                span.text-sm 메시지
+                            button.flex-1.py-1.border-b.border-gray-300.transition-all((click)="initMessage('log')", class="hover:bg-blue-600 hover:text-white", [ngClass]="cache.messageTab == 'log'?'border-blue-600 bg-blue-600 text-white':'bg-blue-50 text-blue-600'")
+                                span.text-sm 작업이력
+                            button.flex-1.py-1.border-b.border-gray-300.transition-all((click)="initMessage('favorite')", class="hover:bg-blue-600 hover:text-white", [ngClass]="cache.messageTab == 'favorite'?'border-blue-600 bg-blue-600 text-white':'bg-blue-50 text-blue-600'")
+                                span.text-sm 중요메시지
+                            button.flex-1.py-1.border-b.border-gray-300.transition-all((click)="initMessage('file')", class="hover:bg-blue-600 hover:text-white", [ngClass]="cache.messageTab == 'file'?'border-blue-600 bg-blue-600 text-white':'bg-blue-50 text-blue-600'")
+                                span.text-sm 파일
+                        
+                        .flex-1.flex.flex-col.overflow-hidden
+                            .p-4.flex-1.relative.text-sm.overflow-auto(class="bg-indigo-50/50")
+                                ng-container(*ngIf="cache.newMessage")
+                                    div(class="w-4/5 p-2 text-center rounded-lg bg-gray-300 absolute left-[10%] bottom-3 z-[9999] cursor-pointer", (click)="unreadMessage(true)") 새로운 메시지가 있습니다
+                                
+                                div('#messages'='', (scroll)="onScrollMessage()")
+                                    ng-container(*ngIf="data.messages.length > 0")
+                                        .mx-auto.mb-4.p-2.text-center.rounded-lg.bg-gray-300(*ngIf="cache.isLastMessage", class="w-4/5") 모든 메시지를 확인하였습니다
+                                        .mt-5.mb-4(*ngIf="!cache.isLastMessage")
+                                    
+                                    .mx-auto.mb-4.p-2.text-center.rounded-lg.bg-gray-300(*ngIf="data.messages.length > 0 && cache.loadMessage") 메시지를 불러오고 있습니다
+
+                                    ng-container(*ngIf="data.messages.length == 0 && cache.isLastMessage")
+                                        .mx-auto.mb-4.p-2.text-center.rounded-lg.bg-gray-300(*ngIf="cache.messageTab == 'message'", class="w-4/5") 메시지가 없습니다
+                                        .mx-auto.mb-4.p-2.text-center.rounded-lg.bg-gray-300(*ngIf="cache.messageTab == 'log'", class="w-4/5") 작업이력이 없습니다
+                                        .mx-auto.mb-4.p-2.text-center.rounded-lg.bg-gray-300(*ngIf="cache.messageTab == 'favorite'", class="w-4/5") 중요메시지가 없습니다
+                                        .mx-auto.mb-4.p-2.text-center.rounded-lg.bg-gray-300(*ngIf="cache.messageTab == 'file'", class="w-4/5") 파일이 없습니다
+
+                                    ng-container(*ngFor="let msg of data.messages")
+                                        .flex.items-end.relative([class.justify-end]="service.auth.session.id == msg.user_id")
+                                            .mr-2.mb-3(*ngIf="service.auth.session.id != msg.user_id")
+                                                .ml-2.flex.items-center.justify-center.size-9.border.border-orange-500.bg-orange-400.rounded-md.bg-contain.bg-center.bg-cover.bg-no-repeat(style='background-image: url({{project.member.map[msg.user_id].profile_image}})', *ngIf="msg.type == 'message' || msg.type == 'file'")
+                                                    .ff-b.text-white(*ngIf="!project.member.map[msg.user_id].profile_image") {{project.member.map[msg.user_id].name[0]}}
+                                                .ml-2.flex.items-center.justify-center.size-9.border.border-gray-300.bg-gray-100.rounded-md.bg-contain.bg-center.bg-cover.bg-no-repeat(*ngIf="msg.type == 'log'")
+                                                    i.fa-solid.fa-history
+
+                                            div(
+                                                class="flex flex-col bg-white mb-4 rounded-xl w-[70%] divide-y overflow-hidden",
+                                                [ngClass]="(cache.message.parent_id == msg.id?'border-2 border-blue-500':'border border-gray-300') + ' ' + (service.auth.session.id == msg.user_id?'rounded-br-none':'rounded-bl-none')",
+                                            )
+                                                wiz-portal-works-message-body([event]="messageEvent", [project]="project", [msg]="msg", [cache]="cache")
+                                                
+                                                ng-container(*ngFor="let reply of msg.reply")
+                                                    wiz-portal-works-message-body([event]="messageEvent", [project]="project", [msg]="reply", [cache]="cache")
+
+                                            .ml-3.ml-2(*ngIf="service.auth.session.id == msg.user_id")
+                                                .flex.items-center.justify-center.size-9.border.border-gray-300.bg-gray-100.rounded-md.bg-contain.bg-center.bg-cover.bg-no-repeat(style='background-image: url({{project.member.map[msg.user_id].profile_image}})', *ngIf="msg.type == 'message' || msg.type == 'file'")
+                                                    .ff-b.text-white(*ngIf="!project.member.map[msg.user_id].profile_image") {{project.member.map[msg.user_id].name[0]}}
+                                                .flex.items-center.justify-center.size-9.border.border-gray-300.bg-gray-100.rounded-md.bg-contain.bg-center.bg-cover.bg-no-repeat(*ngIf="msg.type == 'log'")
+                                                    i.fa-solid.fa-history
+
+                            .flex.px-2.py-1.bg-slate-200.items-center(*ngIf="cache.message.parent_id")
+                                span.text-gray-500.text-sm 답글을 작성하고 있습니다
+                                .ml-auto
+                                i.fa-solid.fa-xmark.cursor-pointer(class="hover:text-blue-500", (click)="replyMessage()")
+
+                            .p-2.bg-white.border-t.border-gray-300(*ngIf="(cache.message.attachment && cache.message.attachment.length > 0) || cache.message.uploading")
+                                ng-container(*ngFor="let file of cache.message.attachment")
+                                    button.border.border-gray-300.text-xs.mx-1.px-2(class="hover:border-black my-0.5 py-0.5", (click)="removeAttachment(file)")
+                                        span.ff-b {{file.filename}}
+                                        i.fa-solid.fa-xmark.ml-2
+                                
+                                button.rounded-sm.text-xs.bg-gray-700.text-white(*ngIf="cache.message.uploading", class="hover:bg-gray-600 px-2 py-0.5")
+                                    span {{cache.message.uploading.total}} 중 {{cache.message.uploading.index}} 번째 파일 업로드 중 ({{cache.message.uploading.process | number: '1.0-2'}}%)
+                            
+                            .border-t.border-gray-300.bg-white(*ngIf="cache.message.images && cache.message.images.length > 0")
+                                .flex.flex-wrap.p-0.m-0
+                                    .p-0.m-0(*ngFor="let image of cache.message.images", class="w-1/4")
+                                        .relative.w-full.bg-center.bg-no-repeat.bg-cover.cursor-pointer(class="hover:border-4 hover:border-blue-500", [style.background-image]="imageUrl(image)")
+                                            svg(viewBox="0 0 100 100")
+                                                rect(width="100", height="100", style="fill:rgba(255,255,255,0);")
+                                            .bg-red-500.text-white.absolute.top-1.right-1.size-6.text-center((click)="removeImage(image)")
+                                                i.fa-solid.fa-xmark
+
+                            .min-h-44.bg-white.border-t.border-gray-300.p-2(*ngIf="!readOnly")
+                                .ck-editor-small.ck-editor-works.height-sm.prose.max-w-full
+                                    textarea('#comment'='', [namespace]="NAMESPACE")
+                                .flex.mt-2
+                                    button.rounded-sm.text-xs.bg-blue-500.text-white.mr-1(class="hover:bg-blue-600 px-2 py-0.5", (click)="upload('image')") 이미지
+                                    button.rounded-sm.text-xs.bg-blue-500.text-white(class="hover:bg-blue-600 px-2 py-0.5", (click)="upload('file')") 파일
+                                    .ml-auto
+                                    button.rounded-sm.text-xs.bg-gray-700.text-white.mr-1(class="hover:bg-gray-600 px-2 py-0.5", (click)="replyMessage()", *ngIf="cache.message.parent_id")
+                                        span 취소
+                                        i.fa-solid.fa-xmark.ml-1
+                                    button.rounded-sm.text-xs.bg-blue-500.text-white(class="hover:bg-blue-600 px-2 py-0.5", (click)="sendMessage()")
+                                        span(*ngIf="cache.message.parent_id") 답글달기
+                                        span(*ngIf="!cache.message.parent_id") 보내기
+                                        i.fa-solid.fa-paper-plane.ml-1
+
+ng-keyboard-shortcuts([shortcuts]="shortcuts")

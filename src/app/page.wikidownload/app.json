@@ -1,0 +1,11 @@
+{
+    "mode": "page",
+    "id": "page.wikidownload",
+    "title": "/wikidownload/:path?",
+    "namespace": "wikidownload",
+    "viewuri": "/wikidownload/:id",
+    "category": "",
+    "controller": "user",
+    "layout": "layout.empty",
+    "template": "wiz-page-wikidownload()"
+}

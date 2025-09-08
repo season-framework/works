@@ -4,7 +4,10 @@ import { Service } from '@wiz/libs/portal/season/service';
 import { Project } from '@wiz/libs/portal/works/project';
 
 export class Component implements OnInit {
-    constructor(public service: Service, public project: Project) { }
+    constructor(
+        public service: Service,
+        public project: Project,
+    ) { }
 
     public async ngOnInit() {
         await this.service.init();
@@ -15,7 +18,16 @@ export class Component implements OnInit {
         this.service.navbar.toggle(true);
     }
 
-    public isActive(link: string) {
-        return location.pathname.indexOf(link) === 0
+    public async logout() {
+        const res = await this.service.alert.show({
+            title: "Logout",
+            status: "error",
+            message: "정말 로그아웃하시겠습니까?",
+            action: "logout",
+            actionBtn: "error",
+            cancel: "cancel",
+        });
+        if (!res) return;
+        location.href = "/auth/logout?returnTo=/authenticate";
     }
 }

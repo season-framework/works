@@ -1,0 +1,10 @@
+{
+    "mode": "component",
+    "id": "component.spinner",
+    "title": "spinner",
+    "namespace": "spinner",
+    "viewuri": "",
+    "category": "",
+    "controller": "",
+    "template": "wiz-component-spinner()"
+}

@@ -1,0 +1,39 @@
+.overflow-auto.h-full(*ngIf="loaded")
+    .flex.flex-col.bg-white.rounded-lg.border.border-gray-300.w-full.mx-auto.divide-y.text-sm(class="max-w-[30rem]")
+        .py-4.px-5
+            label.block.mb-2 위키 제목
+            input.w-full.shadow-0.border-0.border-gray-400(class="!border-b-2 focus:!border-blue-500", placeholder="새 위키", [(ngModel)]="wikibook.data().title", [disabled]="readOnly")
+
+        .py-4.px-5
+            label.block.mb-2 Namespace
+            input.w-full.shadow-0.border-0.border-gray-400(class="!border-b-2 focus:!border-blue-500", placeholder="mybook", [(ngModel)]="wikibook.data().namespace", [disabled]="readOnly")
+
+        .py-4.px-5
+            label.block.mb-2 공개범위
+            .flex.gap-x-1.text-sm.text-gray-400(class="*:rounded-full *:border *:border-gray-300 *:py-1 *:px-4 *:cursor-pointer *:transition-all")
+                label(class="hover:text-black has-[:checked]:!border-blue-600 has-[:checked]:!text-blue-600")
+                    input.sr-only(type='radio', name='book-visibility', value='private', [(ngModel)]="wikibook.data().visibility", [disabled]="readOnly")
+                    span.pt-1.pb-1
+                        i.fa-solid.me-1.fa-lock
+                        | 비공개
+                
+                label(*ngIf="service.auth.show.membership(['admin', 'staff'])", class="hover:text-black has-[:checked]:!border-blue-600 has-[:checked]:!text-blue-600")
+                    input.sr-only(type='radio', name='book-visibility', value='internal', [(ngModel)]="wikibook.data().visibility", [disabled]="readOnly")
+                    span.pt-1.pb-1
+                        i.fa-solid.me-1.fa-users
+                        | 내부공개
+                
+                label(class="hover:text-black has-[:checked]:!border-blue-600 has-[:checked]:!text-blue-600")
+                    input.sr-only(type='radio', name='book-visibility', value='public', [(ngModel)]="wikibook.data().visibility", [disabled]="readOnly")
+                    span.pt-1.pb-1
+                        i.fa-solid.me-1.fa-lock-open
+                        | 전체공개
+
+        .py-4.px-5
+            label.block.mb-2 설명
+            textarea.w-full.shadow-0.border-0.resize-none(placeholder="위키 설명을 입력해주세요", [(ngModel)]="wikibook.data().description", [disabled]="readOnly", rows=5)
+        
+        .flex.py-4.px-5(*ngIf="wikibook.data().id")
+            .ml-auto
+            button.rounded-sm.py-2.px-3.bg-blue-500.text-white(class="hover:bg-blue-600", (click)="update()") 저장하기
+

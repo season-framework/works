@@ -1,0 +1,62 @@
+.flex.h-full.overflow-hidden.bg-white
+    .flex.flex-col.w-80.border-r.border-gray-300.h-full.overflow-auto
+        wiz-portal-wiki-book-tree
+
+    .flex-1.flex.flex-col.h-full.overflow-hidden
+        ng-container(*ngIf="wikibook.content.is('content')")
+            .flex.w-full.h-16.items-center.px-3.border-b.border-gray-300
+                input.flex-auto.text-sm.border-0.shadow-0.ff-eb(placeholder="문서 제목을 입력해주세요", [(ngModel)]="wikibook.content.data().title", [disabled]="!wikibook.accessLevel(['admin', 'user'])")
+
+                ng-container(*ngIf="wikibook.content.data().id")
+                    .overflow-hidden.rounded-2xl.ml-auto.border.border-gray-300.divide-x.text-sm.ff-b
+                        button.py-2.min-w-20([ngClass]="is('default')?'bg-blue-500 text-white hover:bg-blue-600':'text-black hover:bg-blue-50 hover:text-blue-600'", (click)="active('default')") 문서
+                        button.py-2.min-w-20([ngClass]="is('graph')?'bg-blue-500 text-white hover:bg-blue-600':'text-black hover:bg-blue-50 hover:text-blue-600'", (click)="active('graph')") 그래프
+            
+            .relative.flex-1.overflow-hidden
+                .h-full.ck-fit-content.ck-editor-noborder.ck-editor-works.prose.max-w-full(*ngIf="is('default')")
+                    textarea('#editor'='')
+                .p-6.text-center(*ngIf="is('graph')") 준비중입니다.
+
+        ng-container(*ngIf="wikibook.content.is('setting') && wikibook.accessLevel(['admin'])")
+            .flex.w-full.h-16.items-center.px-3.border-b.border-gray-300
+                .overflow-hidden.rounded-2xl.ml-auto.border.border-gray-300.divide-x.text-sm.ff-b
+                    button.py-2.min-w-20([ngClass]="is('default')?'bg-blue-500 text-white hover:bg-blue-600':'text-black hover:bg-blue-50 hover:text-blue-600'", (click)="active('default')") 설정
+                    button.py-2.min-w-20([ngClass]="is('access')?'bg-blue-500 text-white hover:bg-blue-600':'text-black hover:bg-blue-50 hover:text-blue-600'", (click)="active('access')") 접근권한
+
+            .flex-1.overflow-auto.bg-slate-50.p-4
+                wiz-portal-wiki-book-info(*ngIf="is('default')")
+                wiz-portal-wiki-book-access(*ngIf="is('access')")
+
+    .flex.flex-col.w-80.border-l.border-gray-300.h-full.overflow-auto.divide-y
+        .py-4.px-3(*ngIf="wikibook.accessLevel(['admin', 'user'])")
+            .ff-eb.mb-3 문서 관리
+
+            button.w-full.rounded-sm.bg-blue-500.text-white.text-sm.py-2.flex.items-center.justify-center(class="hover:bg-blue-600", (click)="updateContent()")
+                wiz-component-spinner.mr-2(*ngIf="isUpdate")
+                span 문서 {{ wikibook.content.data().id ? '업데이트' : '생성' }}
+                i.fas.fa-save.ml-2
+
+            ng-container(*ngIf="wikibook.content.data().id && wikibook.content.data().id != wikibook.data().home")
+                button.w-full.rounded-sm.text-blue-500.text-sm.py-2.mt-2(class="hover:underline underline-offset-4", (click)="home()")
+                    span 대문글 지정
+
+        ng-container(*ngIf="wikibook.content.data().id && wikibook.accessLevel(['admin', 'user'])")
+            .py-4.px-3
+                .flex.ff-eb.mb-3
+                    span 리비전
+                    button.rounded-full.bg-black.text-white.text-xs.px-2.ml-auto.ff-b(class="hover:bg-gray-800", (click)="commit()")
+                        span.mr-1.text-white 리비전 생성
+                        i.fa-solid.fa-circle-check
+
+                .text-sm
+                    div([class.bg-blue-50]="!revision_id")
+                        span.text-blue-500.cursor-pointer(class="hover:underline", (click)="loadRevision()") 최신문서
+                    div(*ngFor="let revision of wikibook.content.revisions()", [class.bg-blue-50]="revision.id == revision_id")
+                        span.text-blue-500.cursor-pointer(class="hover:underline", (click)="loadRevision(revision.id)") {{revision.created}}
+                        span.text-gray-500.ml-1 ({{revision.user.name}})
+
+            .py-4.px-3
+                .ff-eb.mb-3 문서 삭제
+                button.w-full.rounded-sm.text-sm.bg-red-500.text-white.py-2(class="hover:bg-red-600", (click)="delete()")
+                    span 삭제하기
+                    i.fas.fa-trash.ml-2

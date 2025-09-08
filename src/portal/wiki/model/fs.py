@@ -1,0 +1,6 @@
+import os
+import season
+
+config = wiz.model("portal/wiki/config")
+STORAGE_PATH = config.STORAGE_PATH
+Model = season.util.fs(os.path.join(STORAGE_PATH))

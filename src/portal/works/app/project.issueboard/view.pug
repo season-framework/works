@@ -1,0 +1,89 @@
+.relative.w-full.h-full
+    .px-6.absolute.inset-0.overflow-x-auto.overflow-y-hidden(*ngIf="cache.loaded", '#container'='', class="z-[999]")
+        ng-container(*ngIf="labels.length == 0")
+            .p-4
+                .flex.flex-col.items-center.bg-white.rounded-lg.border.border-gray-300.py-10.w-full
+                    img.h-32.w-auto(src="/assets/portal/works/work.svg")
+                    p.mt-8.text-xl 이슈보드가 시작되지 않았습니다
+                    p.mt-2.text-md.text-gray-500(*ngIf="!readOnly") 아래 시작하기 버튼을 눌러서 이슈보드를 시작해주세요.
+                    button.bg-blue-500.text-white.rounded-lg.py-2.px-3.mt-6(*ngIf="!readOnly", class="hover:bg-blue-400", (click)="start()")
+                        span 시작하기
+                        i.fa-solid.fa-person-running.ml-2
+
+        ng-container(*ngIf="labels.length > 0")
+            .table.w-max.h-full.overflow-hidden
+                .table.h-full.w-max.overflow-hidden([sortablejs]="labels", [sortablejsOptions]="config.labelSorted")
+                    .table-cell.w-80.p-0.h-full.overflow-hidden.border-r.border-gray-300(*ngFor="let label of labels")
+                        .flex.flex-col.h-full.overflow-auto(class="pt-0.5")
+                            .flex.h-11.items-center.px-5.border-b.border-gray-300
+                                input.w-full.shadow-0.border-none.text-md.ff-eb.bg-inherit([(ngModel)]="label.title", (change)="updateLabels([label])", [disabled]="!project.accessLevel(['admin', 'manager'])")
+                                .ml-auto
+                                .flex
+                                    button.rounded-sm.text-xs.bg-gray-500.text-white.size-6(class="hover:bg-gray-600", (click)="addIssue(label)")
+                                        i.fa-solid.fa-plus
+                                    ng-container(*ngIf="project.accessLevel(['admin', 'manager'])")
+                                        button.rounded-sm.text-xs.bg-gray-500.text-white.size-6.btn-action-move.cursor-grab.ml-1(*ngIf="label.mode == 0", class="hover:bg-gray-600")
+                                            i.fa-solid.fa-up-down-left-right
+                                        button.rounded-sm.text-xs.bg-gray-500.text-white.size-6.ml-1(*ngIf="label.mode == 0", class="hover:bg-gray-600", (click)="removeLabel(label)",)
+                                            i.fa-solid.fa-xmark
+                            .flex-1.overflow-y-auto.px-4(class="max-sm:px-8")
+                                ng-container(*ngIf="label.issues.length == 0")
+                                    button.w-full.rounded-md.text-xs.bg-gray-500.text-white.mt-3.py-2(*ngIf="!readOnly", class="hover:bg-gray-600", (click)="addIssue(label)")
+                                        i.fa-solid.fa-plus
+
+                                .min-h-40([sortablejs]="label.issues", [sortablejsOptions]="config.issueSorted")
+                                    ng-container(*ngFor="let issue_id of label.issues")
+                                        .rounded-2xl.mb-3(class="first:mt-3 max-sm:mb-4", (click)="openIssue(issue_id)", [class.is-loaded]="isLoadedIssue(issue_id)", *ngIf="onProcessIssue(cache.issues[issue_id])")
+                                            wiz-portal-works-widget-project-issueboard-issue([issue]="cache.issues[issue_id]")      
+
+                                ng-container(*ngIf="label.issues.length > 0")
+                                    .my-2.py-2.rounded-md.text-center.text-sm.text-gray-500.cursor-pointer(*ngIf="!readOnly", class="hover:bg-gray-200 hover:text-black", (click)="addIssue(label)") 새로운 이슈 만들기
+                                
+                                .flex.rounded-md.text-gray-500.px-2.py-3.cursor-pointer.text-sm(*ngIf="label.closeCount > 0", class="hover:bg-gray-200 hover:text-black", (click)="loadClosed(label, true)")
+                                    span 종료된 작업
+                                    span.ml-2 ({{label.closeCount}})
+                                    .ml-auto
+                                    i.fa-solid.fa-chevron-up(*ngIf="hiddenIssues(label.id, 'close').length == 0")
+                                    i.fa-solid.fa-chevron-down(*ngIf="hiddenIssues(label.id, 'close').length > 0")
+
+                                .issue-closed-items(*ngIf="hiddenIssues(label.id, 'close').length > 0")
+                                    ng-container(*ngFor="let issue_id of hiddenIssues(label.id, 'close')")
+                                        .rounded-2xl.mb-3(class="first:mt-3 max-sm:mb-4", (click)="openIssue(issue_id)", [class.is-loaded]="isLoadedIssue(issue_id)", *ngIf="!cache.issues[issue_id] || cache.issues[issue_id].status == 'close'")
+                                            wiz-portal-works-widget-project-issueboard-issue([issue]="cache.issues[issue_id]")
+
+                                ng-container(*ngIf="!hiddenIssues(label.id, 'close', true).isLastPage && hiddenIssues(label.id, 'close').length > 0")
+                                    .my-2.py-2.rounded-md.text-center.text-sm.text-gray-500.cursor-pointer(class="hover:bg-gray-200 hover:text-black", (click)="loadClosed(label)") 더 불러오기
+
+                                .flex.rounded-md.text-gray-500.px-2.py-3.cursor-pointer.text-sm(*ngIf="label.cancelCount > 0", class="hover:bg-gray-200 hover:text-black", (click)="loadCanceled(label, true)")
+                                    span 취소된 작업
+                                    span.ml-2 ({{label.cancelCount}})
+                                    .ml-auto
+                                    i.fa-solid.fa-chevron-up(*ngIf="hiddenIssues(label.id, 'cancel').length == 0")
+                                    i.fa-solid.fa-chevron-down(*ngIf="hiddenIssues(label.id, 'cancel').length > 0")
+                                
+                                .issue-closed-items(*ngIf="hiddenIssues(label.id, 'cancel').length > 0")
+                                    ng-container(*ngFor="let issue_id of hiddenIssues(label.id, 'cancel')")
+                                        .rounded-2xl.mb-3(class="first:mt-3 max-sm:mb-4", (click)="openIssue(issue_id)", [class.is-loaded]="isLoadedIssue(issue_id)", *ngIf="!cache.issues[issue_id] || cache.issues[issue_id].status == 'cancel'")
+                                            wiz-portal-works-widget-project-issueboard-issue([issue]="cache.issues[issue_id]")
+
+                                ng-container(*ngIf="!hiddenIssues(label.id, 'cancel', true).isLastPage && hiddenIssues(label.id, 'cancel').length > 0")
+                                    .my-2.py-2.rounded-md.text-center.text-sm.text-gray-500.cursor-pointer(class="hover:bg-gray-200 hover:text-black", (click)="loadCanceled(label)") 더 불러오기
+
+                                .mt-6
+
+                .table-cell.w-80.p-0.h-full.overflow-hidden.border-r.border-gray-300(*ngIf="project.accessLevel(['admin', 'manager'])")
+                    .flex.flex-col.h-full.overflow-auto(class="pt-0.5")
+                        .flex.h-11.items-center.px-5.border-b.border-gray-300
+                            input.w-full.shadow-0.border-none.text-md.ff-b.bg-inherit(placeholder="라벨명을 입력해주세요", [(ngModel)]="cache.label", (keyup.enter)="addLabel(cache.label)")
+                            .ml-auto
+                                button.rounded-sm.text-xs.bg-blue-500.text-white.w-12.h-6(class="hover:bg-blue-600", (click)="addLabel(cache.label)")
+                                    i.fa-solid.fa-plus
+
+    .absolute.left-0.p-3.text-2xl.cursor-pointer(class="top-[49%] z-[1000] max-sm:hidden hover:bg-gray-300", (click)="scroll('left')")
+        i.ti.ti-chevron-left
+
+    .absolute.right-0.p-3.text-2xl.cursor-pointer(class="top-[49%] z-[1000] max-sm:hidden hover:bg-gray-300", (click)="scroll('right')")
+        i.ti.ti-chevron-right
+
+ng-container(*ngIf="issue.modal > 0")
+    wiz-portal-works-project-issueboard-issue([issue]="issue")

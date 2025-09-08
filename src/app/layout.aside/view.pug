@@ -1,11 +1,9 @@
-.wiz-page
+.flex.flex-row.relative.w-full.h-screen.overflow-hidden(class="max-sm:flex-col")
     wiz-component-nav-aside
-
-    .wiz-content
-        .wiz-view
-            router-outlet
+    .flex-1.h-full.overflow-auto(class="bg-[#f6f7fb]")
+        router-outlet
 
 wiz-portal-season-alert
-.loading-zone(*ngIf="service.auth.status === null || service.loading.isshow")
-    .loading-zone-container
+.fixed.inset-0(*ngIf="service.auth.status === null || service.loading.isshow", class="z-[999999]")
+    .h-full.flex.items-center.justify-center
         wiz-portal-season-loading-season([height]="48")

@@ -1,0 +1,59 @@
+.border-b.border-gray-300.text-white
+    .flex.py-3.px-4.text-left.bg-blue-500
+        img.bg-gray-50.rounded-lg.bg-contain.bg-center.bg-cover.bg-no-repeat.size-8.mr-1(style="background-image: url({{wikibook.data().icon}})", (click)="updateIcon()")
+        .flex.flex-auto.items-center.flex-1.text-lg.ff-b.break-all.whitespace-break-spaces.pl-2(*ngIf="wikibook.data().title", [routerLink]="wikibook.uistat.contentLink('home')") {{wikibook.data().title}}
+        .flex.items-center.justify-center.ml-auto.cursor-pointer(*ngIf="wikibook.accessLevel(['admin'])")
+            a.mr-3([routerLink]="'/wikidownload/' + wikibook.data().id", target="_blank")
+                i.fa-solid.fa-download(class="hover:scale-110")
+            i.fa-solid.fa-gear(class="hover:scale-110", [routerLink]="wikibook.uistat.contentLink('setting')")
+    
+    .flex.bg-slate-50.divide-x.text-sm(*ngIf="wikibook.accessLevel(['admin', 'user'])")
+        button.flex-1.text-blue-500.py-1(class="hover:bg-blue-400 hover:text-white", (click)="newContent()")
+            span 문서생성
+            i.fa-solid.fa-plus.ml-3
+
+        button.flex-1.text-blue-500.py-1(class="hover:bg-blue-400 hover:text-white", (click)="create(treeConfig.rootNode())")
+            span 그룹생성
+            i.fa-solid.fa-folder-plus.ml-3
+
+.flex-auto.overflow-y-auto.overflow-x-hidden.text-lg
+    .container.p-3
+        ng-container(*ngIf="treeConfig.rootNode && treeConfig.rootNode().newItem")
+            .flex.w-full.py-1.cursor-pointer(class="hover:text-blue-500 hover:bg-blue-50")
+                i.flex.items-center.justify-center.w-5.fa-regular.fa-folder.mr-2
+                .flex-auto.overflow-hidden.whitespace-nowrap
+                    input.text-xs.rounded-sm.w-full.py-0.px-1.shadow-0([(ngModel)]="treeConfig.rootNode().newItem.title", placeholder="폴더명", (keyup.enter)="createNode(treeConfig.rootNode())")
+                i.flex.items-center.justify-center.ml-1.text-blue-500.fa-solid.fa-xmark(class="hover:scale-125", (click)="cancelCreate(treeConfig.rootNode()); $event.stopPropagation();")
+                i.flex.items-center.justify-center.ml-1.text-blue-500.fa-solid.fa-check(class="hover:scale-125", (click)="createNode(treeConfig.rootNode()); $event.stopPropagation();")
+
+        wiz-portal-season-viewer-tree([config]="treeConfig")
+            ng-template('#fileTemplate'='', let-data='')
+                .flex.w-full.py-1.cursor-pointer(class="hover:text-blue-500 hover:bg-blue-50 group {{data.isActive()?'text-blue-500 bg-blue-50':''}}", (click)="data.select()")
+                    ng-container(*ngIf="data.id == wikibook.data().home")
+                        ng-container(*ngIf="data.type == 'folder'")
+                            i.flex.items-center.justify-center.w-5.mr-1([ngClass]="data.isOpen() ? 'fa-solid fa-home' : 'fa-solid fa-home'", (click)="data.toggle(); $event.stopPropagation(); service.render();")
+                        ng-container(*ngIf="data.type != 'folder'")
+                            i.flex.items-center.justify-center.w-5.mr-1.fa-solid.fa-home
+
+                    ng-container(*ngIf="data.id != wikibook.data().home")
+                        ng-container(*ngIf="data.type == 'folder'")
+                            i.flex.items-center.justify-center.w-5.ti.mr-1([ngClass]="data.isOpen() ? 'ti-arrow-badge-down-filled' : 'ti-arrow-badge-right-filled'", (click)="data.toggle(); $event.stopPropagation(); service.render();")
+                        ng-container(*ngIf="data.type != 'folder'")
+                            i.flex.items-center.justify-center.w-5.mr-1.ti.ti-arrow-badge-right
+
+                    .flex-auto.overflow-hidden.whitespace-nowrap
+                        span(*ngIf="!data.editable") {{data.title}}
+                        input.text-xs.rounded-sm.w-full.py-0.px-1.shadow-0([(ngModel)]="data.rename", placeholder="폴더명", (keyup.enter)="data.update();", *ngIf="data.editable", (click)="$event.stopPropagation();")
+
+                    ng-container(*ngIf="data.type == 'folder'")
+                        i.flex.items-center.justify-center.w-5.text-gray-300.hidden.fa-solid.fa-folder-plus(class="hover:!text-blue-500 group-hover:!flex", (click)="create(data); $event.stopPropagation();")
+                        i.flex.items-center.justify-center.w-5.text-gray-300.hidden.fa-solid.fa-plus(class="hover:!text-blue-500 group-hover:!flex", (click)="createDoc(data); $event.stopPropagation();")
+
+                ng-container(*ngIf="data.newItem")
+                    .pl-4
+                        .flex.w-full.py-1.cursor-pointer(class="hover:text-blue-500 hover:bg-blue-50")
+                            i.flex.items-center.justify-center.w-5.fa-regular.fa-folder.mr-2
+                            .flex-auto.overflow-hidden.whitespace-nowrap
+                                input.text-xs.rounded-sm.w-full.py-0.px-1.shadow-0([(ngModel)]="data.newItem.title", placeholder="폴더명", (keyup.enter)="createNode(data)")
+                            i.flex.items-center.justify-center.ml-1.text-blue-500.fa-solid.fa-xmark(class="hover:scale-125", (click)="cancelCreate(data); $event.stopPropagation();")
+                            i.flex.items-center.justify-center.ml-1.text-blue-500.fa-solid.fa-check(class="hover:scale-125", (click)="createNode(data); $event.stopPropagation();")

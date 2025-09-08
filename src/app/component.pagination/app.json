@@ -1,0 +1,10 @@
+{
+    "mode": "component",
+    "id": "component.pagination",
+    "title": "pagination",
+    "namespace": "component.pagination",
+    "viewuri": "",
+    "category": "",
+    "controller": "base",
+    "template": "wiz-component-pagination([current]=\"\", [start]=\"\", [end]=\"\", [maxlength]=\"\", [buttonClass]=\"\", (pageMove)=\"\")"
+}

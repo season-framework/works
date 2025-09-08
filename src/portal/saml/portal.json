@@ -1,0 +1,11 @@
+{
+    "package": "saml",
+    "title": "SAML SP",
+    "version": "1.1.0",
+    "use_route": true,
+    "use_controller": true,
+    "use_model": true,
+    "description": "SEASON SW 개발센터장 권태욱 개발",
+    "use_app": true,
+    "use_libs": true
+}

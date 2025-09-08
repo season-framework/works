@@ -1,0 +1,11 @@
+{
+    "mode": "page",
+    "id": "page.authenticate",
+    "title": "/authenticate",
+    "namespace": "authenticate",
+    "viewuri": "/authenticate",
+    "category": "",
+    "controller": "base",
+    "layout": "layout.empty",
+    "template": "wiz-page-authenticate()"
+}

@@ -1,8 +1,7 @@
-.wiz-page
-    .wiz-content
-        .wiz-view
-            router-outlet
+.flex.flex-row.relative.w-screen.h-screen.overflow-hidden
+    router-outlet
 
 wiz-portal-season-alert
-.block-page(*ngIf="service.auth.status === null || service.loading.isshow")
-    wiz-portal-season-loading-season([height]="48")
+.fixed.inset-0(*ngIf="service.auth.status === null || service.loading.isshow", class="z-[999999]")
+    .h-full.flex.items-center.justify-center
+        wiz-portal-season-loading-season([height]="48")

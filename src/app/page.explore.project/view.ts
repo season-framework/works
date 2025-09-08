@@ -31,7 +31,7 @@ export class Component implements OnInit {
         this.project.prev = null;
         await this.service.init();
         await this.service.auth.init();
-        await this.service.auth.allow();
+        await this.service.auth.allow(true, "/authenticate");
         await this.project.revert();
         await this.service.render();
 

@@ -1,0 +1,6 @@
+@media (max-width: 768px) {
+    table>tbody>tr * {
+        word-wrap: break-word;
+        white-space: break-spaces;
+    }
+}

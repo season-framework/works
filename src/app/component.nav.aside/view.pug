@@ -1,71 +1,54 @@
-aside.navbar.navbar-vertical.navbar-expand-lg
-    .container-fluid
-        button.navbar-toggler(type="button", (click)="service.navbar.toggle(); $event.stopPropagation();")
-            span.navbar-toggler-icon
+div(class="flex flex-col max-sm:flex-row max-sm:flex-wrap h-screen max-sm:h-auto max-sm:w-full overflow-y-auto max-sm:overflow-y-hidden bg-white pt-4 max-sm:py-1 w-[288px] border-r max-sm:border-b border-gray-300")
+    button(type="button", class="hidden max-sm:block ml-3 mr-4", (click)="service.navbar.toggle(); $event.stopPropagation();")
+        i.ti.ti-menu-2.text-3xl
 
-        h1.navbar-brand.navbar-brand-autodark.ml-2.mr-2
-            a(routerLink="/")
-                img.navbar-brand-image(src='/assets/portal/season/brand/logo-black.svg')
-        
-        .ml-auto
+    a(routerLink="/", class="flex shrink-0 items-center cursor-pointer")
+        img(class="w-44 mx-auto", src="/assets/portal/season/brand/logo-black.svg", alt="Season WORKS")
 
-        .navbar-collapse.collapse([ngbCollapse]="service.navbar.isMenuCollapsed")
-            ul.navbar-nav.pt-lg-3
-                li.nav-item([class.active]="isActive('/issues')", *ngIf="service.auth.show(true)")
-                    a.nav-link(routerLink="/issues", routerLinkActive="active")
-                        span.nav-link-icon.d-md-none.d-lg-inline-block
-                            i.ti.ti-brand-wechat
-                        span.nav-link-title 이슈모음
-                
-                li.nav-item([class.active]="isActive('/explore/project')")
-                    a.nav-link(routerLink="/explore/project", routerLinkActive="active")
-                        span.nav-link-icon.d-md-none.d-lg-inline-block
-                            i.ti.ti-brand-asana
-                        span.nav-link-title 프로젝트 탐색
-                
-                li.nav-item([class.active]="isActive('/explore/wiki')")
-                    a.nav-link(routerLink="/explore/wiki", routerLinkActive="active")
-                        span.nav-link-icon.d-md-none.d-lg-inline-block
-                            i.ti.ti-book-2
-                        span.nav-link-title 위키 탐색
-                
-                li.nav-item.dropdown.active(*ngIf="project.status() && project.isLoaded")
-                    a.nav-link.dropdown-toggle
-                        span.nav-link-icon.d-md-none.d-lg-inline-block.cursor-pointer((click)="project.untrack(!project.data().userconfig_untrack)")
-                            i.fa-regular.fa-star(*ngIf="project.data().userconfig_untrack")
-                            i.fa-solid.fa-star(*ngIf="!project.data().userconfig_untrack")
+    nav.flex.flex-col.text-sm.mt-5.border-t.border-gray-300(*ngIf="service.auth.show(true)", [ngbCollapse]="service.navbar.isMenuCollapsed", class="transition-all duration-300 max-sm:h-0 max-sm:!basis-full max-sm:mt-0 max-sm:border-t-0")
+        .p-3
+            span.text-gray-500 {{service.auth.session.name}}({{service.auth.session.email}})
+            span 님, 환영합니다.
+            // 새로운 이슈 ~~건, 알림 ~~, 바로가기 등등
+        .flex.bg-gray-100.border-y.border-gray-300.h-9
+            button.flex-1.text-center.lh-9(routerLink="/mypage", routerLinkActive="text-bold text-blue-600 !bg-blue-50 !hover:bg-blue-50", class="hover:bg-gray-200")
+                i.ti.ti-user-shield
+                span.ml-1 마이페이지
+            button.flex-1.text-center.border-l.border-gray-300((click)="logout()", class="hover:bg-gray-200")
+                i.ti.ti-logout
+                span.ml-1 로그아웃
+            button.w-9(*ngIf="service.auth.session.membership === 'admin'", class="hover:bg-gray-200 border-l border-gray-300", routerLink="/admin", routerLinkActive="!bg-blue-50 !hover:bg-blue-50")
+                i.ti.ti-settings.text-gray-500.text-xl
 
-                        span.nav-link-title {{project.data().title}}
-                    .dropdown-menu.show
-                        .dropdown-menu-columns
-                            .dropdown-menu-column
-                                a.dropdown-item([routerLink]="project.menuLink('info')", routerLinkActive="active") 프로젝트 정보
-                                a.dropdown-item([routerLink]="project.menuLink('member')", routerLinkActive="active") 구성원
-                                a.dropdown-item([routerLink]="project.menuLink('plan')", routerLinkActive="active", *ngIf="project.data().extra.menu.plan") 작업계획
-                                a.dropdown-item([routerLink]="project.menuLink('meeting')", routerLinkActive="active", *ngIf="project.data().extra.menu.meeting") 회의록
-                                a.dropdown-item([routerLink]="project.menuLink('issueboard')", routerLinkActive="active", *ngIf="project.data().extra.menu.issueboard") 이슈보드
-                                a.dropdown-item([routerLink]="project.menuLink('wiki')", routerLinkActive="active", *ngIf="project.data().extra.menu.wiki") 위키
-                                a.dropdown-item([routerLink]="project.menuLink('drive')", routerLinkActive="active", *ngIf="project.data().extra.menu.drive") 드라이브
-            
-                li.nav-item.d-mobile([class.active]="isActive('/mypage')")
-                    a.nav-link(routerLink="/mypage", routerLinkActive="active")
-                        span.nav-link-icon.d-md-none.d-lg-inline-block
-                            i.ti.ti-user-shield
-                        span.nav-link-title 마이페이지
-                
-                li.nav-item.d-mobile
-                    a.nav-link(href="/auth/logout")
-                        span.nav-link-icon.d-md-none.d-lg-inline-block
-                            i.ti.ti-logout
-                        span.nav-link-title 로그아웃
 
-        .nav-footer(*ngIf="service.auth.show(false)")
-            a.login(href="/auth/login") 로그인
+    nav([ngbCollapse]="service.navbar.isMenuCollapsed", class="flex grow flex-col mt-2 max-sm:mt-0 max-sm:h-0 transition-all duration-300 max-sm:!basis-full")
+        ul(role="list", class="flex flex-1 flex-col gap-y-7")
+            li
+                ul.text-gray-400(role="list", class="")
+                    li
+                        a(*ngIf="service.auth.show(true)", routerLink="/issues", class="flex gap-x-3 p-2 mt-1 hover:bg-blue-50 text-sm/6 font-semibold", routerLinkActive="text-blue-600 ff-b bg-blue-50 border-l-[5px] border-blue-500")
+                            i.ti.ti-brand-wechat.place-content-center
+                            | 이슈모음
+                    li
+                        a(routerLink="/explore/project", class="flex gap-x-3 p-2 hover:bg-blue-50 text-sm/6 font-semibold", routerLinkActive="text-blue-600 ff-b bg-blue-50 border-l-4 border-blue-500")
+                            i.ti.ti-brand-asana.place-content-center
+                            | 프로젝트 탐색
+                    li
+                        a(routerLink="/explore/wiki", class="flex gap-x-3 p-2 hover:bg-blue-50 text-sm/6 font-semibold", routerLinkActive="text-blue-600 ff-b bg-blue-50 border-l-4 border-blue-500")
+                            i.ti.ti-book-2.place-content-center
+                            | 위키 탐색
+                    li.border-l-4.border-blue-500(*ngIf="project.status() && project.isLoaded")
+                        .text-blue-600.ff-b(class="flex gap-x-3 p-2 text-sm/6 font-semibold")
+                            span.cursor-pointer.transition-all(class="hover:scale-125", (click)="project.untrack(!project.data().userconfig_untrack)")
+                                i.fa-regular.fa-star(*ngIf="project.data().userconfig_untrack")
+                                i.fa-solid.fa-star(*ngIf="!project.data().userconfig_untrack")
 
-        .nav-footer.d-flex.v-login(*ngIf="service.auth.show(true)")
-            a(routerLink="/mypage", routerLinkActive="active")
-                i.ti.ti-user-shield.mr-1
-                span 마이페이지
-            a(href="/auth/logout")
-                i.ti.ti-logout.mr-1
-                span 로그아웃
+                            span {{project.data().title}}
+                        div
+                            a.pl-7([routerLink]="project.menuLink('info')", routerLinkActive="text-blue-600 ff-b bg-blue-50", class="flex gap-x-3 p-2 hover:bg-blue-50 text-sm/6 font-semibold") 프로젝트 정보
+                            a.pl-7([routerLink]="project.menuLink('member')", routerLinkActive="text-blue-600 ff-b bg-blue-50", class="flex gap-x-3 p-2 hover:bg-blue-50 text-sm/6 font-semibold") 구성원
+                            a.pl-7([routerLink]="project.menuLink('meeting')", routerLinkActive="text-blue-600 ff-b bg-blue-50", class="flex gap-x-3 p-2 hover:bg-blue-50 text-sm/6 font-semibold", *ngIf="project.data().extra.menu.meeting") 회의록
+                            a.pl-7([routerLink]="project.menuLink('issueboard')", routerLinkActive="text-blue-600 ff-b bg-blue-50", class="flex gap-x-3 p-2 hover:bg-blue-50 text-sm/6 font-semibold", *ngIf="project.data().extra.menu.issueboard") 이슈보드
+                            a.pl-7([routerLink]="project.menuLink('wiki')", routerLinkActive="text-blue-600 ff-b bg-blue-50", class="flex gap-x-3 p-2 hover:bg-blue-50 text-sm/6 font-semibold", *ngIf="project.data().extra.menu.wiki") 위키
+                            a.pl-7([routerLink]="project.menuLink('drive')", routerLinkActive="text-blue-600 ff-b bg-blue-50", class="flex gap-x-3 p-2 hover:bg-blue-50 text-sm/6 font-semibold", *ngIf="project.data().extra.menu.drive") 드라이브
+

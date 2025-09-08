@@ -1,0 +1,180 @@
+.drive-container.relative.flex.flex-col.w-full.h-full.max-w-full.overflow-hidden.bg-white
+    ng-container(*ngIf="project.drive.status")
+        .fixed.bottom-6.right-6.w-full.max-w-64.bg-white.py-3.px-4.rounded-lg.border.border-slate-300.bg-slate-100.text-slate-600
+            h4 파일 업로드 ({{project.drive.queue.length}}개 파일)
+            .text-gray-600 {{project.drive.current}}
+            .w-full(class="h-0.5")
+                .h-full.bg-blue-500(style="width: {{project.drive.percent}}%;")
+    
+    .bg-slate-50.border-b.border-gray-300
+        .flex.py-3.px-4.text-left
+            .flex.items-center.ff-eb.text-blue-500.pl-2 드라이브
+            .ml-auto
+            ng-container(*ngIf="accessLevel()")
+                button.h-8.rounded-full.text-white.px-4.bg-red-500.ml-2(class="hover:bg-red-600", (click)="deleteSelected()", *ngIf="selected.length > 0")
+                    i.fa-solid.fa-trash-can
+                button.h-8.rounded-full.text-white.px-4.bg-blue-500.ml-2(class="hover:bg-blue-600", (click)="upload(current)")
+                    i.fa-solid.fa-arrow-up-from-bracket
+                button.h-8.rounded-full.text-white.px-4.bg-blue-500.ml-2(class="hover:bg-blue-600", (click)="create(current, false)")
+                    i.fa-solid.fa-folder-plus
+
+    .relative.flex.flex-auto.overflow-hidden.h-full
+        .flex.flex-col.w-80.min-w-80.border-r.border-gray-300.h-full.overflow-auto.bg-gray-100(class="max-sm:hidden")
+            .py-2.px-3.cursor-pointer(class="max-sm:hidden", [class.text-blue-500]="tab == 'files'", (click)="tabChange('files')") 파일
+
+            .bg-white.overflow-y-auto.overflow-x-hidden(
+                (drop)="treeConfig.rootNode().drop($event)",
+                (dragend)="treeConfig.rootNode().dragend($event)", 
+                (dragover)="treeConfig.rootNode().dragover($event)",
+            )
+                .p-3
+                    wiz-portal-season-viewer-tree([config]="treeConfig")
+                        ng-template('#fileTemplate'='', let-data='')
+                            div(
+                                *ngIf="data.type != 'file'",
+                                class="flex cursor-pointer hover:text-blue-500 hover:bg-blue-50 group",
+                                [ngClass]="data.isActive()?'text-blue-500 bg-blue-50':''",
+                                (click)="data.select(); $event.stopPropagation();",
+                                (dblclick)="open(data); $event.stopPropagation();",
+                            )
+                                ng-container(*ngIf="data.type == 'file'")
+                                    i.flex.items-center.justify-center.w-5.text-gray-300.w-5.text-center.mr-1(class="hover:!text-blue-500", [ngClass]="icon(data)")
+                                ng-container(*ngIf="data.type == 'folder'")
+                                    i.flex.items-center.justify-center.w-5.text-gray-300.w-5.text-center.mr-1(class="hover:!text-blue-500", [ngClass]="icon(data)", (click)="data.editable = !data.editable; $event.stopPropagation(); service.render()")
+
+                                .flex-auto.overflow-hidden.whitespace-nowrap
+                                    span(*ngIf="!data.editable") {{data.title}}
+                                    input.text-xs.rounded-sm.w-full.py-0.px-1.shadow-0([(ngModel)]="data.rename", placeholder="폴더명", (keyup.enter)="data.update();", *ngIf="data.editable", (click)="$event.stopPropagation();")
+                                
+                                ng-container(*ngIf="data.type == 'folder'")
+                                    i.flex.items-center.justify-center.w-5.text-gray-300.hidden.fa-solid.fa-folder-plus(class="hover:!text-blue-500 group-hover:!flex", (click)="create(data); $event.stopPropagation();")
+                                    i.flex.items-center.justify-center.w-5.text-gray-300.hidden.fa-solid.fa-arrow-up-from-bracket(class="hover:!text-blue-500 group-hover:!flex", (click)="upload(data); $event.stopPropagation();")
+                                i.flex.items-center.justify-center.w-5.text-gray-300.hidden.fa-solid.fa-trash-can(class="hover:!text-blue-500 group-hover:!flex", (click)="delete(data); $event.stopPropagation();")
+                                i.flex.items-center.justify-center.w-5.text-gray-300.hidden.fa-solid.fa-download(class="hover:!text-blue-500 group-hover:!flex", (click)="download(data); $event.stopPropagation();")
+
+                            ng-container(*ngIf="data.newItem")
+                                .pl-4
+                                    div(class="flex cursor-pointer hover:text-blue-500 hover:bg-blue-50")
+                                        i.flex.items-center.justify-center.w-5.text-gray-300.w-5.text-center.fa-regular.fa-folder.text-sky-400.mr-2(class="hover:!text-blue-500")
+                                        .flex-auto.overflow-hidden.whitespace-nowrap
+                                            input.text-xs.rounded-sm.w-full.py-0.px-1.shadow-0([(ngModel)]="data.newItem.title", placeholder="폴더명", (keyup.enter)="createFolder(data)")
+                                        i.flex.items-center.justify-center.w-5.text-blue-500.fa-solid.fa-xmark(class="ml-[6px] hover:scale-125", (click)="cancelCreate(data); $event.stopPropagation();")
+                                        i.flex.items-center.justify-center.w-5.text-blue-500.fa-solid.fa-check(class="ml-[6px] hover:scale-125", (click)="createFolder(data); $event.stopPropagation();")
+
+            .py-2.px-3.cursor-pointer(class="max-sm:hidden", [class.text-blue-500]="tab == 'attachment'", (click)="tabChange('attachment')") 이슈파일
+            .py-2.px-3.cursor-pointer(class="max-sm:hidden", [class.text-blue-500]="tab == 'photo'", (click)="tabChange('photo')") 사진
+
+        ng-container(*ngIf="current && tab =='files'")
+            .flex-auto.h-full.overflow-auto(
+                (drop)="current.drop($event)",
+                (dragend)="preventEvent($event)", 
+                (dragover)="preventEvent($event)",
+            )
+                table.w-full
+                    thead.sticky.top-0.z-50.bg-slate-50.text-xs
+                        tr(class="*:py-1 *:px-3")
+                            th.w-14.text-nowrap.text-center(*ngIf="accessLevel()", class="!pl-5 !pr-0")
+                                span.text-sm.border.rounded-md.px-2.cursor-pointer(
+                                    [ngClass]="selected.length == current.getChildren().length ? 'bg-blue-500 text-white' : 'border-gray-300 text-gray-300'",
+                                    (click)="selectAll()",
+                                )
+                                    i.fa-solid.fa-check
+                            th.text-left 이름
+                            th.w-1.text-nowrap.text-right 크기
+                            th.w-1.text-nowrap.text-right 수정된 날짜
+                            th.w-20(*ngIf="accessLevel()")
+                    tbody.text-sm.divide-y.border-y(class="hover:*:bg-slate-200")
+                        tr.cursor-pointer(*ngIf="current.id", class="*:px-3 *.py-2")
+                            td(*ngIf="accessLevel()")
+                            td.p-3(colspan=4, (click)="open(current.parent()); $event.stopPropagation();")
+                                .flex.items-center(class="max-w-[480px]")
+                                    i.mr-2.fa-solid.fa-folder.text-xl.text-sky-400
+                                    span ..
+                        
+                        tr(*ngIf="newFolder.type", class="*:p-3")
+                            td(*ngIf="accessLevel()")
+                            td(colspan=5)
+                                .flex.items-center
+                                    i.mr-2.fa-solid.fa-folder-plus.text-xl.text-sky-400
+                                    input.w-full.shadow-0.border.border-gray-300.py-1.text-sm(class="max-w-[480px]", placeholder="새로운 폴더", [(ngModel)]="newFolder.title", (keyup.enter)="createFolder(current, false)", (keyup.esc)="cancelCreate(current, false)")
+                                    span.cursor-pointer.px-2.py-1.rounded-lg.text-red-500.ml-1(class="hover:bg-red-500 hover:text-white", (click)="cancelCreate(current, false)")
+                                        i.fa-solid.fa-xmark
+                                    span.cursor-pointer.px-2.py-1.rounded-lg.text-black.ml-1(class="hover:bg-gray-600 hover:text-white", (click)="createFolder(current, false)")
+                                        i.fa-solid.fa-check
+
+                        ng-container(*ngFor="let file of current.getChildren()")
+                            tr(
+                                draggable="true",
+                                class="*:p-3",
+                                [class.bg-blue-lt]="isSelected(file)", 
+                                [class.bg-secondary-lt]="isDrop(file)",
+                                (dragend)="dragend($event, file)", 
+                                (dragover)="dragover($event, file)",
+                                (click)="select(file); $event.stopPropagation();", 
+                                (dblclick)="open(file); $event.stopPropagation();",
+                            )
+                                td.text-center(*ngIf="accessLevel()", class="!pl-5 !pr-0")
+                                    span.text-sm.rounded-md.px-2.cursor-pointer.border.border-gray-300.text-gray-300(
+                                        [ngClass]="isSelected(file) ? '!bg-blue-500 !text-white' : ''",
+                                        (click)="select(file); $event.stopPropagation();",
+                                    )
+                                        i.fa-solid.fa-check
+                                td
+                                    .flex.items-center(class="max-w-[480px]")
+                                        i.mr-2.text-xl([ngClass]="icon(file, false)")
+                                        span.underline-offset-4.cursor-pointer(*ngIf="!file.editable", (click)="open(file); $event.stopPropagation();", class="!text-gray-700 hover:underline") {{file.title}}
+                                        input.w-full.shadow-0.border.border-gray-300.py-1([(ngModel)]="file.rename", placeholder="폴더명", (keyup.enter)="file.update();", (keyup.esc)="file.editable=!file.editable;service.render();", *ngIf="file.editable", (click)="$event.stopPropagation();")
+                                td.text-gray-500.text-right.text-nowrap {{file.size}}
+                                td.text-gray-500.text-nowrap {{file.modified}}
+                                td.w-20(*ngIf="accessLevel()", class="!pl-0 !pr-3")
+                                    ng-container(*ngIf="!file.editable")
+                                        span.cursor-pointer.px-2.py-1.rounded-lg.text-black.mr-1(class="hover:bg-gray-600 hover:text-white", (click)="rename(file); $event.stopPropagation();")
+                                            i.fa-solid.fa-i-cursor
+                                    span.cursor-pointer.px-2.py-1.rounded-lg.text-red-500(class="hover:bg-red-500 hover:text-white", (click)="delete(file); $event.stopPropagation();")
+                                        i.fa-solid.fa-trash
+
+                        tr(*ngIf="!newFolder.type && current.getChildren().length == 0", class="*:p-3")
+                            td(colspan=5)
+                                .flex.flex-col.items-center.w-full.h-full.top-0
+                                    img.h-32.w-auto.mt-3(src="/assets/portal/works/work.svg")
+                                    p.mt-8.text-xl 업로드된 파일이 없습니다
+        
+        ng-container(*ngIf="tab =='attachment'")
+            .flex.flex-col.flex-auto.overflow-hidden
+                .flex-auto.overflow-auto
+                    table.w-full
+                        thead.sticky.top-0.z-50.bg-slate-50.text-xs
+                            tr(class="*:p-3")
+                                th.pl-5.text-left 이름
+                                th.w-1.pr-5.text-right.text-nowrap 생성된 날짜
+                        tbody.text-sm.divide-y
+                            tr(*ngFor="let file of attachment.list", class="hover:bg-slate-200 *:p-3")
+                                td.pl-5
+                                    div
+                                        i.mr-2([ngClass]="icon(file, false)")
+                                        a.underline-offset-4([href]="imageUrl(file, false)", target="_blank", class="!text-gray-700 hover:underline") {{file.filename}}
+                                td.pr-5.text-gray-500.text-nowrap {{file.created}}
+                
+                .py-3.border-t.border-gray-300
+                    wiz-component-pagination(
+                        [current]="attachment.page", 
+                        [start]="attachment.start", 
+                        [end]="attachment.end", 
+                        (pageMove)="loadAttachment($event)")
+        
+        ng-container(*ngIf="tab =='photo'")
+            .flex.flex-col.overflow-hidden.py-2.w-full
+                .overflow-auto.flex.flex-auto.flex-wrap.p-2
+                    .p-2(*ngFor="let photo of attachment.list", class="w-1/3")
+                        .border.rounded-md.overflow-hidden.cursor-pointer.relative
+                            .bg-no-repeat.bg-center.bg-cover.bg-gray-100.rounded-3(class="pt-[100%]", [style.background-image]="imageUrl(photo)")
+                            .opacity-0.absolute.z-10.inset-0.flex.items-center.justify-center(class="hover:!opacity-100 bg-black/[.6]")
+                                a.py-1.px-4.rounded-sm.bg-white.text-black([href]="imageUrl(photo, false)", target="_blank")
+                                    i.fa-solid.fa-download
+
+                .pb-1.pt-3.border-t.border-gray-300
+                    wiz-component-pagination(
+                        [current]="attachment.page", 
+                        [start]="attachment.start", 
+                        [end]="attachment.end", 
+                        (pageMove)="loadAttachment($event)")

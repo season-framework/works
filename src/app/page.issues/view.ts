@@ -55,14 +55,14 @@ export class Component implements OnInit {
 
     public displayColor(issue: any) {
         if (!issue) return '';
-        if (issue.status == 'close' || issue.status == 'cancel') return 'bg-secondary-lt';
-        if (issue.status == 'finish') return 'bg-teal-lt';
+        if (issue.status == 'close' || issue.status == 'cancel') return '!bg-gray-100 !text-gray-600 ';
+        if (issue.status == 'finish') return '!bg-emerald-50 !text-green-600 ';
         if (issue.planend) {
             try {
                 let endtime = new Date(issue.planend).getTime();
                 let now = new Date().getTime();
                 if (now - endtime > 1000 * 60 * 60 * 24)
-                    return 'bg-red-lt';
+                    return '!bg-red-100 !text-red-600 ';
             } catch (e) {
             }
         }
@@ -81,12 +81,13 @@ export class Component implements OnInit {
     }
 
     public displayStatus(status: any) {
-        if (status == 'noti') return { text: "공지/알림", cls: 'bg-secondary-lt' };
-        if (status == 'open') return { text: "대기", cls: 'bg-secondary-lt' };
-        if (status == 'work') return { text: "진행", cls: 'bg-lime-lt' };
-        if (status == 'close') return { text: "종료", cls: 'bg-red-lt' };
-        if (status == 'cancel') return { text: "취소", cls: 'bg-red-lt' };
-        return { text: "완료", cls: 'bg-red-lt' };
+        if (status == 'noti') return { text: "공지/알림", cls: 'bg-slate-100 text-gray-500' };
+        if (status == 'open') return { text: "대기", cls: 'bg-slate-100 text-gray-500' };
+        if (status == 'work') return { text: "진행", cls: 'bg-lime-100 !text-lime-600' };
+        if (status == 'close') return { text: "종료", cls: 'bg-red-100 text-red-500' };
+        if (status == 'cancel') return { text: "취소", cls: 'bg-red-100 text-red-500' };
+        if (status == 'finish') return { text: "완료", cls: 'bg-red-100 text-red-500' };
+        return { text: "", cls: 'bg-slate-100 text-gray-500' };
     }
 
     public tab: string = 'list';
