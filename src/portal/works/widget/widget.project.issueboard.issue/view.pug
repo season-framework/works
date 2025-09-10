@@ -37,8 +37,8 @@
             ng-container(*ngIf="issue.todo.length > 0")
                 .divide-y.mt-1.text-sm
                     .py-2(*ngFor="let todo of issue.todo")
-                        i.ti.ti-check.text-muted.mr-2([class.text-green]="todo.checked", [class.text-muted]="!todo.checked")
-                        span([class.text-decoration-line-through]="todo.checked", [class.text-muted]="todo.checked") {{todo.title}}
+                        i.ti.ti-check.mr-2([ngClass]="todo.checked?'text-green-500':'text-gray-500'")
+                        span([ngClass]="todo.checked?'line-through text-gray-500':''") {{todo.title}}
 
         .text-right.p-1.border-t.border-gray-300(*ngIf="issue.worker.length > 0", [ngClass]="color()")
             ng-container(*ngFor="let worker_id of issue.worker")

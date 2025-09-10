@@ -62,6 +62,7 @@
                                         i.flex.items-center.justify-center.w-5.text-blue-500.fa-solid.fa-check(class="ml-[6px] hover:scale-125", (click)="createFolder(data); $event.stopPropagation();")
 
             .py-2.px-3.cursor-pointer(class="max-sm:hidden", [class.text-blue-500]="tab == 'attachment'", (click)="tabChange('attachment')") 이슈파일
+            .py-2.px-3.cursor-pointer(class="max-sm:hidden", [class.text-blue-500]="tab == 'meeting'", (click)="tabChange('meeting')") 회의록파일
             .py-2.px-3.cursor-pointer(class="max-sm:hidden", [class.text-blue-500]="tab == 'photo'", (click)="tabChange('photo')") 사진
 
         ng-container(*ngIf="current && tab =='files'")
@@ -152,8 +153,42 @@
                                 td.pl-5
                                     div
                                         i.mr-2([ngClass]="icon(file, false)")
+                                        span.mr-2.ff-b(*ngIf="file.issue_title") [{{file.issue_title}}]
                                         a.underline-offset-4([href]="imageUrl(file, false)", target="_blank", class="!text-gray-700 hover:underline") {{file.filename}}
                                 td.pr-5.text-gray-500.text-nowrap {{file.created}}
+                            tr(*ngIf="attachment.list.length === 0")
+                                td(colspan=2)
+                                    .flex.flex-col.items-center.w-full.h-full.top-0
+                                        img.h-32.w-auto.mt-3(src="/assets/portal/works/work.svg")
+                                        p.mt-8.text-xl 업로드된 파일이 없습니다
+                
+                .py-3.border-t.border-gray-300
+                    wiz-component-pagination(
+                        [current]="attachment.page", 
+                        [start]="attachment.start", 
+                        [end]="attachment.end", 
+                        (pageMove)="loadAttachment($event)")
+        
+        ng-container(*ngIf="tab =='meeting'")
+            .flex.flex-col.flex-auto.overflow-hidden
+                .flex-auto.overflow-auto
+                    table.w-full
+                        thead.sticky.top-0.z-50.bg-slate-50.text-xs
+                            tr(class="*:p-3")
+                                th.pl-5.text-left 이름
+                                th.w-1.pr-5.text-right.text-nowrap 생성된 날짜
+                        tbody.text-sm.divide-y
+                            tr(*ngFor="let file of attachment.list", class="hover:bg-slate-200 *:p-3")
+                                td.pl-5
+                                    div
+                                        i.mr-2([ngClass]="icon(file, false)")
+                                        a.underline-offset-4([href]="imageUrl(file, false)", target="_blank", class="!text-gray-700 hover:underline") {{file.filename}}
+                                td.pr-5.text-gray-500.text-nowrap {{file.created}}
+                            tr(*ngIf="attachment.list.length === 0")
+                                td(colspan=2)
+                                    .flex.flex-col.items-center.w-full.h-full.top-0
+                                        img.h-32.w-auto.mt-3(src="/assets/portal/works/work.svg")
+                                        p.mt-8.text-xl 업로드된 파일이 없습니다
                 
                 .py-3.border-t.border-gray-300
                     wiz-component-pagination(

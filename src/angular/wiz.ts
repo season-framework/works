@@ -61,7 +61,7 @@ export default class Wiz {
         if (this.namespace)
             socketns = socketns + "/" + this.namespace;
         return io(socketns);
-    };
+    }
 
     public url(function_name: string) {
         if (function_name[0] == "/") function_name = function_name.substring(1);

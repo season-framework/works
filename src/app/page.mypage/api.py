@@ -22,7 +22,7 @@ class Tool:
         params['onetimepass'] = onetimepass
         params['template'] = 'email_verify'
         smtp.send(**params)
-        
+
 tool = Tool()
 orm = wiz.model("portal/season/orm")
 db = orm.use("user")

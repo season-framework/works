@@ -249,6 +249,17 @@ if action.startswith("attachment/list"):
         rows = attachmentdb.rows(**where)
     except Exception as e:
         wiz.response.status(500)
+    if namespace == '.attachment':
+        cache = dict()
+        for row in rows:
+            try:
+                issue_id = row["namespace"].split(":")[1]
+                if issue_id not in cache:
+                    cache[issue_id] = project.issueboard.issue.get(issue_id)
+                row["issue_title"] = cache[issue_id]["title"]
+            except:
+                row["issue_title"] = None
+
     wiz.response.status(200, rows=rows, lastpage=math.ceil(total/dump), page=page)
 
 wiz.response.status(404)

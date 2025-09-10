@@ -42,6 +42,9 @@ export class Component implements OnInit, OnDestroy {
         } else if (tab == 'photo') {
             this.attachment.ns = '.image';
             await this.loadAttachment(1);
+        } else if (tab == 'meeting') {
+            this.attachment.ns = 'meeting';
+            await this.loadAttachment(1);
         }
 
         await this.service.render();

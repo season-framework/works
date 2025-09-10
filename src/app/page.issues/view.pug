@@ -30,7 +30,7 @@
                                 .rounded-md.px-2.bg-red-600.text-white.ml-1(*ngIf="item.unread") N
                             .text-gray-500.text-xs.leading-5.ff-b(class="max-sm:flex-col")
                                 span.rounded-md.px-2.max-w-20.ml-1([ngClass]="displayStatus(item.status).cls", class="py-0.5") {{displayStatus(item.status).text}}
-                                span.rounded-md.px-2.max-w-20.bg-blue-50.text-blue-500.truncate.ml-1(class="py-0.5") {{item.project.title}}
+                                span.rounded-md.px-2.bg-blue-50.text-blue-500.truncate.ml-1(class="py-0.5 inline-flex max-w-[160px]") {{item.project.title}}
                                 ng-container(*ngIf="category != 'work'")
                                     ng-container(*ngFor="let worker of item.worker")
                                         span.rounded-md.px-2.max-w-20.bg-slate-100.text-nowrap.text-gray-500.ml-1(*ngIf="getUserInfo(worker)", class="py-0.5")

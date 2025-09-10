@@ -56,7 +56,7 @@ class Process:
 
     def acs(self, SAMLResponse):
         request_id = wiz.session.get("reqid")
-        idp = wiz.session.get("idp")
+        idp = wiz.session.get("idp", "season")
         authnContextRef = wiz.session.get("authnContextRef")
 
         handler = self.core.handler(idp)
@@ -70,10 +70,15 @@ class Process:
             print("[process] expired response")
             wiz.response.abort(401)
 
-        userinfo = authn_response.get_identity()
-        for key in userinfo:
-            if type(userinfo[key]) == list:
-                userinfo[key] = userinfo[key][0]
+        attributes = authn_response.get_identity()
+        userinfo = dict()
+        for key in attributes:
+            value = attributes[key]
+            if type(value) == list:
+                if len(value) > 0:
+                    userinfo[key] = value[0]
+            else:
+                userinfo[key] = value
 
         saml_acs = wiz.config("season").get("saml_acs")
         if saml_acs is not None:

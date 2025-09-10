@@ -23,7 +23,7 @@ export class Component implements OnInit {
         await this.service.render();
 
         this.socket = wiz.app("portal.works.project.issueboard").socket();
-
+        
         this.socket.on("connect", async () => {
             await this.load(false);
         });

@@ -314,7 +314,6 @@ export class Component implements OnInit {
 
     public async refreshMessage(message_id: number) {
         let { code, data } = await this.api("message", { message_id: message_id });
-        console.log(data);
         if (data) {
             for (let i = 0; i < this.data.messages.length; i++) {
                 if (this.data.messages[i].id == data.id) {
