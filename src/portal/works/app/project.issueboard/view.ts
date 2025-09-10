@@ -288,7 +288,7 @@ export class Component implements OnInit, OnDestroy {
 
     public onProcessIssue(issue: any) {
         if (!issue) return true;
-        return ["open", "work", "finish", "noti"].includes(issue.status);
+        return ["open", "work", "finish", "noti", "event"].includes(issue.status);
     }
 
     public async loadIssue(issueId: any) {

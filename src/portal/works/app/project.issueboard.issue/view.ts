@@ -127,10 +127,10 @@ export class Component implements OnInit {
         this.issue.event.update = async () => {
             let { data } = await self.api('load');
             self.data.info = data;
-            if (self.data.info.planstart)
-                self.data.info.planstart = moment(self.data.info.planstart).format("YYYY-MM-DD");
-            if (self.data.info.planend)
-                self.data.info.planend = moment(self.data.info.planend).format("YYYY-MM-DD");
+            if (self.data.info.planstart == "Invalid date" || self.data.info.planstart == "0000-00-00 00:00:00") self.data.info.planstart = null;
+            if (self.data.info.planend == "Invalid date" || self.data.info.planend == "0000-00-00 00:00:00") self.data.info.planend = null;
+            if (self.data.info.planstart) self.data.info.planstart = moment(self.data.info.planstart).format("YYYY-MM-DD");
+            if (self.data.info.planend) self.data.info.planend = moment(self.data.info.planend).format("YYYY-MM-DD");
             self.data.info.level = self.data.info.level + '';
             self.data.info.process = self.data.info.process + '';
             self.editor.description.data.set(self.data.info.description);

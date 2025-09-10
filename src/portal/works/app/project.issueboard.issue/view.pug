@@ -106,6 +106,11 @@ div(*ngIf="cache.loaded", class="w-full h-full", [ngClass]="containerClass()")
                                             i.fas.fa-bell.mr-1
                                             span 공지/알림
                                     label.cursor-pointer
+                                        input.sr-only(type="radio", name="status", value='event', class="peer/status", [(ngModel)]="data.info.status", [disabled]="!isRole(['owner', 'manager'])")
+                                        span.border.border-gray-300.rounded-sm.transition-all.text-gray-500.p-1.mr-1(class="peer-checked/status:!text-blue-600 peer-checked/status:!border-blue-600 hover:!text-black")
+                                            i.fa-regular.fa-calendar-days.mr-1
+                                            span 일정
+                                    label.cursor-pointer
                                         input.sr-only(type="radio", name="status", value='open', class="peer/status", [(ngModel)]="data.info.status", [disabled]="!isRole(['owner', 'manager'])")
                                         span.border.border-gray-300.rounded-sm.transition-all.text-gray-500.p-1.mr-1(class="peer-checked/status:!text-blue-600 peer-checked/status:!border-blue-600 hover:!text-black")
                                             i.fas.fa-hourglass-start.mr-1

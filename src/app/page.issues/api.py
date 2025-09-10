@@ -14,6 +14,9 @@ def search():
     dump = 10
     fields = 'id,project_id,status,title,user_id,worker,updated,planend'
     untracks = projectModel.untracks()
+    closed = projectdb.rows(status='close', fields="id")
+    closed = [x['id'] for x in closed]
+    print(closed)
     
     def query(db, qs):
         if category == 'request':
@@ -23,8 +26,8 @@ def search():
         else:
             myproject = projectModel.workin(["admin", "manager", "user", "guest"])
             base = db.project_id.in_(myproject) & db.status.in_(['open', 'work', 'finish'])
-            if len(untracks) > 0:
-                base = base & db.project_id.not_in(untracks)
+        if len(untracks) > 0:
+            base = base & db.project_id.not_in(untracks)
         qs = qs.where(base)
         return qs
 
