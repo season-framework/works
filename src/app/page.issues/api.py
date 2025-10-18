@@ -16,7 +16,7 @@ def search():
     untracks = projectModel.untracks()
     closed = projectdb.rows(status='close', fields="id")
     closed = [x['id'] for x in closed]
-    print(closed)
+    untracks = untracks + closed
     
     def query(db, qs):
         if category == 'request':

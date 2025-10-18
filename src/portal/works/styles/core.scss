@@ -1,3 +1,11 @@
+.scroll-hide {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+}
+.scroll-hide::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera*/
+}
+
 .ck-editor-noborder {
     .ck-editor__editable_inline {
         padding: 16px 32px !important;

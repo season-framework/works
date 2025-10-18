@@ -1,4 +1,4 @@
-import { OnInit, Input } from '@angular/core';
+import { HostListener, OnInit, Input } from '@angular/core';
 import { Service } from '@wiz/libs/portal/season/service';
 import { Project } from '@wiz/libs/portal/works/project';
 
@@ -10,8 +10,18 @@ export class Component implements OnInit {
 
     @Input() issue: any;
 
+    public innerWidth: any;
+
     public async ngOnInit() {
         await this.service.init();
+        this.innerWidth = window.innerWidth;
+        await this.service.render();
+    }
+
+    @HostListener('window:resize', ['$event'])
+    public async onResize(event) {
+        this.innerWidth = window.innerWidth;
+        await this.service.render();
     }
 
     public color() {
@@ -29,4 +39,5 @@ export class Component implements OnInit {
         }
         return '';
     }
+
 }

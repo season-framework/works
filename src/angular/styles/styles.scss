@@ -112,3 +112,9 @@ button {
     --tw-bg-opacity: 1;
     background-color: rgb(209 213 219 / var(--tw-bg-opacity, 1));
 }
+
+wiz-portal-works-message-body pre {
+    overflow-x: auto;
+    color: white;
+    background-color: #222;
+}

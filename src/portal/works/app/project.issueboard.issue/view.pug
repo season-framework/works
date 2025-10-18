@@ -1,31 +1,32 @@
-div(*ngIf="cache.loaded", class="w-full h-full", [ngClass]="containerClass()")
-    .w-full.h-full.overflow-hidden([class.pt-7]="issue.modal")
-        .overflow-hidden([ngClass]="(issue.modal?'mx-auto rounded-xl bg-white max-w-screen-2xl w-5/4 h-[90vh]':'w-full h-full') + (issue.id == 'new'?' max-w-[840px]':'')", role='document', '#body'='')
+div(*ngIf="cache.loaded", class="w-full h-full overflow-hidden", [ngClass]="containerClass()")
+    .w-full.h-full.overflow-hidden(class="{{issue.modal ? 'lg:pt-7' : ''}}")
+        .overflow-hidden([ngClass]="(issue.modal ? 'mx-auto lg:rounded-xl bg-white max-w-screen-2xl w-5/4 h-full lg:h-[90vh]':'w-full h-full') + (issue.id == 'new'?' max-w-[840px]':'')", role='document', '#body'='')
             .w-full.h-full.overflow-hidden.flex.flex-col([class.modal-content]="issue.modal")
                 .flex.p-3.border-b.border-gray-300.h-14.shrink-0
-                    input.flex-1.border-0.shadow-0.outline-none.ff-b([(ngModel)]="data.info.title", placeholder="이슈 제목을 입력해주세요", [disabled]="!isRole(['owner', 'manager'])")
-                    button.ml-auto.mr-4.py-1.px-3.text-sm.flex.items-center.justify-center.rounded-md.bg-blue-500.text-white((click)="update()", class="hover:bg-blue-600", *ngIf="!readOnly && isRole(['owner', 'manager'])")
-                        span 저장하기
-                        wiz-component-spinner.ml-1(*ngIf="cache.isUpdate")
+                    input.border-0.shadow-0.outline-none.ff-b.w-full([(ngModel)]="data.info.title", placeholder="이슈 제목을 입력해주세요", [disabled]="!isRole(['owner', 'manager'])")
+                    .flex
+                        .mr-4.py-1.px-3.text-sm.flex.items-center.justify-center.rounded-md.bg-blue-500.text-white.text-nowrap((click)="update()", class="hover:bg-blue-600", *ngIf="!readOnly && isRole(['owner', 'manager'])")
+                            span 저장하기
+                            wiz-component-spinner.ml-1(*ngIf="cache.isUpdate")
 
-                    button.size-8.flex.items-center.justify-center.rounded-lg.mr-3.movable-btn((mousedown)="onStartMoving($event)", (mouseup)="onStopMoving($event)", *ngIf="isMovable")
-                        i.fa-solid.fa-up-down-left-right
+                        .size-8.flex.items-center.justify-center.rounded-lg.mr-3.movable-btn(class="hidden lg:flex", (mousedown)="onStartMoving($event)", (mouseup)="onStopMoving($event)", *ngIf="isMovable")
+                            i.fa-solid.fa-up-down-left-right
 
-                    button.size-8.flex.items-center.justify-center.rounded-lg(class="hover:bg-gray-100", (click)="hide()")
-                        i.fa-solid.fa-xmark
+                        .size-8.flex.items-center.justify-center.rounded-lg(class="hover:bg-gray-100", (click)="hide()")
+                            i.fa-solid.fa-xmark
                 
                 div(class="hidden max-sm:!flex border-b border-gray-300")
-                    a((click)="switchTab('info')", [ngClass]="cache.tab == 'info'?'bg-blue-50':''", class="flex-1 text-center")
+                    a((click)="switchTab('info')", [ngClass]="cache.tab == 'info'?'bg-blue-50':''", class="flex-1 text-center py-2")
                         span 작업정보
                         i.fa-brands.fa-readme.ml-3
                     
-                    a((click)="switchTab('message')", [ngClass]="cache.tab == 'message'?'bg-blue-50':''", class="flex-1 text-center")
+                    a((click)="switchTab('message')", [ngClass]="cache.tab == 'message'?'bg-blue-50':''", class="flex-1 text-center py-2")
                         span 메시지
                         i.fa-solid.fa-message.ml-3
 
                 .flex-1.flex.m-0.p-0.overflow-hidden
-                    .m-0.p-0(class="max-sm:hidden h-full border-r border-gray-300 flex flex-col overflow-hidden bg-white", [ngClass]="(issue.id == 'new'?'w-full flex-1':'w-7/12 max-sm:w-full') + (cache.tab == 'info'?' max-sm:!flex':'')")
-                        .p-4.h-full.overflow-y-auto.overflow-x-hidden.text-xs
+                    .m-0.p-0.overflow-hidden(class="max-sm:hidden h-full border-r border-gray-300 flex flex-col overflow-hidden bg-white", [ngClass]="(issue.id == 'new'?'w-full flex-1':'w-7/12 max-sm:w-full') + (cache.tab == 'info'?' max-sm:!flex':'')")
+                        .p-4.h-full.overflow-y-auto.overflow-x-hidden.text-xs(class="pb-[360px] lg:pb-4")
                             .flex.items-center(class="last:mb-0 max-sm:block")
                                 span.flex.items-center.justify-center.rounded-md.px-2.w-24.h-6.bg-slate-500.text-white.ff-b.mr-3 이슈제목
                                 .flex-1.flex.items-center.h-8
@@ -75,93 +76,93 @@ div(*ngIf="cache.loaded", class="w-full h-full", [ngClass]="containerClass()")
 
                             .flex.items-center(class="last:mb-0 max-sm:block")
                                 span.flex.items-center.justify-center.rounded-md.px-2.w-24.h-6.bg-slate-500.text-white.ff-b.mr-3 우선순위
-                                .flex-1.flex.items-center.h-8
+                                .flex-1.flex.items-center.h-8.overflow-x-scroll.scroll-hide
                                     label.cursor-pointer
                                         input.sr-only(type="radio", name="level", value=0, class="peer/level", [(ngModel)]="data.info.level", [disabled]="!isRole(['owner', 'manager'])")
-                                        span.border.border-gray-300.rounded-sm.transition-all.text-gray-500.p-1.mr-1(class="peer-checked/level:!text-blue-600 peer-checked/level:!border-blue-600 hover:!text-black")
+                                        span.border.border-gray-300.rounded-sm.transition-all.text-gray-500.p-1.mr-1.text-nowrap(class="peer-checked/level:!text-blue-600 peer-checked/level:!border-blue-600 hover:!text-black")
                                             i.fas.fa-dot-circle.mr-1
                                             span 낮음
                                     label.cursor-pointer
                                         input.sr-only(type="radio", name="level", value=1, class="peer/level", [(ngModel)]="data.info.level", [disabled]="!isRole(['owner', 'manager'])")
-                                        span.border.border-gray-300.rounded-sm.transition-all.text-gray-500.p-1.mr-1(class="peer-checked/level:!text-blue-600 peer-checked/level:!border-blue-600 hover:!text-black")
+                                        span.border.border-gray-300.rounded-sm.transition-all.text-gray-500.p-1.mr-1.text-nowrap(class="peer-checked/level:!text-blue-600 peer-checked/level:!border-blue-600 hover:!text-black")
                                             i.fas.fa-circle.mr-1
                                             span 중간
                                     label.cursor-pointer
                                         input.sr-only(type="radio", name="level", value=2, class="peer/level", [(ngModel)]="data.info.level", [disabled]="!isRole(['owner', 'manager'])")
-                                        span.border.border-gray-300.rounded-sm.transition-all.text-gray-500.p-1.mr-1(class="peer-checked/level:!text-blue-600 peer-checked/level:!border-blue-600 hover:!text-black")
+                                        span.border.border-gray-300.rounded-sm.transition-all.text-gray-500.p-1.mr-1.text-nowrap(class="peer-checked/level:!text-blue-600 peer-checked/level:!border-blue-600 hover:!text-black")
                                             i.fas.fa-exclamation-circle.mr-1
                                             span 중요
                                     label.cursor-pointer
                                         input.sr-only(type="radio", name="level", value=3, class="peer/level", [(ngModel)]="data.info.level", [disabled]="!isRole(['owner', 'manager'])")
-                                        span.border.border-gray-300.rounded-sm.transition-all.text-gray-500.p-1.mr-1(class="peer-checked/level:!text-blue-600 peer-checked/level:!border-blue-600 hover:!text-black")
+                                        span.border.border-gray-300.rounded-sm.transition-all.text-gray-500.p-1.mr-1.text-nowrap(class="peer-checked/level:!text-blue-600 peer-checked/level:!border-blue-600 hover:!text-black")
                                             i.fas.fa-bullhorn.mr-1
                                             span 긴급
 
                             .flex.items-center(class="last:mb-0 max-sm:block")
                                 span.flex.items-center.justify-center.rounded-md.px-2.w-24.h-6.bg-slate-500.text-white.ff-b.mr-3 진행상태
-                                .flex-1.flex.items-center.h-8
+                                .flex-1.flex.items-center.h-8.overflow-x-scroll.scroll-hide
                                     label.cursor-pointer
                                         input.sr-only(type="radio", name="status", value='noti', class="peer/status", [(ngModel)]="data.info.status", [disabled]="!isRole(['owner', 'manager'])")
-                                        span.border.border-gray-300.rounded-sm.transition-all.text-gray-500.p-1.mr-1(class="peer-checked/status:!text-blue-600 peer-checked/status:!border-blue-600 hover:!text-black")
+                                        span.border.border-gray-300.rounded-sm.transition-all.text-gray-500.p-1.mr-1.text-nowrap(class="peer-checked/status:!text-blue-600 peer-checked/status:!border-blue-600 hover:!text-black")
                                             i.fas.fa-bell.mr-1
                                             span 공지/알림
                                     label.cursor-pointer
                                         input.sr-only(type="radio", name="status", value='event', class="peer/status", [(ngModel)]="data.info.status", [disabled]="!isRole(['owner', 'manager'])")
-                                        span.border.border-gray-300.rounded-sm.transition-all.text-gray-500.p-1.mr-1(class="peer-checked/status:!text-blue-600 peer-checked/status:!border-blue-600 hover:!text-black")
+                                        span.border.border-gray-300.rounded-sm.transition-all.text-gray-500.p-1.mr-1.text-nowrap(class="peer-checked/status:!text-blue-600 peer-checked/status:!border-blue-600 hover:!text-black")
                                             i.fa-regular.fa-calendar-days.mr-1
                                             span 일정
                                     label.cursor-pointer
                                         input.sr-only(type="radio", name="status", value='open', class="peer/status", [(ngModel)]="data.info.status", [disabled]="!isRole(['owner', 'manager'])")
-                                        span.border.border-gray-300.rounded-sm.transition-all.text-gray-500.p-1.mr-1(class="peer-checked/status:!text-blue-600 peer-checked/status:!border-blue-600 hover:!text-black")
+                                        span.border.border-gray-300.rounded-sm.transition-all.text-gray-500.p-1.mr-1.text-nowrap(class="peer-checked/status:!text-blue-600 peer-checked/status:!border-blue-600 hover:!text-black")
                                             i.fas.fa-hourglass-start.mr-1
                                             span 시작되지 않음
                                     label.cursor-pointer
                                         input.sr-only(type="radio", name="status", value='work', class="peer/status", [(ngModel)]="data.info.status", [disabled]="!isRole(['owner', 'manager'])")
-                                        span.border.border-gray-300.rounded-sm.transition-all.text-gray-500.p-1.mr-1(class="peer-checked/status:!text-blue-600 peer-checked/status:!border-blue-600 hover:!text-black")
+                                        span.border.border-gray-300.rounded-sm.transition-all.text-gray-500.p-1.mr-1.text-nowrap(class="peer-checked/status:!text-blue-600 peer-checked/status:!border-blue-600 hover:!text-black")
                                             i.fas.fa-hourglass-half.mr-1
                                             span 진행
                                     label.cursor-pointer
                                         input.sr-only(type="radio", name="status", value='finish', class="peer/status", [(ngModel)]="data.info.status", [disabled]="!isRole(['owner', 'manager'])")
-                                        span.border.border-gray-300.rounded-sm.transition-all.text-gray-500.p-1.mr-1(class="peer-checked/status:!text-blue-600 peer-checked/status:!border-blue-600 hover:!text-black")
+                                        span.border.border-gray-300.rounded-sm.transition-all.text-gray-500.p-1.mr-1.text-nowrap(class="peer-checked/status:!text-blue-600 peer-checked/status:!border-blue-600 hover:!text-black")
                                             i.fas.fa-hourglass-end.mr-1
                                             span 완료
                                     label.cursor-pointer(*ngIf="isRole(['owner'])")
                                         input.sr-only(type="radio", name="status", value='close', class="peer/status", [(ngModel)]="data.info.status", [disabled]="!isRole(['owner', 'manager'])")
-                                        span.border.border-gray-300.rounded-sm.transition-all.text-gray-500.p-1.mr-1(class="peer-checked/status:!text-blue-600 peer-checked/status:!border-blue-600 hover:!text-black")
+                                        span.border.border-gray-300.rounded-sm.transition-all.text-gray-500.p-1.mr-1.text-nowrap(class="peer-checked/status:!text-blue-600 peer-checked/status:!border-blue-600 hover:!text-black")
                                             i.fa-solid.fa-circle-check.mr-1
                                             span 종료
                                     label.cursor-pointer(*ngIf="isRole(['owner'])")
                                         input.sr-only(type="radio", name="status", value='cancel', class="peer/status", [(ngModel)]="data.info.status", [disabled]="!isRole(['owner', 'manager'])")
-                                        span.border.border-gray-300.rounded-sm.transition-all.text-gray-500.p-1.mr-1(class="peer-checked/status:!text-blue-600 peer-checked/status:!border-blue-600 hover:!text-black")
+                                        span.border.border-gray-300.rounded-sm.transition-all.text-gray-500.p-1.mr-1.text-nowrap(class="peer-checked/status:!text-blue-600 peer-checked/status:!border-blue-600 hover:!text-black")
                                             i.fas.fa-calendar-times.mr-1
                                             span 취소
                             
                             .flex.items-center(class="last:mb-0 max-sm:block")
                                 span.flex.items-center.justify-center.rounded-md.px-2.w-24.h-6.bg-slate-500.text-white.ff-b.mr-3 진행률
-                                .flex-1.flex.items-center.h-8
+                                .flex-1.flex.items-center.h-8.overflow-x-scroll.scroll-hide
                                     label.cursor-pointer
                                         input.sr-only(type="radio", name="process", value=0, class="peer/process", [(ngModel)]="data.info.process", [disabled]="!isRole(['owner', 'manager'])")
-                                        span.border.border-gray-300.rounded-sm.transition-all.text-gray-500.p-1.mr-1(class="peer-checked/process:!text-blue-600 peer-checked/process:!border-blue-600 hover:!text-black")
+                                        span.border.border-gray-300.rounded-sm.transition-all.text-gray-500.p-1.mr-1.text-nowrap(class="peer-checked/process:!text-blue-600 peer-checked/process:!border-blue-600 hover:!text-black")
                                             span 0%
                                     label.cursor-pointer
                                         input.sr-only(type="radio", name="process", value=20, class="peer/process", [(ngModel)]="data.info.process", [disabled]="!isRole(['owner', 'manager'])")
-                                        span.border.border-gray-300.rounded-sm.transition-all.text-gray-500.p-1.mr-1(class="peer-checked/process:!text-blue-600 peer-checked/process:!border-blue-600 hover:!text-black")
+                                        span.border.border-gray-300.rounded-sm.transition-all.text-gray-500.p-1.mr-1.text-nowrap(class="peer-checked/process:!text-blue-600 peer-checked/process:!border-blue-600 hover:!text-black")
                                             span 20%
                                     label.cursor-pointer
                                         input.sr-only(type="radio", name="process", value=40, class="peer/process", [(ngModel)]="data.info.process", [disabled]="!isRole(['owner', 'manager'])")
-                                        span.border.border-gray-300.rounded-sm.transition-all.text-gray-500.p-1.mr-1(class="peer-checked/process:!text-blue-600 peer-checked/process:!border-blue-600 hover:!text-black")
+                                        span.border.border-gray-300.rounded-sm.transition-all.text-gray-500.p-1.mr-1.text-nowrap(class="peer-checked/process:!text-blue-600 peer-checked/process:!border-blue-600 hover:!text-black")
                                             span 40%
                                     label.cursor-pointer
                                         input.sr-only(type="radio", name="process", value=60, class="peer/process", [(ngModel)]="data.info.process", [disabled]="!isRole(['owner', 'manager'])")
-                                        span.border.border-gray-300.rounded-sm.transition-all.text-gray-500.p-1.mr-1(class="peer-checked/process:!text-blue-600 peer-checked/process:!border-blue-600 hover:!text-black")
+                                        span.border.border-gray-300.rounded-sm.transition-all.text-gray-500.p-1.mr-1.text-nowrap(class="peer-checked/process:!text-blue-600 peer-checked/process:!border-blue-600 hover:!text-black")
                                             span 60%
                                     label.cursor-pointer
                                         input.sr-only(type="radio", name="process", value=80, class="peer/process", [(ngModel)]="data.info.process", [disabled]="!isRole(['owner', 'manager'])")
-                                        span.border.border-gray-300.rounded-sm.transition-all.text-gray-500.p-1.mr-1(class="peer-checked/process:!text-blue-600 peer-checked/process:!border-blue-600 hover:!text-black")
+                                        span.border.border-gray-300.rounded-sm.transition-all.text-gray-500.p-1.mr-1.text-nowrap(class="peer-checked/process:!text-blue-600 peer-checked/process:!border-blue-600 hover:!text-black")
                                             span 80%
                                     label.cursor-pointer
                                         input.sr-only(type="radio", name="process", value=100, class="peer/process", [(ngModel)]="data.info.process", [disabled]="!isRole(['owner', 'manager'])")
-                                        span.border.border-gray-300.rounded-sm.transition-all.text-gray-500.p-1.mr-1(class="peer-checked/process:!text-blue-600 peer-checked/process:!border-blue-600 hover:!text-black")
+                                        span.border.border-gray-300.rounded-sm.transition-all.text-gray-500.p-1.mr-1.text-nowrap(class="peer-checked/process:!text-blue-600 peer-checked/process:!border-blue-600 hover:!text-black")
                                             span 100%
                                 
                             .flex.mb-2(*ngIf="data.info.todo.length > 0 || isRole(['owner', 'manager'])", class="last:mb-0 max-sm:block")
@@ -176,7 +177,7 @@ div(*ngIf="cache.loaded", class="w-full h-full", [ngClass]="containerClass()")
                                                 .actions
                                                     i.ti.ti-arrows-move.px-1.cursor-move.text-black.text-base.todo-handle
                                                     i.fa-solid.fa-xmark.px-1.cursor-pointer.text-red-500.rounded-lg.text-base.ml-2(*ngIf="!readOnly", class="hover:bg-red-50", (click)="removeTodo(todo)")
-                                    .flex.pt-1(*ngIf="data.info.todo.length < 5 && isRole(['owner', 'manager'])", [ngClass]="data.info.todo.length > 0?'border-t border-gray-200':''")
+                                    .flex.pt-1(*ngIf="data.info.todo.length < 20 && isRole(['owner', 'manager'])", [ngClass]="data.info.todo.length > 0?'border-t border-gray-200':''")
                                         input.w-full.text-sm.px-2.shadow-0(class="py-0.5 !border-0", [(ngModel)]="cache.todoText", placeholder="TODO 내용을 입력해주세요", (keyup.enter)="addTodo(cache.todoText)")
                                         button.bg-blue-500.text-white.px-3(class="py-0.5 hover:bg-blue-600", (click)="addTodo(cache.todoText)")
                                             i.fa-solid.fa-plus

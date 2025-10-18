@@ -73,6 +73,14 @@ export class Component implements OnInit {
                 command: async () => {
                     await this.update();
                 }
+            },
+            {
+                name: "esc",
+                key: ["esc"],
+                preventDefault: true,
+                command: async () => {
+                    await this.hide();
+                }
             }
         ];
         for (let i = 0; i < this.shortcuts.length; i++)
@@ -94,7 +102,7 @@ export class Component implements OnInit {
 
         await this.load();
 
-        let descEditor = await this.project.bindEditor(this.descriptionElement.nativeElement, false, !this.isRole(['owner']));
+        let descEditor = await this.project.bindEditor(this.descriptionElement.nativeElement, false, false);
         if (descEditor) this.editor.description = descEditor;
 
         this.editor.description.keystrokes.set('Ctrl+S', async (event, cancel) => {
@@ -254,8 +262,8 @@ export class Component implements OnInit {
         if (!this.isRole(['owner', 'manager'])) return;
 
         if (!this.cache.todoText) return;
-        if (this.data.info.todo.length >= 5) {
-            await this.alert(`TODO 목록은 최대 5개 까지만 등록 가능합니다`, "오류", "error", "확인", false);
+        if (this.data.info.todo.length >= 20) {
+            await this.alert(`TODO 목록은 최대 20개 까지만 등록 가능합니다`, "오류", "error", "확인", false);
             return;
         }
         this.data.info.todo.push({ title: todoText, checked: false });

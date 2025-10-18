@@ -134,8 +134,9 @@ export class Component implements OnInit, OnDestroy {
     public async load() {
         const { data } = await wiz.call("load", { project_id: this.project.id() });
         this.labels = [];
-        for (let i = 0; i < data.length; i++)
+        for (let i = 0; i < data.length; i++) {
             this.labels.push(data[i]);
+        }
         await this.sortLabel();
         this.cache.loaded = true;
         await this.service.render();
@@ -316,6 +317,43 @@ export class Component implements OnInit, OnDestroy {
         } else {
             this.workspace.nativeElement.scrollLeft = this.workspace.nativeElement.scrollLeft + 600;
         }
+    }
+
+    public labelExtended: any = {};
+
+    public async gridOption(label) {
+        this.labelExtended[label.id] = !this.labelExtended[label.id];
+        await this.service.render();
+    }
+
+    public targetMember: any = null;
+    public memberSearch: boolean = false;
+    public memberSearchText: string = '';
+
+    public async selectMember() {
+        if (this.memberSearch) this.targetMember = null;
+        this.memberSearchText = '';
+        this.memberSearch = !this.memberSearch;
+        await this.service.render();
+    }
+
+    public searchMember(user: any, keyword: string) {
+        if (!['admin', 'manager', 'user'].includes(user.role)) return false;
+        if (user.meta.name.indexOf(keyword) >= 0) return true;
+        return false;
+    }
+
+    public async searchByMember(target) {
+        this.targetMember = target;
+        this.memberSearch = false;
+        await this.service.render();
+    }
+
+    public isSearchedUser(issue) {
+        if (!this.targetMember) return true;
+        if (issue.user_id == this.targetMember.meta.id) return true;
+        if (issue.worker.includes(this.targetMember.meta.id)) return true;
+        return false;
     }
 
 }
