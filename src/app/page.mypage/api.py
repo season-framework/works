@@ -31,6 +31,8 @@ def session():
     resp = dict()
     user_id = wiz.session.get("id")
     user = db.get(id=user_id)
+    if user is None:
+        wiz.response.status(404, message="사용자를 찾을 수 없습니다")
     if user['password'] is None:
         user['hasPassword'] = False
     else:
@@ -60,6 +62,8 @@ def change_password():
     data = wiz.request.query("data", True)
     user_id = wiz.session.get("id")
     user = db.get(id=user_id)
+    if user is None:
+        wiz.response.status(404, message="사용자를 찾을 수 없습니다")
 
     if user['password'] is not None:
         if user['password'](current) == False:

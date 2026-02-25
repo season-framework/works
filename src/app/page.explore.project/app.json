@@ -18,5 +18,5 @@
         "outputs": []
     },
     "template": "wiz-page-explore-project()",
-    "controller": "base"
+    "controller": "user"
 }

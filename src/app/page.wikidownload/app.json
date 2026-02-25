@@ -5,7 +5,7 @@
     "namespace": "wikidownload",
     "viewuri": "/wikidownload/:id",
     "category": "wiki",
-    "controller": "base",
+    "controller": "user",
     "layout": "layout.empty2",
     "ng.build": {
         "id": "page.wikidownload",

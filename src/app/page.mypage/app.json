@@ -6,7 +6,7 @@
     "viewuri": "/mypage",
     "category": "general",
     "preview": "/mypage",
-    "controller": "base",
+    "controller": "user",
     "layout": "layout.aside",
     "ng.build": {
         "id": "page.mypage",

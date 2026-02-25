@@ -6,7 +6,7 @@
     "viewuri": "/project/:id/:menu?",
     "category": "works",
     "preview": "/project/hmd",
-    "controller": "base",
+    "controller": "user",
     "layout": "layout.aside",
     "ng.build": {
         "id": "page.project.item",

@@ -6,7 +6,7 @@
     "viewuri": "/explore/wiki",
     "category": "general",
     "preview": "/explore/wiki",
-    "controller": "base",
+    "controller": "user",
     "layout": "layout.aside",
     "ng.build": {
         "id": "page.explore.wiki",

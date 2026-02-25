@@ -5,7 +5,7 @@
     "namespace": "wiki.item",
     "viewuri": "/wiki/:id/:content?",
     "category": "wiki",
-    "controller": "base",
+    "controller": "user",
     "layout": "layout.aside",
     "ng.build": {
         "id": "page.wiki.item",

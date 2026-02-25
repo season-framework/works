@@ -1,0 +1,11 @@
+{
+    "id": "page.authenticate",
+    "mode": "page",
+    "title": "/authenticate",
+    "namespace": "authenticate",
+    "category": "auth",
+    "viewuri": "/authenticate",
+    "preview": "/authenticate",
+    "controller": "base",
+    "layout": "layout.empty"
+}
