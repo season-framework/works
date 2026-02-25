@@ -123,6 +123,7 @@ export class Component implements OnInit {
         this.wiki.loaded = false;
         this.wiki.selected = null;
         this.wiki.list = [];
+        this.wiki.search.page = page;
         await this.service.render();
         const { code, data } = await this.call("searchWiki", this.wiki.search);
         if (code != 200) return;
@@ -144,7 +145,7 @@ export class Component implements OnInit {
         }
 
         await this.call("connectWiki", { wiki_ns: this.wiki.selected.namespace });
-        
+
         this.isConnectWiki = false;
         this.wiki.selected = null;
         await this.load();

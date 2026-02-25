@@ -12,9 +12,6 @@ if action.startswith("load"):
         wiz.response.status(404)
     wiz.response.status(200, book.data)
 
-if book is None:
-    wiz.response.status(404, message="위키를 찾을 수 없습니다")
-
 if action.startswith("update"):
     data = wiz.request.query("data", True)
     data = json.loads(data)
@@ -22,8 +19,11 @@ if action.startswith("update"):
     
     namespaceChanged = False
     if book.data['namespace'] != data['namespace']:
-        exists = bookModel.get(data['namespace'])
-        if exists is not None:
+        try:
+            exists = bookModel.get(data['namespace'])
+            if exists is not None:
+                raise Excpetion("Exists Namespace")
+        except:
             wiz.response.status(400, 'Namespace가 사용중입니다')
         namespaceChanged = True
     
@@ -117,18 +117,27 @@ if action.startswith("access/load"):
     wiz.response.status(200, members)
 
 if action.startswith("access/create"):
-    data = wiz.request.query()
-    book.access.create(data['role'], data['key'], data['type'])
+    try:
+        data = wiz.request.query()
+        book.access.create(data['role'], data['key'], data['type'])
+    except Exception as e:
+        wiz.response.status(500, str(e))
     wiz.response.status(200)
 
 if action.startswith("access/remove"):
-    data = wiz.request.query()
-    book.access.remove(data)
+    try:
+        data = wiz.request.query()
+        book.access.remove(data)
+    except Exception as e:
+        wiz.response.status(500, str(e))
     wiz.response.status(200)
 
 if action.startswith("access/update"):
-    data = wiz.request.query()
-    book.access.update(data)
+    try:
+        data = wiz.request.query()
+        book.access.update(data)
+    except Exception as e:
+        wiz.response.status(500, str(e))
     wiz.response.status(200)
 
 wiz.response.status(404)

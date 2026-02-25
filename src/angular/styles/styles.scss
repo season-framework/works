@@ -1,3 +1,122 @@
-@import "portal/season/core";
+@import "custom/font";
+@import "custom/prose";
 @import "portal/works/core";
 @import "portal/wiki/core";
+
+html,
+body,
+app-root {
+    font-family: 'main-r';
+}
+
+router-outlet {
+    display: none;
+}
+
+iframe {
+    border: none;
+    width: 100%;
+}
+
+*::-webkit-scrollbar-track {
+    background-color: #F5F5F5;
+}
+
+*::-webkit-scrollbar {
+    height: 10px;
+    width: 10px;
+    background-color: #F5F5F5;
+}
+
+*::-webkit-scrollbar-thumb {
+    border-radius: 0;
+    background-color: #ABABAB;
+    background-image: -webkit-linear-gradient(45deg,
+            rgba(255, 255, 255, .2) 25%,
+            transparent 25%,
+            transparent 50%,
+            rgba(255, 255, 255, .2) 50%,
+            rgba(255, 255, 255, .2) 75%,
+            transparent 75%,
+            transparent);
+}
+
+a,
+button,
+select {
+    cursor: pointer;
+}
+
+a,
+button,
+select,
+input {
+    outline: 0;
+}
+
+button {
+    transition-property: all;
+    transition-timing-function: cubic-bezier(.4, 0, .2, 1);
+    transition-duration: .15s;
+}
+
+.desktop-only {
+    @media (max-width: 768px) {
+        display: none !important;
+    }
+}
+
+.mobile-only {
+    @media (min-width: 768px) {
+        display: none !important;
+    }
+}
+
+.blind {
+    position: absolute;
+    clip: rect(0, 0, 0, 0);
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+}
+
+.required {
+    &::after {
+        content: "*";
+        color: red;
+    }
+}
+
+.disabled {
+    pointer-events: none !important;
+}
+
+.shadow-0 {
+    box-shadow: none !important;
+}
+
+.hover-actions {
+    .actions {
+        opacity: 0;
+    }
+
+    &:hover {
+        .actions {
+            opacity: 1;
+        }
+    }
+}
+
+.sortable-ghost {
+    --tw-bg-opacity: 1;
+    background-color: rgb(209 213 219 / var(--tw-bg-opacity, 1));
+}
+
+wiz-portal-works-message-body {
+    a {
+        &:hover {
+            color: rgb(59 130 246);
+        }
+    }
+}

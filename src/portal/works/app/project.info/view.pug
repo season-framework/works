@@ -1,144 +1,140 @@
-.row.works-project-info(*ngIf="loaded")
-    .col-md-4
-        .card
-            .card-body
-                label.form-label 프로젝트명
-                input.form-control.form-control-flush(placeholder="새 프로젝트", [(ngModel)]="project.data().title", [disabled]="readOnly")
+.flex.flex-wrap(*ngIf="loaded")
+    .w-96.px-2.text-sm
+        .flex.flex-col.rounded-xl.border.border-gray-300.bg-white.overflow-hidden.divide-y
+            .py-4.px-5
+                label.block.mb-2 프로젝트명
+                input.w-full.shadow-0.border-0.border-gray-400(class="!border-b-2 focus:!border-blue-500", placeholder="새 프로젝트", [(ngModel)]="project.data().title", [disabled]="readOnly")
             
-            .card-body
-                label.form-label 아이콘
-                .col
-                    .avatar.avatar-sm(style='background-image: url({{project.data().icon}})', (click)="updateIcon()")
-                    .ml-2.btn.btn-secondary.pt-1.pb-1((click)="updateIcon()") 아이콘 등록
-                    .ml-2.btn.btn-link.pt-1.pb-1(*ngIf="project.data().icon", (click)="deleteIcon()") 아이콘 삭제
+            .py-4.px-5
+                label.block.mb-2 아이콘
+                .flex.text-center.items-center.h-12
+                    .flex-1.flex
+                        button.ml-2.self-center.size-9.border.border-gray-300.rounded-lg.bg-contain.bg-center.bg-cover.bg-no-repeat.bg-slate-50(style='background-image: url({{project.data().icon}})', (click)="updateIcon()")
+                        button.ml-2.px-3.py-1.bg-gray-500.text-white.text-sm.font-semibold.rounded-md(class="hover:bg-gray-400", (click)="updateIcon()") 아이콘 등록
+                        button.ml-2.px-3.py-1.text-blue-700.text-sm.font-semibold(*ngIf="project.data().icon", class="hover:underline", (click)="deleteIcon()") 아이콘 삭제
 
-            .card-body
-                label.form-label Namespace
-                input.form-control.form-control-flush(placeholder="myproject", [(ngModel)]="project.data().namespace", [disabled]="readOnly")
+            .py-4.px-5
+                label.block.mb-2 Namespace
+                input.w-full.shadow-0.border-0.border-gray-400(class="!border-b-2 focus:!border-blue-500", placeholder="myproject", [(ngModel)]="project.data().namespace", [disabled]="readOnly")
 
-            .card-body
-                label.form-label 축약명
-                input.form-control.form-control-flush(placeholder="DIZEST", [(ngModel)]="project.data().short", [disabled]="readOnly")
+            .py-4.px-5
+                label.block.mb-2 축약명
+                input.w-full.shadow-0.border-0.border-gray-400(class="!border-b-2 focus:!border-blue-500", placeholder="DIZEST", [(ngModel)]="project.data().short", [disabled]="readOnly")
             
-            .card-body.area-round(*ngIf="project.data().status != 'draft'")
-                label.form-label 진행상태
-                .form-selectgroup
-                    label.form-selectgroup-item
-                        input.form-selectgroup-input(type='radio', name='project-status', value='open', [(ngModel)]="project.data().status", [disabled]="readOnly")
-                        span.form-selectgroup-label.pt-1.pb-1
+            .py-4.px-5(*ngIf="project.data().status != 'draft'")
+                label.block.mb-2 진행상태
+                .flex.gap-x-1.text-sm.text-gray-400(class="*:rounded-full *:border *:border-gray-300 *:py-1 *:px-4 *:cursor-pointer *:transition-all")
+                    label(class="hover:text-black has-[:checked]:!border-blue-600 has-[:checked]:!text-blue-600")
+                        input.sr-only(type='radio', name='project-status', value='open', [(ngModel)]="project.data().status", [disabled]="readOnly")
+                        span.pt-1.pb-1
                             i.fa-solid.me-1.fa-toggle-on
                             | 진행중
-                    
-                    label.form-selectgroup-item
-                        input.form-selectgroup-input(type='radio', name='project-status', value='close', [(ngModel)]="project.data().status", [disabled]="readOnly")
-                        span.form-selectgroup-label.pt-1.pb-1
+                    label(class="hover:text-black has-[:checked]:!border-blue-600 has-[:checked]:!text-blue-600")
+                        input.sr-only(type='radio', name='project-status', value='close', [(ngModel)]="project.data().status", [disabled]="readOnly")
+                        span.pt-1.pb-1
                             i.fa-solid.me-1.fa-power-off
                             | 종료됨
                         
-            .card-body.area-round
-                label.form-label 공개범위
-                .form-selectgroup
-                    label.form-selectgroup-item
-                        input.form-selectgroup-input(type='radio', name='project-visibility', value='private', [(ngModel)]="project.data().visibility", [disabled]="readOnly")
-                        span.form-selectgroup-label.pt-1.pb-1
+            .py-4.px-5
+                label.block.mb-2 공개범위
+                .flex.gap-x-1.text-sm.text-gray-400(class="*:rounded-full *:border *:border-gray-300 *:py-1 *:px-4 *:cursor-pointer *:transition-all")
+                    label(class="hover:text-black has-[:checked]:!border-blue-600 has-[:checked]:!text-blue-600")
+                        input.sr-only(type='radio', name='project-visibility', value='private', [(ngModel)]="project.data().visibility", [disabled]="readOnly")
+                        span.pt-1.pb-1
                             i.fa-solid.me-1.fa-lock
                             | 비공개
                     
-                    label.form-selectgroup-item(*ngIf="service.auth.show.membership(['admin', 'staff'])")
-                        input.form-selectgroup-input(type='radio', name='project-visibility', value='internal', [(ngModel)]="project.data().visibility", [disabled]="readOnly")
-                        span.form-selectgroup-label.pt-1.pb-1
+                    label(*ngIf="service.auth.show.membership(['admin', 'staff'])", class="hover:text-black has-[:checked]:!border-blue-600 has-[:checked]:!text-blue-600")
+                        input.sr-only(type='radio', name='project-visibility', value='internal', [(ngModel)]="project.data().visibility", [disabled]="readOnly")
+                        span.pt-1.pb-1
                             i.fa-solid.me-1.fa-users
                             | 내부공개
                     
-                    label.form-selectgroup-item
-                        input.form-selectgroup-input(type='radio', name='project-visibility', value='public', [(ngModel)]="project.data().visibility", [disabled]="readOnly")
-                        span.form-selectgroup-label.pt-1.pb-1
+                    label(class="hover:text-black has-[:checked]:!border-blue-600 has-[:checked]:!text-blue-600")
+                        input.sr-only(type='radio', name='project-visibility', value='public', [(ngModel)]="project.data().visibility", [disabled]="readOnly")
+                        span.pt-1.pb-1
                             i.fa-solid.me-1.fa-lock-open
                             | 전체공개
             
-            .card-body
-                label.form-label 시작일
-                input.form-control.form-control-flush(type="date", [(ngModel)]="project.data().start", [disabled]="readOnly")
+            .py-4.px-5
+                label.block.mb-2 시작일
+                input.w-full.shadow-0.border-0.cursor-pointer.border-gray-400(class="!border-b-2 focus:!border-blue-500", type="date", [(ngModel)]="project.data().start", [disabled]="readOnly")
             
-            .card-body
-                label.form-label 마감일
-                input.form-control.form-control-flush(type="date", [(ngModel)]="project.data().end", [disabled]="readOnly")
+            .py-4.px-5
+                label.block.mb-2 마감일
+                input.w-full.shadow-0.border-0.cursor-pointer.border-gray-400(class="!border-b-2 focus:!border-blue-500", type="date", [(ngModel)]="project.data().end", [disabled]="readOnly")
             
-        .card.mt-4(*ngIf="project.accessLevel(['admin'])")
-            .card-body
-                label.form-label 프로젝트 메뉴
-                
-                label.form-check.form-switch
-                    input.form-check-input(type="checkbox", [(ngModel)]="project.data().extra.menu.plan")
-                    span.form-check-label.form-check-label 작업계획
-                
-                label.form-check.form-switch
-                    input.form-check-input(type="checkbox", [(ngModel)]="project.data().extra.menu.meeting")
-                    span.form-check-label.form-check-label 회의록
-                
-                label.form-check.form-switch
-                    input.form-check-input(type="checkbox", [(ngModel)]="project.data().extra.menu.issueboard")
-                    span.form-check-label.form-check-label 이슈보드
-                
-                label.form-check.form-switch
-                    input.form-check-input(type="checkbox", [(ngModel)]="project.data().extra.menu.wiki")
-                    span.form-check-label.form-check-label 위키
-                
-                label.form-check.form-switch
-                    input.form-check-input(type="checkbox", [(ngModel)]="project.data().extra.menu.drive")
-                    span.form-check-label.form-check-label 드라이브
+        .flex.flex-col.rounded-xl.border.border-gray-300.bg-white.mt-4.overflow-hidden.divide-y(*ngIf="project.accessLevel(['admin'])")
+            .py-4.px-5
+                label.block.mb-2 프로젝트 메뉴
 
-        .card.mt-4(*ngIf="project.accessLevel(['admin'])")
-            .card-body
-                label.form-label 메인메뉴
-                select.form-select([(ngModel)]="project.data().extra.main")
+                .flex.flex-col.gap-y-2
+                    label.inline-flex.items-center.cursor-pointer
+                        input.sr-only.peer(type="checkbox", [(ngModel)]="project.data().extra.menu.meeting")
+                        div(class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer border border-gray-300 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-blue-600 after:absolute after:top-[1px] after:start-[1px] after:bg-white after:border-gray-300 after:border after:rounded-full after:size-5 after:transition-all peer-checked:bg-blue-700")
+                        span(class="ml-3 text-sm") 회의록
+                    label.inline-flex.items-center.cursor-pointer
+                        input.sr-only.peer(type="checkbox", [(ngModel)]="project.data().extra.menu.issueboard")
+                        div(class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer border border-gray-300 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-blue-600 after:absolute after:top-[1px] after:start-[1px] after:bg-white after:border-gray-300 after:border after:rounded-full after:size-5 after:transition-all peer-checked:bg-blue-700")
+                        span(class="ml-3 text-sm") 이슈보드
+                    label.inline-flex.items-center.cursor-pointer
+                        input.sr-only.peer(type="checkbox", [(ngModel)]="project.data().extra.menu.wiki")
+                        div(class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer border border-gray-300 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-blue-600 after:absolute after:top-[1px] after:start-[1px] after:bg-white after:border-gray-300 after:border after:rounded-full after:size-5 after:transition-all peer-checked:bg-blue-700")
+                        span(class="ml-3 text-sm") 위키
+                    label.inline-flex.items-center.cursor-pointer
+                        input.sr-only.peer(type="checkbox", [(ngModel)]="project.data().extra.menu.drive")
+                        div(class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer border border-gray-300 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-blue-600 after:absolute after:top-[1px] after:start-[1px] after:bg-white after:border-gray-300 after:border after:rounded-full after:size-5 after:transition-all peer-checked:bg-blue-700")
+                        span(class="ml-3 text-sm") 드라이브
+
+        .flex.flex-col.rounded-xl.border.border-gray-300.bg-white.mt-4.overflow-hidden.divide-y(*ngIf="project.accessLevel(['admin'])")
+            .py-4.px-5
+                label.block.mb-2 메인메뉴
+                select.w-full.border.border-gray-300.rounded-sm.text-sm(class="!outline-none", [(ngModel)]="project.data().extra.main")
                     option(value="info") 프로젝트 정보
                     option(value="meeting") 회의록
                     option(value="issueboard") 이슈보드
                     option(value="drive") 드라이브
 
-        .area-round(*ngIf="hasSaveBtn && !readOnly")
-            .btn.btn-blue.btn-sm.btn-block.mt-4.pr-3.pl-3((click)="update()")
+        div(*ngIf="hasSaveBtn && !readOnly", class="*:rounded-full")
+            button.w-full.py-1.bg-blue-500.text-white.text-sm.mt-4(class="hover:bg-blue-600", (click)="update()")
                 i.fa-solid.fa-floppy-disk
                 span.ml-2 저장하기
 
-    .col-md-8
-        .card.mb-4
-            .card-header.area-round
-                h4.card-title 프로젝트 내용
+    .flex-1.px-2
+        .flex.flex-col.rounded-xl.border.border-gray-300.bg-white.mb-4.overflow-hidden.divide-y
+            .py-4.px-5.flex
+                h4.ff-b 프로젝트 내용
                 .ml-auto
-                .btn.btn-blue.btn-sm.pr-3.pl-3((click)="update()", *ngIf="hasSaveBtn && !readOnly")
+                button.rounded-full.bg-blue-500.text-white.text-sm.px-4(class="hover:bg-blue-600", (click)="update()", *ngIf="hasSaveBtn && !readOnly")
                     i.fa-solid.fa-floppy-disk
                     span.ml-2 저장하기
             
-            .card-body.p-0.workspace-ckeditor.ck-editor-noborder.ck-editor-works
+            .p-0.workspace-ckeditor.ck-editor-noborder.ck-editor-works.prose.max-w-full
                 textarea('#editor'='', [attr.namespace]="NAMESPACE")
-            
-            .card-footer
         
-        .card.mb-4
-            .card-header.area-round
-                h4.card-title 프로젝트 목표
+        .flex.flex-col.rounded-xl.border.border-gray-300.bg-white.mb-4.overflow-hidden.divide-y
+            .py-4.px-5.flex
+                h4.ff-b 프로젝트 목표
                 .ml-auto
-                .btn.btn-blue.btn-sm.pr-3.pl-3((click)="update()", *ngIf="hasSaveBtn && !readOnly")
+                button.rounded-full.bg-blue-500.text-white.text-sm.px-4(class="hover:bg-blue-600", (click)="update()", *ngIf="hasSaveBtn && !readOnly")
                     i.fa-solid.fa-floppy-disk
                     span.ml-2 저장하기
 
-            .table-responsive(*ngIf="project.data().extra && project.data().extra.goal")
-                table.table.table-bordered.table-nowrap.card-table
+            .overflow-x-auto(*ngIf="project.data().extra && project.data().extra.goal")
+                table.min-w-full
                     thead
-                        tr
-                            th.w-1 분류
+                        tr.text-xs.ff-b(class="*:py-2 *:px-3 *:bg-slate-50 divide-x")
+                            th.w-40.text-nowrap 분류
                             th 목표
                             th 상세설명
-                            th.w-1 단위
-                            th.w-1(*ngIf="!readOnly")
+                            th.w-32.text-nowrap 단위
+                            th.w-1.text-nowrap(*ngIf="!readOnly")
                     
                     tbody([sortablejs]="project.data().extra.goal", [sortablejsOptions]="{ animation: 150 }")
                         ng-container(*ngFor="let item of project.data().extra.goal")
-                            tr.text-left
-                                td
-                                    select.form-select.form-select-flush.w-2([(ngModel)]="item.type", [disabled]="readOnly")
+                            tr.text-left(class="*:py-2 *:px-3 divide-x")
+                                td.w-40.text-nowrap
+                                    select.w-full.text-sm.border-0.border-gray-400(class="!border-b-2 focus:!border-blue-500", [(ngModel)]="item.type", [disabled]="readOnly")
                                         option(value="서비스") 서비스
                                         option(value="시스템") 시스템
                                         option(value="솔루션") 솔루션
@@ -147,18 +143,18 @@
                                         option(value="논문") 논문
                                         option(value="특허") 특허
                                         option(value="기타") 기타
-                                td
-                                    input.form-control.form-control-flush([(ngModel)]="item.title", placeholder="데이터 공유 웹 서비스", [disabled]="readOnly")
-                                td
-                                    textarea.form-control.form-control-flush([(ngModel)]="item.desc", rows=3, placeholder="상세 설명", [disabled]="readOnly")
-                                td
-                                    input.form-control.form-control-flush.w-1([(ngModel)]="item.unit", placeholder="수량/단위", [disabled]="readOnly")
-                                td.area-round(*ngIf="!readOnly")
-                                    .btn.btn-red.btn-sm((click)="arrayRemove(project.data().extra.goal, item)", style="width: 48px;")
+                                td.text-nowrap
+                                    input.w-full.text-sm.border-0.border-gray-400(class="!border-b-2 focus:!border-blue-500", [(ngModel)]="item.title", placeholder="데이터 공유 웹 서비스", [disabled]="readOnly")
+                                td.text-nowrap
+                                    textarea.w-full.text-sm.resize-none.border-0.border-gray-400(class="!border-b-2 focus:!border-blue-500", [(ngModel)]="item.desc", rows=3, placeholder="상세 설명", [disabled]="readOnly")
+                                td.w-32.text-nowrap
+                                    input.w-full.text-sm.border-0.border-gray-400(class="!border-b-2 focus:!border-blue-500", [(ngModel)]="item.unit", placeholder="수량/단위", [disabled]="readOnly")
+                                td.w-1.text-nowrap(*ngIf="!readOnly", class="*:rounded-full")
+                                    button.text-sm.px-4.py-1.bg-red-500.text-white(class="hover:bg-red-600", (click)="arrayRemove(project.data().extra.goal, item)")
                                         i.fa-solid.fa-xmark
 
-            .card-footer.pt-2.pb-2.area-round(*ngIf="!readOnly")
-                .btn.btn-sm.btn-block.btn-secondary((click)="arrayAdd(project.data().extra.goal, {type: '서비스'})")
+            .px-4.py-2(*ngIf="!readOnly")
+                button.w-full.rounded-full.text-xs.bg-gray-500.text-white.py-1((click)="arrayAdd(project.data().extra.goal, {type: '서비스'})")
                     i.fa-solid.fa-plus
 
 ng-keyboard-shortcuts([shortcuts]="shortcuts")

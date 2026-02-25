@@ -24,11 +24,12 @@ class Model:
     @staticmethod
     def cls(tablename=None, module=None):
         try:
-            orm = wiz.model(os.path.join(ORM_BASE, tablename))
-        except:
+            if module is not None:
+                orm = wiz.model(os.path.join("portal", module, "db", tablename))
+            else:
+                orm = wiz.model(os.path.join(ORM_BASE, tablename))
+        except Exception as e:
             pass
-        if module is not None:
-            orm = wiz.model(os.path.join("portal", module, "db", tablename))
         return orm
     
     @staticmethod
@@ -67,7 +68,7 @@ class Model:
         kwargs['dump'] = 1
         data = self.rows(**kwargs)
         if len(data) > 0:
-            return season.util.std.stdClass(data[0])
+            return season.util.stdClass(data[0])
         return None
 
     def count(self, query=None, groupby=None, like=None, **where):
@@ -206,7 +207,7 @@ class Model:
         db = self.orm
         if 'id' not in data and hasattr(db, "id"):
             cls = type(getattr(db, "id"))
-            if cls is not pw.IntegerField and cls is not pw.BigIntegerField:
+            if cls is not pw.IntegerField and cls is not pw.BigIntegerField and cls is not pw.AutoField:
                 obj_id = self.random(self.id_size)
                 if self.id_size == 32:
                     obj_id = str(int(time.time()*1000000)) + self.random(16)

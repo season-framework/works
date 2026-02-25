@@ -6,24 +6,30 @@ import { Project } from '@wiz/libs/portal/works/project';
 
 import moment from 'moment';
 
-const BASE_CONTENT = `<h3>회의목적</h3>
-<blockquote>~ 를 위한 ~ 회의</blockquote>
-<hr>
-<h3>회의참석자</h3>
-<ul>
-    <li>소속1: 참석자1, 참석자2, 참석자3</li>
-    <li>소속2: 참석자4, 참석자5</li>
-</ul>
-<hr>
-<h3>주요안건</h3>
-<ul>
-    <li>안건 1</li>
-    <li>안건 2</li>
-    <li>안건 3</li>
-</ul>
-<hr>
-<h3>회의내용</h3>
-<p>회의 내용을 작성해주세요</p>`;
+const BASE_CONTENT = `### 회의목적
+
+> ~ 를 위한 ~ 회의
+
+---
+
+### 회의참석자
+
+*   소속1: 참석자1, 참석자2, 참석자3
+*   소속2: 참석자4, 참석자5
+
+---
+
+### 주요안건
+
+*   안건 1
+*   안건 2
+*   안건 3
+
+---
+
+### 회의내용
+
+회의 내용을 작성해주세요`;
 
 export class Component implements OnInit, OnDestroy {
     constructor(
@@ -220,7 +226,7 @@ export class Component implements OnInit, OnDestroy {
             title: "새로운 회의",
             meetdate_day: moment().format("YYYY-MM-DD"),
             attachment: [],
-            meetdate_time: '10:00',
+            meetdate_time: moment().format("HH:00"),
             content: BASE_CONTENT
         };
 
@@ -245,6 +251,8 @@ export class Component implements OnInit, OnDestroy {
         if (item.title.length == 0) item.title = '제목없음';
 
         this.isUpdate = true;
+        await this.service.render();
+
         const { code, data } = await this.call("update", item);
 
         if (code == 200 || code == 201) {
@@ -259,6 +267,7 @@ export class Component implements OnInit, OnDestroy {
 
         await this.load(false);
         this.isUpdate = false;
+        await this.service.render();
     }
 
     public async onChange() {
@@ -285,7 +294,7 @@ export class Component implements OnInit, OnDestroy {
     }
 
     public async delete() {
-        let res = await this.alert('회의록 삭제', '삭제된 목록 보기를 통해 다시 불러올 수 있습니다. 정말 삭제하시겠습니까?', '삭제', '취소');
+        const res = await this.alert('회의록 삭제', '삭제한 회의록은 복구할 수 없습니다. 정말 삭제하시겠습니까?', '삭제', '취소');
         if (!res) return;
         await this.call("delete", { id: this.selected.id });
         await this.load();

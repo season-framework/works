@@ -1,11 +1,17 @@
-.wiz-page
-    wiz-component-nav-aside
+.flex.flex-row.relative.w-full.h-screen.overflow-hidden(class="max-sm:flex-col")
+    wiz-component-nav-aside(*ngIf="!isAside")
 
-    .wiz-content
-        .wiz-view
-            router-outlet
+    div(
+        class="hidden lg:flex fixed w-[16px] h-[64px] bg-slate-200 text-slate-700 bottom-[24px] z-50 items-center justify-center hover:bg-slate-300 cursor-pointer z-[1000]",
+        [ngClass]="isAside ? 'left-0' : 'left-[272px]'",
+        (click)="hideAside()")
+        i.fa-solid.fa-caret-left(*ngIf="!isAside")
+        i.fa-solid.fa-caret-right(*ngIf="isAside")
+
+    .flex-1.h-full.overflow-auto(class="bg-[#f6f7fb]")
+        router-outlet
 
 wiz-portal-season-alert
-.loading-zone(*ngIf="service.auth.status === null || service.loading.isshow")
-    .loading-zone-container
+.fixed.inset-0(*ngIf="service.auth.status === null || service.loading.isshow", class="z-[999999]")
+    .h-full.flex.items-center.justify-center
         wiz-portal-season-loading-season([height]="48")

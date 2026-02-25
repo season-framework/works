@@ -36,6 +36,15 @@ export class Component implements OnInit {
     }
 
     public async remove(user: any) {
+        const res = await this.service.alert.show({
+            title: "구성원 제외",
+            status: "error",
+            message: `"${user.meta.name}" 사용자를 이 프로젝트에서 제외하시겠습니까?`,
+            action: "제외하기",
+            actionBtn: "error",
+            cancel: "cancel",
+        });
+        if (!res) return;
         await this.project.member.remove(user.user);
         await this.project.member.load();
         await this.service.render();
@@ -43,11 +52,14 @@ export class Component implements OnInit {
 
     public async create() {
         let { email, role } = this.newuser;
-        email = email.replace(" ", "");
+        email = email.replace(/\s/g, "");
+        if (email.length === 0) return;
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        if (!emailRegex.test(email)) return await this.service.error("Email 포맷이 아닙니다.");
         const { code, data } = await this.project.member.create(email, role);
 
         if (code != 200) {
-            await this.alert(data);
+            await this.service.error(data);
             return;
         }
 

@@ -42,6 +42,9 @@ export class Component implements OnInit, OnDestroy {
         } else if (tab == 'photo') {
             this.attachment.ns = '.image';
             await this.loadAttachment(1);
+        } else if (tab == 'meeting') {
+            this.attachment.ns = 'meeting';
+            await this.loadAttachment(1);
         }
 
         await this.service.render();
@@ -82,12 +85,12 @@ export class Component implements OnInit, OnDestroy {
     public icon(node: any, checkopen: boolean = true) {
         if (node.type == 'folder') {
             if (node.isOpen() && checkopen)
-                return 'fa-regular fa-folder-open';
+                return 'fa-regular fa-folder-open text-sky-400';
             else
-                return 'fa-solid fa-folder';
+                return 'fa-solid fa-folder text-sky-400';
         }
 
-        return 'fa-regular fa-file-lines';
+        return 'fa-regular fa-file-lines w-5 text-center text-gray-400';
     }
 
     public async open(node: any) {

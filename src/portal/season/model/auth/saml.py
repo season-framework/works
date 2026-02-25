@@ -31,7 +31,7 @@ class SAML:
                 'query_string': request.query_string
             }
 
-            basepath = wiz.branch.path(os.path.join(SAML_BASE_PATH, entity))
+            basepath = wiz.project.path(os.path.join(SAML_BASE_PATH, entity))
             return OneLogin_Saml2_Auth(req, custom_base_path=basepath)
 
         pattern = self.basepath + "/saml/<action>/<entity>/<path:path>"
@@ -85,7 +85,8 @@ class SAML:
             userinfo = auth.get_attributes()
             sessiondata = dict()
             if SAML_ACS is not None:
-                sessiondata = season.util.fn.call(SAML_ACS, wiz=wiz, userinfo=userinfo)
+                compiler = season.util.compiler(SAML_ACS)
+                sessiondata = compiler.call(wiz=wiz, userinfo=userinfo)
             
             redirect = session.get('SAML_REDIRECT', None)
             try:

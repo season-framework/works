@@ -1,0 +1,11 @@
+{
+    "type": "app",
+    "mode": "portal",
+    "title": "mgmt.idp",
+    "id": "mgmt.idp",
+    "namespace": "mgmt.idp",
+    "viewuri": "",
+    "category": "",
+    "controller": "base",
+    "template": "wiz-portal-saml-mgmt-idp()"
+}

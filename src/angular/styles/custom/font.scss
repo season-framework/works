@@ -1,0 +1,43 @@
+@font-face {
+    font-family: 'main-eb';
+    font-weight: 700;
+    src: url('/assets/font/SUIT-woff2/SUIT-ExtraBold.woff2') format('woff2'),
+        url('/assets/font/SUIT-ttf/SUIT-ExtraBold.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'main-b';
+    font-weight: 500;
+    src: url('/assets/font/SUIT-woff2/SUIT-Bold.woff2') format('woff2'),
+        url('/assets/font/SUIT-ttf/SUIT-Bold.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'main-r';
+    font-weight: 400;
+    src: url('/assets/font/SUIT-woff2/SUIT-Regular.woff2') format('woff2'),
+        url('/assets/font/SUIT-ttf/SUIT-Regular.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'main-l';
+    font-weight: 300;
+    src: url('/assets/font/SUIT-woff2/SUIT-Light.woff2') format('woff2'),
+        url('/assets/font/SUIT-ttf/SUIT-Light.ttf') format('truetype');
+}
+
+.ff-eb {
+    font-family: main-eb;
+}
+
+.ff-b {
+    font-family: main-b;
+}
+
+.ff-r {
+    font-family: main-r;
+}
+
+.ff-l {
+    font-family: main-l;
+}

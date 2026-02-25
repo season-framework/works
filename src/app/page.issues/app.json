@@ -4,19 +4,8 @@
     "title": "/issues",
     "namespace": "issues",
     "viewuri": "/issues",
-    "category": "general",
-    "preview": "/issues",
+    "category": "",
     "controller": "user",
     "layout": "layout.aside",
-    "ng.build": {
-        "id": "page.issues",
-        "name": "PageIssuesComponent",
-        "path": "./page.issues/page.issues.component"
-    },
-    "ng": {
-        "selector": "wiz-page-issues",
-        "inputs": [],
-        "outputs": []
-    },
     "template": "wiz-page-issues()"
 }

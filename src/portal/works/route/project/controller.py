@@ -20,9 +20,6 @@ if action.startswith("load"):
         wiz.response.status(404)
     wiz.response.status(200, project.data)
 
-if project is None:
-    wiz.response.status(404, message="프로젝트를 찾을 수 없습니다")
-
 if action.startswith("update"):
     data = wiz.request.query("data", True)
     data = json.loads(data)
@@ -30,8 +27,11 @@ if action.startswith("update"):
     
     namespaceChanged = False
     if project.data['namespace'] != data['namespace']:
-        exists = projectModel.get(data['namespace'])
-        if exists is not None:
+        try:
+            exists = projectModel.get(data['namespace'])
+            if exists is not None:
+                raise Excpetion("Exists Namespace")
+        except:
             wiz.response.status(400, 'Namespace가 사용중입니다')
         namespaceChanged = True
     
@@ -50,20 +50,29 @@ if action.startswith("member/load"):
     wiz.response.status(200, members)
 
 if action.startswith("member/create"):
-    user = wiz.request.query("user", True)
-    role = wiz.request.query("role", True)
-    project.member.create(user, role)
+    try:
+        user = wiz.request.query("user", True)
+        role = wiz.request.query("role", True)
+        project.member.create(user, role)
+    except Exception as e:
+        wiz.response.status(500, str(e))
     wiz.response.status(200)
 
 if action.startswith("member/remove"):
-    user = wiz.request.query("user", True)
-    project.member.remove(user)
+    try:
+        user = wiz.request.query("user", True)
+        project.member.remove(user)
+    except Exception as e:
+        wiz.response.status(500, str(e))
     wiz.response.status(200)
 
 if action.startswith("member/update"):
-    user = wiz.request.query("user", True)
-    role = wiz.request.query("role", True)
-    project.member.update(dict(role=role, user=user))
+    try:
+        user = wiz.request.query("user", True)
+        role = wiz.request.query("role", True)
+        project.member.update(dict(role=role, user=user))
+    except Exception as e:
+        wiz.response.status(500, str(e))
     wiz.response.status(200)
 
 # Plan API
@@ -100,7 +109,10 @@ def driveItem(path):
     return item
 
 if action.startswith("drive/tree"):
-    project.member.accessLevel(['admin', 'manager', 'user', 'guest'])
+    try:
+        project.member.accessLevel(['admin', 'manager', 'user', 'guest'])
+    except Exception as e:
+        wiz.response.status(401, str(e))
     path = wiz.request.query("path", "")
     fs.makedirs(path)
     root = driveItem(path)
@@ -110,7 +122,10 @@ if action.startswith("drive/tree"):
     wiz.response.status(200, dict(root=root, children=children))
 
 if action.startswith("drive/create"):
-    project.member.accessLevel(['admin', 'manager', 'user'])
+    try:
+        project.member.accessLevel(['admin', 'manager', 'user'])
+    except Exception as e:
+        wiz.response.status(401, str(e))
     root_id = wiz.request.query("root_id", "")
     title = wiz.request.query("title", True)
     path = os.path.join(root_id, title)
@@ -120,7 +135,10 @@ if action.startswith("drive/create"):
     wiz.response.status(200)
 
 if action.startswith("drive/update"):
-    project.member.accessLevel(['admin', 'manager', 'user'])
+    try:
+        project.member.accessLevel(['admin', 'manager', 'user'])
+    except Exception as e:
+        wiz.response.status(401, str(e))
     file_id = wiz.request.query("id", True)
     root_id = wiz.request.query("root_id", "")
     title = wiz.request.query("title", True)
@@ -131,7 +149,10 @@ if action.startswith("drive/update"):
     wiz.response.status(200)
 
 if action == "drive/delete":
-    project.member.accessLevel(['admin', 'manager', 'user'])
+    try:
+        project.member.accessLevel(['admin', 'manager', 'user'])
+    except Exception as e:
+        wiz.response.status(401, str(e))
     path = wiz.request.query("id", "")
     if len(path) == 0:
         wiz.response.status(401)
@@ -139,7 +160,10 @@ if action == "drive/delete":
     wiz.response.status(200)
 
 if action == "drive/deletes":
-    project.member.accessLevel(['admin', 'manager', 'user'])
+    try:
+        project.member.accessLevel(['admin', 'manager', 'user'])
+    except Exception as e:
+        wiz.response.status(401, str(e))
     data = wiz.request.query("data", "")
     data = json.loads(data)
     for path in data:
@@ -147,7 +171,10 @@ if action == "drive/deletes":
     wiz.response.status(200)
 
 if action.startswith("drive/upload"):
-    project.member.accessLevel(['admin', 'manager', 'user'])
+    try:
+        project.member.accessLevel(['admin', 'manager', 'user'])
+    except Exception as e:
+        wiz.response.status(401, str(e))
 
     filepath = None
     try:
@@ -171,7 +198,10 @@ if action.startswith("drive/upload"):
     wiz.response.status(200)
 
 if action.startswith("drive/download"):
-    project.member.accessLevel(['admin', 'manager', 'user', 'guest'])
+    try:
+        project.member.accessLevel(['admin', 'manager', 'user', 'guest'])
+    except Exception as e:
+        wiz.response.status(401, str(e))
     segment = wiz.request.match("/api/works/project/<project_id>/drive/download/<path:path>")
     path = segment.path
     path = fs.abspath(path)
@@ -196,23 +226,40 @@ if action.startswith("drive/download"):
     wiz.response.download(path)
 
 if action.startswith("attachment/list"):
-    project.member.accessLevel(['admin', 'manager', 'user', 'guest'])
+    try:
+        project.member.accessLevel(['admin', 'manager', 'user', 'guest'])
+    except Exception as e:
+        wiz.response.status(401, str(e))
     page = int(wiz.request.query("page", 1))
     namespace = wiz.request.query("ns", ".attachment")
     dump = 24
     if namespace == '.attachment': dump = 40
-    orm = wiz.model("portal/season/orm")
-    attachmentdb = orm.use("attachment", module="works")
-    where = dict()
-    where['project_id'] = project_id
-    where['namespace'] = namespace
-    where['page'] = page
-    where['dump'] = dump
-    where['orderby'] = "created"
-    where['order'] = "DESC"
-    where['like'] = "namespace"
-    total = attachmentdb.count(**where)
-    rows = attachmentdb.rows(**where)
+    try:
+        orm = wiz.model("portal/season/orm")
+        attachmentdb = orm.use("attachment", module="works")
+        where = dict()
+        where['project_id'] = project_id
+        where['namespace'] = namespace
+        where['page'] = page
+        where['dump'] = dump
+        where['orderby'] = "created"
+        where['order'] = "DESC"
+        where['like'] = "namespace"
+        total = attachmentdb.count(**where)
+        rows = attachmentdb.rows(**where)
+    except Exception as e:
+        wiz.response.status(500)
+    if namespace == '.attachment':
+        cache = dict()
+        for row in rows:
+            try:
+                issue_id = row["namespace"].split(":")[1]
+                if issue_id not in cache:
+                    cache[issue_id] = project.issueboard.issue.get(issue_id)
+                row["issue_title"] = cache[issue_id]["title"]
+            except:
+                row["issue_title"] = None
+
     wiz.response.status(200, rows=rows, lastpage=math.ceil(total/dump), page=page)
 
 wiz.response.status(404)

@@ -15,10 +15,6 @@ if wiz.request.match(f"{BASEURI}/logout") is not None:
     if LOGOUT_URI is not None and LOGOUT_URI != f"{BASEURI}/logout":
         wiz.response.redirect(LOGOUT_URI)
 
-    authType = wiz.session.get("authType", "local")
-    if authType == 'saml':
-        wiz.response.redirect(f"{BASEURI}/saml/logout")
-
     wiz.session.clear()
     wiz.response.redirect(returnTo)
 
@@ -26,7 +22,20 @@ if wiz.request.match(f"{BASEURI}/login") is not None:
     if LOGIN_URL is not None and LOGIN_URL != f"{BASEURI}/login":
         wiz.response.redirect(LOGIN_URL)
 
+BASE = "/auth"
+uri = wiz.request.uri()[len(BASE):]
+if uri.startswith("/"): uri = uri[1:]
 if config.auth_saml_use:
-    wiz.model("portal/season/auth/saml").proceed()
+    struct = wiz.model("portal/saml/struct")
+    if uri == "saml/acs":
+        # import logging
+        # import sys
+        # logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+        # logging.getLogger('saml2').setLevel(logging.DEBUG)
+
+        SAMLResponse = wiz.request.query("SAMLResponse", True)
+        struct.process.acs(SAMLResponse)
+    elif uri == "saml/sls":
+        struct.process.logout()
 
 wiz.response.redirect("/")

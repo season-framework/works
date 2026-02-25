@@ -1,0 +1,123 @@
+ng-container(*ngIf="info")
+    div(class="flex")
+        div
+            h3(class="text-xl font-bold")
+                | SAML Config
+                a(
+                    class="border border-blue-500 text-blue-500 px-2 py-1 rounded-lg text-xs ml-4 hover:bg-blue-500 hover:text-white",
+                    href="/saml/metadata",
+                    target="_blank",
+                )
+                    | Metadata
+                    i.ti.ti-external-link
+            div(class="text-gray-500 text-xs mt-1")
+                | 외부 SAML IDP들과의 연동을 위한 설정
+        div(class="ml-auto")
+            button((click)="update()", class="bg-blue-500 text-white px-4 py-2 rounded-lg")
+                i.ti.ti-device-floppy
+                span.ml-1 SAVE
+
+    table(class="table-auto w-full border-collapse mt-4")
+        colgroup
+            col(class="bg-gray-100 w-64")
+            col
+        tbody(class="border-y border-black divide-y")
+            tr
+                th(class="text-left pl-3 py-2") Entity ID
+                td.py-2.px-3
+                    input([(ngModel)]="info.entityID", class="w-full rounded-md border-gray-300 shadow-sm text-sm focus:border-blue-500 focus:ring-blue-500")
+            tr
+                th(class="text-left pl-3 py-2") ACS Endpoint
+                td.py-2.px-3
+                    input([(ngModel)]="info.acs", placeholder="/auth/saml/acs", class="w-full rounded-md border-gray-300 shadow-sm text-sm focus:border-blue-500 focus:ring-blue-500")
+            tr
+                th(class="text-left pl-3 py-2") SLS Endpoint
+                td.py-2.px-3
+                    input([(ngModel)]="info.sls", placeholder="/auth/saml/sls", class="w-full rounded-md border-gray-300 shadow-sm text-sm focus:border-blue-500 focus:ring-blue-500")
+            tr
+                th(class="text-left pl-3 py-2") AuthnRequestSigned
+                td.py-2.px-3
+                    label(class="flex items-center cursor-pointer")
+                        div(class="relative")
+                            input(type="checkbox", class="sr-only", [(ngModel)]="info.AuthnRequestSigned", (ngModelChange)="service.render();")
+                            div(class="block w-10 h-6 rounded-full", [ngClass]="info.AuthnRequestSigned ? 'bg-blue-500' : 'bg-gray-300'")
+                            div(class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform", [ngClass]="{ 'translate-x-4': info.AuthnRequestSigned }")
+                        div(class="ml-2") {{info.AuthnRequestSigned?"True":"False"}}
+            tr
+                th(class="text-left pl-3 py-2") WantAssertionsSigned
+                td.py-2.px-3
+                    label(class="flex items-center cursor-pointer")
+                        div(class="relative")
+                            input(type="checkbox", class="sr-only", [(ngModel)]="info.WantAssertionsSigned", (ngModelChange)="service.render();")
+                            div(class="block w-10 h-6 rounded-full", [ngClass]="info.WantAssertionsSigned ? 'bg-blue-500' : 'bg-gray-300'")
+                            div(class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform", [ngClass]="{ 'translate-x-4': info.WantAssertionsSigned }")
+                        div(class="ml-2") {{info.WantAssertionsSigned?"True":"False"}}
+            tr
+                th(class="text-left pl-3 py-2") NameIDFormat
+                td.py-2.px-3
+                    wiz-portal-saml-select(
+                        [options]="nameIDFormats",
+                        [multiple]="true",
+                        [(value)]="info.NameIDFormat",
+                        widthClassName="w-[448px]",
+                    )
+            tr
+                th(class="text-left pl-3 py-2") Required Attributes
+                td.py-2.px-3
+                    wiz-portal-saml-select(
+                        [options]="samlAttributes",
+                        [multiple]="true",
+                        [(value)]="info.required_attributes",
+                        widthClassName="w-[448px]",
+                    )
+            tr
+                th(class="text-left pl-3 py-2") Optional Attributes
+                td.py-2.px-3
+                    wiz-portal-saml-select(
+                        [options]="samlAttributes",
+                        [multiple]="true",
+                        [(value)]="info.optional_attributes",
+                        widthClassName="w-[448px]",
+                    )
+            tr(class="border-t border-gray-200")
+                th(class="text-left pl-3 py-2") Cert (Public Key)
+                td.relative.py-2.px-3
+                    input(type="text", [(ngModel)]="info.public_key.path", placeholder="Public Key file path(Absolute Path)", class="w-full rounded-md border-gray-300 shadow-sm text-sm focus:border-blue-500 focus:ring-blue-500")
+                    ng-container(*ngIf="info.public_key.exists")
+                        button((click)="showPublicKey=!showPublicKey;service.render();", class="text-gray-500 hover:underline mt-2") {{showPublicKey?"접기":"펼치기"}}
+                        ng-container(*ngIf="showPublicKey")
+                            pre {{info.public_key.content}}
+                            div.absolute.top-14.right-1.z-10.flex.gap-2
+                                div.relative
+                                    button((click)="copyToClipboard(modal.xml)", class="size-7 text-sm bg-gray-100 hover:bg-gray-200 rounded-lg")
+                                        i.ti.ti-clipboard
+                                    div(*ngIf="showCopied", class="absolute -bottom-8 right-0 bg-gray-800 text-white text-xs px-2 py-1 rounded") Copied
+                    ng-container(*ngIf="!info.public_key.exists")
+                        div.text-gray-500 Public Key file is not exists!
+            tr(class="border-t border-gray-200")
+                th(class="text-left pl-3 py-2") Cert (Private Key)
+                td.relative.py-2.px-3
+                    input(type="text", [(ngModel)]="info.private_key.path", placeholder="Private Key file path(Absolute Path)", class="w-full rounded-md border-gray-300 shadow-sm text-sm focus:border-blue-500 focus:ring-blue-500")
+                    ng-container(*ngIf="!info.private_key.exists")
+                        div.text-gray-500 Private Key file is not exists!
+            tr(class="border-t border-gray-200")
+                th(class="text-left pl-3 py-2") Organization
+                td.py-2.px-3
+                    table(class="w-full text-sm")
+                        tbody
+                            tr(*ngFor="let key of O.keys(info.org)", class="border-y border-gray-200")
+                                td(class="w-32 px-2 py-1 bg-gray-100")
+                                    span(class="ff-b") {{ key }}
+                                td
+                                    input([(ngModel)]="info.org[key]", class="w-full px-2 py-1 rounded-lg border border-gray-300 focus:border-blue-500")
+            tr(class="border-t border-gray-200")
+                th(class="text-left pl-3 py-2") Contact
+                td.py-2.px-3
+                    table(class="w-full text-sm")
+                        tbody
+                            tr(*ngFor="let key of O.keys(info.contact)", class="border-y border-gray-200")
+                                td(class="w-32 px-2 py-1 bg-gray-100")
+                                    span(class="ff-b") {{ key }}
+                                td
+                                    input([(ngModel)]="info.contact[key]", class="w-full px-2 py-1 rounded-lg border border-gray-300 focus:border-blue-500")
+

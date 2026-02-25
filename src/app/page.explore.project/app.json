@@ -1,22 +1,11 @@
 {
-    "title": "/explore/project",
     "mode": "page",
-    "namespace": "explore.project",
-    "category": "general",
     "id": "page.explore.project",
-    "ng.build": {
-        "id": "page.explore.project",
-        "name": "PageExploreProjectComponent",
-        "path": "./page.explore.project/page.explore.project.component"
-    },
+    "title": "/explore/project",
+    "namespace": "explore.project",
     "viewuri": "/explore/project",
+    "category": "",
+    "controller": "user",
     "layout": "layout.aside",
-    "preview": "/explore/project",
-    "ng": {
-        "selector": "wiz-page-explore-project",
-        "inputs": [],
-        "outputs": []
-    },
-    "template": "wiz-page-explore-project()",
-    "controller": "user"
+    "template": "wiz-page-explore-project()"
 }

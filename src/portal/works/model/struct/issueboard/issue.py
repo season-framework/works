@@ -99,7 +99,7 @@ class Model:
 
         # update Issue
         if issue_auth != 'owner':
-            del data['description']
+            # del data['description']
             if data['status'] not in ['open', 'work', 'finish']:
                 data['status'] = issue['status']
 

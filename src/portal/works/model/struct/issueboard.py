@@ -18,7 +18,7 @@ class Model:
 
     def emit(self, event, data):
         socketio = wiz.server.app.socketio
-        branch = wiz.branch()
-        socketNamespace = f"/wiz/app/{branch}/portal.works.project.issueboard"
-        socketio.emit(event, data, to=self.project_id, namespace=socketNamespace, broadcast=True)
-        socketio.emit("updated", True, namespace=socketNamespace, broadcast=True)
+        project = wiz.project()
+        socketNamespace = f"/wiz/app/{project}/portal.works.project.issueboard"
+        socketio.emit(event, data, to=self.project_id, namespace=socketNamespace)
+        socketio.emit("updated", True, namespace=socketNamespace)

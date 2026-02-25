@@ -1,4 +1,3 @@
-import $ from "jquery";
 import { io } from "socket.io-client";
 
 export default class Wiz {
@@ -36,7 +35,7 @@ export default class Wiz {
         return false;
     }
 
-    public branch() {
+    public project() {
         let findcookie = (name) => {
             let ca: Array<string> = document.cookie.split(';');
             let caLen: number = ca.length;
@@ -52,39 +51,52 @@ export default class Wiz {
             return '';
         }
 
-        let branch = findcookie("season-wiz-branch");
-        if (branch) return branch;
+        let project = findcookie("season-wiz-project");
+        if (project) return project;
         return "main";
     }
 
     public socket() {
-        let socketns = this.baseuri + "/app/" + this.branch();
+        let socketns = this.baseuri + "/app/" + this.project();
         if (this.namespace)
             socketns = socketns + "/" + this.namespace;
         return io(socketns);
-    };
+    }
 
     public url(function_name: string) {
         if (function_name[0] == "/") function_name = function_name.substring(1);
         return this.baseuri + "/api/" + this.namespace + "/" + function_name;
     }
 
-    public call(function_name: string, data = {}, options = {}) {
-        let ajax = {
-            url: this.url(function_name),
-            type: "POST",
-            data: data,
-            ...options
-        };
+    public async call(api: string, body = {}, options = {}) {
+        let res;
+        const uri = this.url(api);
 
-        return new Promise((resolve) => {
-            try {
-                $.ajax(ajax).always(function (res) {
-                    resolve(res);
+        try {
+            if (body) {
+                res = await fetch(uri, {
+                    method: "post",
+                    body: JSON.stringify(body),
+                    headers: { 'Content-Type': 'application/json' },
+                    ...options,
                 });
-            } catch (e) {
-                resolve({ code: 500, data: e });
             }
-        });
+            else {
+                res = await fetch(uri);
+            }
+            try {
+                res = await res.clone().json();
+            } catch (err) {
+                if (res.status !== 200)
+                    return { code: res.status, data: res.statusText };
+                else {
+                    const data = await res.text();
+                    return { code: res.status, data };
+                }
+            }
+        } catch (err) {
+            return { code: 500, data: err };
+        }
+        return res;
     }
 }

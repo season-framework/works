@@ -16,10 +16,10 @@ class Model:
     
     def emit(self, event, data):
         socketio = wiz.server.app.socketio
-        branch = wiz.branch()
-        socketNamespace = f"/wiz/app/{branch}/portal.works.project.meeting"
+        project = wiz.project()
+        socketNamespace = f"/wiz/app/{project}/portal.works.project.meeting"
         meeting_id = data['id']
-        socketio.emit(event, data, to=meeting_id, namespace=socketNamespace, broadcast=True)
+        socketio.emit(event, data, to=meeting_id, namespace=socketNamespace)
 
     def transformUser(self, user_id):
         if user_id in self.cache['users']:

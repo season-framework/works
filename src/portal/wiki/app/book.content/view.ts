@@ -17,12 +17,6 @@ export class Component implements OnInit {
 
     public async ngOnInit() {
         await this.service.init();
-
-        // ktw added start
-        const allow = this.wikibook.accessLevel(['admin', 'manager', 'user', 'guest']);
-        if (!allow) return await this.service.href("/explore/project");
-        // ktw added end
-
         await this.active("default");
 
         this.wikibook.content.bind('load', async () => {

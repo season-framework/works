@@ -34,7 +34,7 @@ export class Component implements OnInit {
     public async update() {
         const { code, data } = await this.wikibook.update();
         if (code == 200) {
-            await this.alert("저장되었습니다", 'success');
+            await this.service.success("저장되었습니다.");
             if (data.namespaceChanged)
                 this.service.href(`/project/${data.data.namespace}/info`);
         } else {

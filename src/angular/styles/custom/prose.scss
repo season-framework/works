@@ -1,0 +1,134 @@
+.prose {
+    // 기본 폰트 크기 및 라인 높이 (선택 사항, 필요시 조정)
+    font-size: 14px;
+    // line-height: 1.75; // 텍스트 라인 간격
+
+    // 문단 (p)
+    p {
+        margin-top: 0.75em;
+        margin-bottom: 0.75em;
+    }
+
+    // 제목 (h1 ~ h6)
+    h1 {
+        margin-top: 1.5em;
+        margin-bottom: 0.75em;
+    }
+
+    h2 {
+        margin-top: 1.25em;
+        margin-bottom: 0.6em;
+    }
+
+    h3 {
+        margin-top: 1em;
+        margin-bottom: 0.5em;
+    }
+
+    h4 {
+        margin-top: 0.75em;
+        margin-bottom: 0.4em;
+    }
+
+    h5 {
+        margin-top: 0.6em;
+        margin-bottom: 0.3em;
+    }
+
+    h6 {
+        margin-top: 0.5em;
+        margin-bottom: 0.25em;
+    }
+
+    // 목록 (ul, ol)
+    ul,
+    ol {
+        margin-top: 0.5em;
+        margin-bottom: 0.5em;
+        padding-left: 1.5em; // 들여쓰기 복원 (tailwind reset 때문에 사라질 수 있음)
+    }
+
+    // 목록 아이템 (li)
+    li {
+        margin-top: 0.25em;
+        margin-bottom: 0.25em;
+        // ul, ol의 padding-left로 인해 li 자체에 추가 들여쓰기가 필요 없는 경우가 많음
+    }
+
+    // 인용 블록 (blockquote)
+    blockquote {
+        margin-top: 1em;
+        margin-bottom: 1em;
+        // border-left: 0.25rem solid #e5e7eb; // Tailwind gray-200 색상 예시
+        // padding-left: 1em;
+    }
+
+    // 코드 블록 (pre)
+    pre {
+        margin-top: 1em;
+        margin-bottom: 1em;
+        // background-color: #1f2937; // Tailwind gray-800 색상 예시
+        // color: #f9fafb;             // Tailwind gray-50 색상 예시
+        // padding: 1em;
+        // border-radius: 0.375rem;     // md (6px) border-radius
+        // overflow-x: auto;          // 가로 스크롤 허용
+    }
+
+    // 이미지 (img)
+    img {
+        margin-top: 1em;
+        margin-bottom: 1em;
+        max-width: 100%; // 이미지가 부모 요소를 넘지 않도록
+        height: auto;
+        display: block; // img 기본 display: inline; 을 block으로 변경하여 margin 적용
+    }
+
+    // 테이블 (table)
+    table {
+        width: 100%;
+        margin-top: 1.5em;
+        margin-bottom: 1.5em;
+        border-collapse: collapse; // 테두리 병합
+    }
+
+    // 테이블 헤더 (th)
+    th {
+        padding: 0.5em 0.75em;
+        border-bottom: 1px solid #d1d5db; // Tailwind gray-300 색상 예시
+        text-align: left;
+    }
+
+    // 테이블 데이터 (td)
+    td {
+        padding: 0.5em 0.75em;
+        border-bottom: 1px solid #e5e7eb; // Tailwind gray-200 색상 예시
+    }
+
+    // 수평선 (hr)
+    hr {
+        margin-top: 2em;
+        margin-bottom: 2em;
+        border-top: 1px solid #e5e7eb; // Tailwind gray-200 색상 예시
+    }
+
+    // 링크 (a)
+    a {
+        // color: #2563eb; // Tailwind blue-600 색상 예시
+        // text-decoration: underline;
+        // font-weight: 500;
+    }
+
+    // 인라인 코드 (code)
+    code {
+        // background-color: #f3f4f6; // Tailwind gray-100 색상 예시
+        // padding: 0.2em 0.4em;
+        // border-radius: 0.25rem;
+        // font-weight: 600;
+    }
+
+    // strong (볼드 텍스트)
+    strong {
+        // font-weight: 700;
+        // color: #1f2937; // Tailwind gray-800 색상 예시
+    }
+}

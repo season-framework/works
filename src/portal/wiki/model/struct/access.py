@@ -61,7 +61,7 @@ class Model:
         if auth in allowed:
             return True
         if raise_exception:
-            raise Exception("Not Allowed")
+            wiz.response.abort(401)
         return False
     
     def create(self, role, key, type="user"):

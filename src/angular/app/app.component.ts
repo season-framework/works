@@ -15,12 +15,33 @@ export class AppComponent implements OnInit {
         public project: Project,
         public wikibook: WikiBook,
         public router: Router,
-        public ref: ChangeDetectorRef
+        public ref: ChangeDetectorRef,
     ) { }
 
     public async ngOnInit() {
         await this.service.init(this);
         await this.project.bind(this.service);
         await this.wikibook.bind(this.service);
+        this.service.copy = (obj) => {
+            return JSON.parse(JSON.stringify(obj));
+        }
+        this.service.error = async (message, title = "ERROR") => {
+            return await this.service.alert.show({
+                title,
+                message,
+                action: "close",
+                cancel: false,
+            });
+        }
+        this.service.success = async (message, title = "SUCCESS") => {
+            return await this.service.alert.show({
+                title,
+                status: "success",
+                message,
+                action: "close",
+                actionBtn: "success",
+                cancel: false,
+            });
+        }
     }
 }

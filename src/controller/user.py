@@ -1,17 +1,9 @@
 import season
-import datetime
-import json
-import os
 
-class Controller:
+class Controller(wiz.controller("base")):
     def __init__(self):
-        ctrl = wiz.controller("base")
+        super().__init__()
+        
+        if wiz.session.has("id") == False:
+            wiz.response.status(401)
 
-        user_id = wiz.session.get("id")
-        if user_id is None:
-            config = wiz.model("portal/season/config")
-            login_uri = config.auth_login_uri
-            if login_uri is None:
-                login_uri = "/authenticate"
-            current_uri = wiz.request.uri()
-            wiz.response.redirect(f"{login_uri}?returnTo={current_uri}")

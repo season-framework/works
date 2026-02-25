@@ -4,18 +4,8 @@
     "title": "/wikidownload/:path?",
     "namespace": "wikidownload",
     "viewuri": "/wikidownload/:id",
-    "category": "wiki",
+    "category": "",
     "controller": "user",
-    "layout": "layout.empty2",
-    "ng.build": {
-        "id": "page.wikidownload",
-        "name": "PageWikidownloadComponent",
-        "path": "./page.wikidownload/page.wikidownload.component"
-    },
-    "ng": {
-        "selector": "wiz-page-wikidownload",
-        "inputs": [],
-        "outputs": []
-    },
+    "layout": "layout.empty",
     "template": "wiz-page-wikidownload()"
 }

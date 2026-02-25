@@ -13,8 +13,6 @@ project_id = segment.project_id
 
 if wiz.session.get("access_project", None) != project_id:
     project = wiz.model("portal/works/project").get(project_id)
-    if project is None:
-        wiz.response.status(404, message="프로젝트를 찾을 수 없습니다")
     project.member.accessLevel(["admin", "manager", "user", "guest", "visitor"])
     wiz.session.set(access_project=project_id)
 
@@ -22,32 +20,35 @@ fs = wiz.model("portal/works/fs").use(f"project/{project_id}/attachment")
 cachefs = wiz.model("portal/works/fs").use(f"project/{project_id}/cache")
 
 if action == 'upload':
-    orm = wiz.model("portal/season/orm")
-    attachmentdb = orm.use("attachment", module="works")
-    config = wiz.model("portal/works/config")
+    try:
+        orm = wiz.model("portal/season/orm")
+        attachmentdb = orm.use("attachment", module="works")
+        config = wiz.model("portal/works/config")
 
-    segment = wiz.request.match("/api/works/attachment/<action>/<project_id>/<namespace>/<path:path>")
-    namespace = segment.namespace
-    file = wiz.request.file("upload")
-    if file is None: 
-        wiz.response.status(404)
+        segment = wiz.request.match("/api/works/attachment/<action>/<project_id>/<namespace>/<path:path>")
+        namespace = segment.namespace
+        file = wiz.request.file("upload")
+        if file is None: 
+            wiz.response.status(404)
 
-    filepath = str(int(time.time()*1000000)) + orm.random(16)
-    while attachmentdb.get(id=filepath) is not None:
         filepath = str(int(time.time()*1000000)) + orm.random(16)
+        while attachmentdb.get(id=filepath) is not None:
+            filepath = str(int(time.time()*1000000)) + orm.random(16)
 
-    fs.write.file(filepath, file)
-    filename = file.filename
-    urlfilename = urllib.parse.quote(file.filename)
+        fs.write.file(filepath, file)
+        filename = file.filename
+        urlfilename = urllib.parse.quote(file.filename)
 
-    obj = dict()
-    obj['id'] = filepath
-    obj['project_id'] = project_id
-    obj['namespace'] = namespace
-    obj['user_id'] = config.session_user_id()
-    obj['filename'] = filename
-    obj['created'] = datetime.datetime.now()
-    attachmentdb.insert(obj)
+        obj = dict()
+        obj['id'] = filepath
+        obj['project_id'] = project_id
+        obj['namespace'] = namespace
+        obj['user_id'] = config.session_user_id()
+        obj['filename'] = filename
+        obj['created'] = datetime.datetime.now()
+        attachmentdb.insert(obj)
+    except Exception as e:
+        wiz.response.json(dict(code=500))
 
     wiz.response.json(dict(
         code=200,

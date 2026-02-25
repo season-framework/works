@@ -92,10 +92,6 @@ export class Component implements OnInit, OnDestroy {
         this.service.href(`/wiki/${this.wikibook.data().namespace}/new`)
     }
 
-    public async download() {
-        window.open(`/wikidownload/${this.wikibook.data().id}`, '_blank');
-    }
-
     public async cancelCreate(node: any) {
         delete node.newItem;
         await this.service.render();

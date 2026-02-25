@@ -11,8 +11,6 @@ db = orm.use("meeting", module="works")
 user_id = wiz.session.get("id")
 project_id = wiz.request.query("project_id", True)
 project = wiz.model("portal/works/project").get(project_id)
-if project is None:
-    wiz.response.status(404, message="프로젝트를 찾을 수 없습니다")
 
 def search():
     text = wiz.request.query("text", "")

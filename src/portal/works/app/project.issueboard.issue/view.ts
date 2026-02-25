@@ -34,7 +34,8 @@ export class Component implements OnInit {
 
     public config: any = {
         todoSorted: {
-            animation: 0
+            animation: 0,
+            handle: ".todo-handle",
         }
     };
 
@@ -72,6 +73,14 @@ export class Component implements OnInit {
                 command: async () => {
                     await this.update();
                 }
+            },
+            {
+                name: "esc",
+                key: ["esc"],
+                preventDefault: true,
+                command: async () => {
+                    await this.hide();
+                }
             }
         ];
         for (let i = 0; i < this.shortcuts.length; i++)
@@ -93,7 +102,7 @@ export class Component implements OnInit {
 
         await this.load();
 
-        let descEditor = await this.project.bindEditor(this.descriptionElement.nativeElement, false, !this.isRole(['owner']));
+        let descEditor = await this.project.bindEditor(this.descriptionElement.nativeElement, false, false);
         if (descEditor) this.editor.description = descEditor;
 
         this.editor.description.keystrokes.set('Ctrl+S', async (event, cancel) => {
@@ -126,10 +135,10 @@ export class Component implements OnInit {
         this.issue.event.update = async () => {
             let { data } = await self.api('load');
             self.data.info = data;
-            if (self.data.info.planstart)
-                self.data.info.planstart = moment(self.data.info.planstart).format("YYYY-MM-DD");
-            if (self.data.info.planend)
-                self.data.info.planend = moment(self.data.info.planend).format("YYYY-MM-DD");
+            if (self.data.info.planstart == "Invalid date" || self.data.info.planstart == "0000-00-00 00:00:00") self.data.info.planstart = null;
+            if (self.data.info.planend == "Invalid date" || self.data.info.planend == "0000-00-00 00:00:00") self.data.info.planend = null;
+            if (self.data.info.planstart) self.data.info.planstart = moment(self.data.info.planstart).format("YYYY-MM-DD");
+            if (self.data.info.planend) self.data.info.planend = moment(self.data.info.planend).format("YYYY-MM-DD");
             self.data.info.level = self.data.info.level + '';
             self.data.info.process = self.data.info.process + '';
             self.editor.description.data.set(self.data.info.description);
@@ -253,8 +262,8 @@ export class Component implements OnInit {
         if (!this.isRole(['owner', 'manager'])) return;
 
         if (!this.cache.todoText) return;
-        if (this.data.info.todo.length >= 5) {
-            await this.alert(`TODO 목록은 최대 5개 까지만 등록 가능합니다`, "오류", "error", "확인", false);
+        if (this.data.info.todo.length >= 20) {
+            await this.alert(`TODO 목록은 최대 20개 까지만 등록 가능합니다`, "오류", "error", "확인", false);
             return;
         }
         this.data.info.todo.push({ title: todoText, checked: false });
@@ -313,7 +322,6 @@ export class Component implements OnInit {
 
     public async refreshMessage(message_id: number) {
         let { code, data } = await this.api("message", { message_id: message_id });
-        console.log(data);
         if (data) {
             for (let i = 0; i < this.data.messages.length; i++) {
                 if (this.data.messages[i].id == data.id) {
@@ -409,11 +417,7 @@ export class Component implements OnInit {
             info.type = 'file';
 
         this.cache.sendMessage = true;
-        await this.api("sendMessage", {
-            project_title: this.project.data().title,
-            issue_title: this.data.info.title,
-            data: JSON.stringify(info),
-        });
+        await this.api("sendMessage", { data: JSON.stringify(info) });
         let parent_id: any = this.cache.message.parent_id;
         this.cache.message = { attachment: [], images: [] };
         if (parent_id)
@@ -509,7 +513,7 @@ export class Component implements OnInit {
         for (let i = 0; i < images.length; i++) {
             row.items.push(images[i]);
             if (row.items.length == 4) {
-                row.size = "col-3";
+                row.size = "w-1/4";
                 grid.push(row);
                 row = { items: [] };
             }
@@ -517,13 +521,13 @@ export class Component implements OnInit {
 
         if (row.items.length > 0) {
             if (row.items.length == 1) {
-                row.size = "col-12";
+                row.size = "w-full";
             } else if (row.items.length == 2) {
-                row.size = "col-6";
+                row.size = "w-1/2";
             } else if (row.items.length == 3) {
-                row.size = "col-4";
+                row.size = "w-1/3";
             } else {
-                row.size = "col-3";
+                row.size = "w-1/4";
             }
 
             grid.push(row);
@@ -586,7 +590,7 @@ export class Component implements OnInit {
         if (info.process == 100 && !["finish", "close", "cancel"].includes(info.status))
             info.status = 'finish';
 
-        const { code, data } = await this.api("update", { data: JSON.stringify(info), project_title: this.project.data().title, });
+        const { code, data } = await this.api("update", { data: JSON.stringify(info) });
 
         this.cache.isUpdate = false;
 
@@ -650,6 +654,15 @@ export class Component implements OnInit {
 
         this.bodyElement.nativeElement.style.marginTop = (y + this.modalStyle.y) + 'px';
         this.bodyElement.nativeElement.style.marginLeft = (x + this.modalStyle.x) + 'px';
+    }
+
+    public containerClass() {
+        const list = [];
+        if (this.issue.modal) { // wiz-modal
+            list.push("absolute", "top-0", "left-0", "bg-black/[.5]", "flex", "items-baseline", "justify-center", "max-sm:p-0", "z-[4000]");
+        }
+        else list.push("overflow-hidden");
+        return list.join(" ");
     }
 
 }

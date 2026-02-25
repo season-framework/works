@@ -17,7 +17,7 @@ class Model:
         project_id = self.project_id
         labels = labeldb.rows(project_id=project_id)
 
-        issues = issuedb.rows(project_id=project_id, status=['open', 'work', 'finish', 'noti'], fields="id")
+        issues = issuedb.rows(project_id=project_id, status=['open', 'work', 'finish', 'noti', 'event'], fields="id")
         issues = [x['id'] for x in issues]
         classified = []
         undefined = -1

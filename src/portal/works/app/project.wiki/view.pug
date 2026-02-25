@@ -1,122 +1,100 @@
-.wiki-container
-    .row.m-0.p-0
-        .col-md-3
-            .sticky-top.pt-4.pb-4
-                .d-flex.mb-3
-                    .btn.btn-blue.btn-block((click)="createProject()", *ngIf="service.auth.show.membership(['admin', 'staff', 'user']) && project.accessLevel(['admin', 'manager'])")
-                        i.ti.ti-plus.mr-2
-                        span 새 위키 만들기
-                    
-                    .btn.btn-link.btn-block((click)="connectWiki()", *ngIf="service.auth.show.membership(['admin', 'staff', 'user']) && project.accessLevel(['admin', 'manager'])")
+.container.py-6.px-4.flex.flex-wrap.overflow-auto
+    .flex.w-full(class="max-sm:flex-col-reverse")
+        div(class="w-3/4 p-4 max-sm:w-full")
+            .flex.flex-col.gap-y-4
+                .flex.flex-col.bg-white.rounded-lg.border.border-gray-300.p-6.w-full.gap-y-3.items-end(*ngIf="!loaded")
+                    .bg-gray-300.rounded-full.h-4(class="w-9/12")
+                    .bg-gray-300.rounded-full.h-3(class="w-10/12")
+                    .bg-gray-300.rounded-full.h-3(class="w-11/12")
+                    .bg-gray-300.rounded-full.h-3(class="w-8/12")
+
+                ng-container(*ngIf="loaded")
+                    .flex.flex-col.items-center.bg-white.rounded-lg.border.border-gray-300.py-10.w-full(*ngIf="list.length == 0")
+                        img.h-32.w-auto(src="/assets/portal/works/work.svg")
+                        p.mt-8.text-xl 검색된 위키가 없습니다
+                        p.mt-2.text-md.text-gray-500(*ngIf="service.auth.show.membership(['admin', 'staff', 'user'])") 아래 시작하기 버튼을 눌러서 위키를 시작해주세요.
+                        button.bg-blue-500.text-white.rounded-lg.py-2.px-3.mt-6(*ngIf="service.auth.show.membership(['admin', 'staff', 'user'])", class="hover:bg-blue-600", (click)="createProject()")
+                            span 시작하기
+                            i.fa-solid.fa-person-running.ml-2
+                    ng-container(*ngFor="let item of list;let i = index")
+                        .flex.flex-wrap.bg-white.rounded-lg.border.border-gray-300.p-6.w-full.transition-all.duration-300.cursor-pointer(class="hover:text-blue-500 hover:border-blue-500", (click)="open(item)")
+                            img.bg-gray-50.border.border-gray-300.rounded-lg.bg-contain.bg-center.bg-cover.bg-no-repeat(class="size-14", style="background-image: url({{item.icon}})")
+                            .flex-1.ml-5
+                                h3.ff-b {{item.title}}
+                                .flex.text-gray-500.text-sm.mt-2(class="max-sm:flex-col")
+                                    span(class="max-sm:before:!content-[''] max-sm:before:!mx-0")
+                                        i.ti.ti-rotate-clockwise-2.mr-1
+                                        span {{displayDate(item.updated)}}
+                    .sticky.py-4.backdrop-blur(*ngIf="list.length > 0", class="max-sm:pb-2 -bottom-4")
+                        wiz-component-pagination(
+                            [current]="search.page",
+                            [start]="pagenation.start",
+                            [end]="pagenation.end",
+                            (pageMove)="load($event)",
+                        )
+
+        div(class="w-1/4 max-sm:w-full")
+            .sticky.top-0.pt-4(class="max-sm:pt-0")
+                .flex.mb-4(*ngIf="service.auth.show.membership(['admin', 'staff', 'user']) && project.accessLevel(['admin', 'manager'])")
+                    button.bg-blue-500.text-white.rounded-lg.py-2.px-3.flex-1(class="max-sm:hidden hover:bg-blue-600", (click)="createProject()")
+                        i.ti.ti-plus
+                        span.ml-2 새 위키 만들기
+                    button.text-blue-500.py-2.px-3.flex-1(class="hover:underline underline-offset-4", (click)="connectWiki()")
                         span 위키 연결
 
                 .mb-4
-                    input.form-control(placeholder="검색어를 입력해주세요", [(ngModel)]="search.text", (keyup.enter)="load()")
+                    input.w-full.rounded-md.border-gray-400.text-sm.mt-2(placeholder="검색어를 입력해주세요", [(ngModel)]="search.text", (keyup.enter)="load()")
 
-        .col-md-9.p-4
-            .row.row-cards
-                .space-y
-                    .card(*ngIf="!loaded")
-                        .card-body.text-end.placeholder-glow
-                            .placeholder.col-9.mb-3
-                            .placeholder.placeholder-xs.col-10
-                            .placeholder.placeholder-xs.col-11
-                            .placeholder.placeholder-xs.col-8
-
-                    .card.card-hover(*ngIf="list.length == 0 && loaded")
-                        .empty
-                            .empty-img
-                                img(src="/assets/portal/works/work.svg")
-                            p.empty-title 검색된 위키가 없습니다
-                            p.empty-subtitle.text-muted(*ngIf="service.auth.show.membership(['admin', 'staff', 'user'])") 아래 시작하기 버튼을 눌러서 위키를 시작해주세요.
-                            .empty-action(*ngIf="service.auth.show.membership(['admin', 'staff', 'user'])")
-                                a.btn.btn-blue((click)="createProject()")
-                                    span 시작하기
-                                    i.fa-solid.fa-person-running.ml-2
-
-                    ng-container(*ngFor="let item of list")
-                        .card.card-hover((click)="open(item)")
-                            .row.g-0
-                                .col-auto
-                                    .card-body
-                                        .avatar.avatar-md(style='background-image: url({{item.icon}})')
-                                .col
-                                    .card-body.ps-0
-                                        .row
-                                            .col
-                                                h3.mb-0
-                                                    a {{item.title}}
-                                        .row
-                                            .col-md
-                                                .mt-2.list-inline.list-inline-dots.mb-0.text-muted
-                                                    .list-inline-item
-                                                        i.ti.ti-rotate-clockwise-2.mr-1
-                                                        span {{displayDate(item.updated)}}
-
-            .mt-4.mb-4
-                wiz-portal-season-pagenation(
-                    [current]="search.page", 
-                    [start]="pagenation.start", 
-                    [end]="pagenation.end", 
-                    (pageMove)="load($event)")
-
-.wiz-modal(*ngIf="isConnectWiki")
-    .modal
-        .modal-dialog(role='document')
-            .modal-content
-                .modal-header.p-3
-                    h3.modal-title 위키 연결
-                    .ml-auto
-                    .text-dark.close-btn((click)="closeConnectWikiModal()")
-                        i.fa-solid.fa-xmark
-            
-                .modal-body.p-4.bg-blue-lt
+div(class="relative z-[99999]", *ngIf="isConnectWiki")
+    div(class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity")
+    div(class="fixed inset-0 z-50 w-screen overflow-y-auto")
+        div(class="flex min-h-full items-end justify-center text-center sm:items-center sm:p-0 w-4/5 min-w-96 max-w-[640px] mx-auto")
+            div(class="relative flex flex-col transform rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 w-full max-h-[90vh] overflow-hidden")
+                div(class="absolute top-0 right-0 size-8 flex items-center justify-center text-gray-500 hover:text-gray-900 text-xl cursor-pointer hover:scale-125 transition-all", (click)="closeConnectWikiModal()")
+                    i.fa-solid.fa-xmark
+                .flex.border-b.border-gray-300.py-3.px-5
+                    h3(class="text-base font-semibold leading-6 text-gray-900") 위키 연결
+                div(class="relative flex-1 flex flex-col gap-y-3 px-4 py-2 overflow-auto bg-slate-50")
                     ng-container(*ngFor="let item of wiki.list")
-                        .card.card-hover.mb-3((click)="selectConnectWiki(item)", [class.active]="wiki.selected ? item.id == wiki.selected.id : false")
-                            .row.g-0
-                                .col-auto
-                                    .card-body
-                                        .avatar.avatar-md(style='background-image: url({{item.icon}})')
-                                .col
-                                    .card-body.ps-0
-                                        .row
-                                            .col
-                                                h3.mb-0
-                                                    a {{item.title}}
-                                        .row
-                                            .col-md
-                                                .mt-2.list-inline.list-inline-dots.mb-0.text-muted
-                                                    .list-inline-item
-                                                        i.ti.ti-rotate-clockwise-2.mr-1
-                                                        span {{displayDate(item.updated)}}
+                        .flex.flex-wrap.bg-white.rounded-lg.border.border-gray-300.p-6.w-full.transition-all.duration-300.cursor-pointer(
+                            class="hover:text-blue-500 hover:border-blue-500",
+                            [ngClass]="wiki.selected && item.id == wiki.selected.id?'!border-blue-600 !bg-blue-50':''",
+                            (click)="selectConnectWiki(item)",
+                        )
+                            img.bg-gray-50.border.border-gray-300.rounded-lg.bg-contain.bg-center.bg-cover.bg-no-repeat(class="size-14", style="background-image: url({{item.icon}})")
+                            .flex-1.ml-5
+                                h3.ff-b {{item.title}}
+                                .flex.text-gray-500.text-sm.mt-2(class="max-sm:flex-col")
+                                    span(class="max-sm:before:!content-[''] max-sm:before:!mx-0")
+                                        i.ti.ti-rotate-clockwise-2.mr-1
+                                        span {{displayDate(item.updated)}}
 
-                    wiz-portal-season-pagenation(
-                        [current]="wiki.search.page", 
-                        [start]="wiki.pagenation.start", 
-                        [end]="wiki.pagenation.end", 
-                        (pageMove)="loadWiki($event)")
+                    .sticky.py-4.backdrop-blur(*ngIf="wiki.list.length > 0", class="max-sm:pb-2 -bottom-4")
+                        wiz-component-pagination(
+                            [current]="wiki.search.page",
+                            [start]="wiki.pagenation.start",
+                            [end]="wiki.pagenation.end",
+                            (pageMove)="loadWiki($event)")
 
-                .modal-footer.d-flex.pt-1.pb-1
-                    .btn.btn-white((click)="closeConnectWikiModal()") 닫기
-                    .ml-auto
-                    .btn.btn-blue((click)="connectWiki()", *ngIf="wiki.selected") 연결하기
-                    .btn.btn-link(*ngIf="!wiki.selected") 연결할 위키를 선택해주세요
+                div(class="flex border-t border-gray-300 py-3 px-5")
+                    button(class="rounded-md px-3 py-2 text-sm font-semibold text-gray-900 shadow-0 border border-gray-300 bg-white hover:border-black sm:mt-0 sm:w-auto transition-all", (click)="closeConnectWikiModal()") 닫기
+                    button(*ngIf="wiki.selected", class="rounded-md px-3 py-2 text-sm font-semibold text-white shadow-0 bg-blue-500 hover:bg-blue-600 sm:mt-0 sm:w-auto ml-auto transition-all", (click)="connectWiki()") 연결하기
+                    button(*ngIf="!wiki.selected", class="rounded-md px-3 py-2 text-sm font-semibold text-gray-500 shadow-0 bg-gray-300 sm:mt-0 sm:w-auto ml-auto transition-all cursor-auto") 연결할 위키를 선택해주세요.
 
-.wiz-modal(*ngIf="newProject")
-    .modal
-        .modal-dialog(role='document')
-            .modal-content
-                .modal-header.p-3
-                    h3.modal-title 새로운 위키
-                    .ml-auto
-                    .text-dark.close-btn((click)="closeCreateBookModal()")
-                        i.fa-solid.fa-xmark
-            
-                .modal-body
+div(class="relative z-[99999]", *ngIf="newProject")
+    div(class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity")
+    div(class="fixed inset-0 z-50 w-screen overflow-y-auto")
+        div(class="flex min-h-full items-end justify-center text-center sm:items-center sm:p-0 w-4/5 min-w-96 max-w-[640px] mx-auto")
+            div(class="relative flex flex-col transform rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 w-full max-h-[90vh] overflow-hidden")
+                div(class="absolute top-0 right-0 size-8 flex items-center justify-center text-gray-500 hover:text-gray-900 text-xl cursor-pointer hover:scale-125 transition-all", (click)="closeCreateBookModal()")
+                    i.fa-solid.fa-xmark
+                .flex.border-b.border-gray-300.py-3.px-5
+                    h3(class="text-base font-semibold leading-6 text-gray-900") 새로운 위키
+                div(class="flex-1 px-4 py-2 overflow-auto bg-slate-50")
                     wiz-portal-wiki-book-info([hasSaveBtn]="false")
-                
-                .modal-footer.d-flex
-                    .btn.btn-white((click)="closeCreateBookModal()") 닫기
-                    .ml-auto
-                    .btn.btn-blue((click)="createBook()") 시작하기
+
+                div(class="flex border-t border-gray-300 py-3 px-5")
+                    button(class="rounded-md px-3 py-2 text-sm font-semibold text-gray-900 shadow-0 border border-gray-300 bg-white hover:border-black sm:mt-0 sm:w-auto transition-all", (click)="closeCreateBookModal()") 닫기
+                    button(class="rounded-md px-3 py-2 text-sm font-semibold text-white shadow-0 bg-blue-500 hover:bg-blue-600 sm:mt-0 sm:w-auto ml-auto transition-all", (click)="createBook()") 시작하기
+
 

@@ -49,10 +49,9 @@
                         "inlineStyleLanguage": "scss",
                         "assets": [],
                         "styles": [
-                            "node_modules/@tabler/core/dist/css/tabler.min.css",
-                            "node_modules/toastr/build/toastr.min.css",
                             "node_modules/@fortawesome/fontawesome-free/css/all.min.css",
-                            "node_modules/@tabler/icons-webfont/tabler-icons.scss",
+                            "node_modules/@tabler/icons-webfont/dist/tabler-icons.min.css",
+                            "tailwind.min.css",
                             "src/styles.scss"
                         ],
                         "scripts": [

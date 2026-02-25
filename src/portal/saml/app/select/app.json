@@ -1,0 +1,11 @@
+{
+    "type": "app",
+    "mode": "portal",
+    "title": "select",
+    "id": "select",
+    "namespace": "select",
+    "viewuri": "",
+    "category": "",
+    "controller": "",
+    "template": "wiz-portal-saml-select([options]=\"\", [value]=\"\", [disabled]=\"\", [searchable]=\"\", [placeholder]=\"\", [widthClassName]=\"\", [className]=\"\", [multiple]=\"\", [align]=\"\", [maxHeight]=\"\", (valueChange)=\"\")"
+}
