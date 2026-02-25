@@ -1,3 +1,4 @@
+import $ from "jquery";
 import { io } from "socket.io-client";
 
 export default class Wiz {
@@ -35,7 +36,7 @@ export default class Wiz {
         return false;
     }
 
-    public project() {
+    public branch() {
         let findcookie = (name) => {
             let ca: Array<string> = document.cookie.split(';');
             let caLen: number = ca.length;
@@ -51,52 +52,39 @@ export default class Wiz {
             return '';
         }
 
-        let project = findcookie("season-wiz-project");
-        if (project) return project;
+        let branch = findcookie("season-wiz-branch");
+        if (branch) return branch;
         return "main";
     }
 
     public socket() {
-        let socketns = this.baseuri + "/app/" + this.project();
+        let socketns = this.baseuri + "/app/" + this.branch();
         if (this.namespace)
             socketns = socketns + "/" + this.namespace;
         return io(socketns);
-    }
+    };
 
     public url(function_name: string) {
         if (function_name[0] == "/") function_name = function_name.substring(1);
         return this.baseuri + "/api/" + this.namespace + "/" + function_name;
     }
 
-    public async call(api: string, body = {}, options = {}) {
-        let res;
-        const uri = this.url(api);
+    public call(function_name: string, data = {}, options = {}) {
+        let ajax = {
+            url: this.url(function_name),
+            type: "POST",
+            data: data,
+            ...options
+        };
 
-        try {
-            if (body) {
-                res = await fetch(uri, {
-                    method: "post",
-                    body: JSON.stringify(body),
-                    headers: { 'Content-Type': 'application/json' },
-                    ...options,
-                });
-            }
-            else {
-                res = await fetch(uri);
-            }
+        return new Promise((resolve) => {
             try {
-                res = await res.clone().json();
-            } catch (err) {
-                if (res.status !== 200)
-                    return { code: res.status, data: res.statusText };
-                else {
-                    const data = await res.text();
-                    return { code: res.status, data };
-                }
+                $.ajax(ajax).always(function (res) {
+                    resolve(res);
+                });
+            } catch (e) {
+                resolve({ code: 500, data: e });
             }
-        } catch (err) {
-            return { code: 500, data: err };
-        }
-        return res;
+        });
     }
 }

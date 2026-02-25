@@ -22,19 +22,14 @@ export class Component implements OnInit {
 
     public async ngOnInit() {
         await this.service.init();
-        // await this.service.auth.allow(true, "/authenticate");
-        // await this.service.auth.allow.membership("admin", "/authenticate");
+        await this.service.auth.allow();
         const { code, data } = await wiz.call("load", { id: this.DOC_ID });
         let editor = await this.wikibook.bindEditor(this.editorElement.nativeElement, false);
         if (editor) this.editor = editor;
         this.editor.data.set(data);
 
-        const wrap = document.querySelector("wiz-layout-empty > div");
-        wrap.style.overflow = "auto";
-        wrap.style.justifyContent = "center";
-        wrap.classList.add("bg-slate-50");
+        document.getElementsByTagName("html")[0].style.overflow = 'auto';
         document.body.style.height = 'auto';
-        document.querySelector("app-root").style.height = "auto";
-        document.querySelector(".ck-editor__top").style.display = "none";
+        document.getElementsByTagName('app-root')[0].style.height = 'auto';
     }
 }

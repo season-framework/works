@@ -1,4 +1,4 @@
-const INDEX_PAGE = "explore/project";
+const INDEX_PAGE = "issues";
 
 import { URLPattern } from "urlpattern-polyfill";
 import { NgModule } from '@angular/core';

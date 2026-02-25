@@ -1,106 +1,121 @@
-.w-full.h-full.overflow-auto
-    .container.py-6.px-4
-        .flex(class="max-sm:flex-col-reverse")
-            div(class="w-3/4 p-4 max-sm:w-full")
-                .flex.flex-col.gap-y-4
-                    .flex.flex-col.bg-white.rounded-lg.border.border-gray-300.p-6.w-full.gap-y-3.items-end(*ngIf="!loaded")
-                        .bg-gray-300.rounded-full.h-4(class="w-9/12")
-                        .bg-gray-300.rounded-full.h-3(class="w-10/12")
-                        .bg-gray-300.rounded-full.h-3(class="w-11/12")
-                        .bg-gray-300.rounded-full.h-3(class="w-8/12")
+.container
+    .row                        
+        .col-md-9.p-4
+            .row.row-cards
+                .space-y
+                    .card(*ngIf="!loaded")
+                        .card-body.text-end.placeholder-glow
+                            .placeholder.col-9.mb-3
+                            .placeholder.placeholder-xs.col-10
+                            .placeholder.placeholder-xs.col-11
+                            .placeholder.placeholder-xs.col-8
 
-                    ng-container(*ngIf="loaded")
-                        .flex.flex-col.items-center.bg-white.rounded-lg.border.border-gray-300.py-10.w-full(*ngIf="list.length == 0")
-                            img.h-32.w-auto(src="/assets/portal/works/work.svg")
-                            p.mt-8.text-xl 검색된 프로젝트가 없습니다
-                            p.mt-2.text-md.text-gray-500(*ngIf="service.auth.show.membership(['admin', 'staff', 'user'])") 아래 시작하기 버튼을 눌러서 프로젝트를 시작해주세요.
-                            button.bg-blue-500.text-white.rounded-lg.py-2.px-3.mt-6(*ngIf="service.auth.show.membership(['admin', 'staff', 'user'])", class="hover:bg-blue-400", (click)="createProject()")
-                                span 시작하기
-                                i.fa-solid.fa-person-running.ml-2
-                        ng-container(*ngFor="let item of list;let i = index")
-                            a.flex.flex-wrap.bg-white.rounded-lg.border.border-gray-300.p-6.w-full.transition-all.duration-300.cursor-pointer([routerLink]="'/project/' + item.namespace", class="hover:text-blue-500 hover:border-blue-500")
-                                img.bg-gray-50.border.border-gray-300.rounded-lg.bg-contain.bg-center.bg-cover.bg-no-repeat(class="size-14", style="background-image: url({{item.icon}})")
-                                .flex-1.ml-5
-                                    h3.ff-b {{item.title}}
-                                    .flex.text-gray-500.text-sm.mt-2.list-linline-dots(class="max-sm:flex-col")
-                                        span
-                                            i.ti.ti-hash
-                                            span.ml-1 {{item.short}}
-                                        span(class="max-sm:before:!content-[''] max-sm:before:!mx-0")
-                                            i.ti.ti-alarm.mr-1
-                                                span {{displayDate(item.start)}}
-                                                ng-container(*ngIf="item.end")
-                                                    i.ti.ti-arrow-narrow-right.mr-1.ml-1
-                                                    span {{displayDate(item.end)}}
-                                        span(class="max-sm:before:!content-[''] max-sm:before:!mx-0")
-                                            i.ti.ti-rotate-clockwise-2.mr-1
-                                            span {{displayDate(item.updated)}}
-                                        span(*ngIf="item.untrack", class="max-sm:before:!content-[''] max-sm:before:!mx-0")
-                                            i.ti.ti-ban.mr-1
-                                            span 추적하지 않음
-                        .sticky.py-4.backdrop-blur(*ngIf="list.length > 0", class="-bottom-0")
-                            wiz-component-pagination(
-                                [current]="search.page", 
-                                [start]="pagenation.start", 
-                                [end]="pagenation.end", 
-                                (pageMove)="load($event)")
+                    .card.card-hover(*ngIf="list.length == 0 && loaded")
+                        .empty
+                            .empty-img
+                                img(src="/assets/portal/works/work.svg")
+                            p.empty-title 검색된 프로젝트가 없습니다
+                            p.empty-subtitle.text-muted(*ngIf="service.auth.show.membership(['admin', 'staff', 'user'])") 아래 시작하기 버튼을 눌러서 프로젝트를 시작해주세요.
+                            .empty-action(*ngIf="service.auth.show.membership(['admin', 'staff', 'user'])")
+                                a.btn.btn-blue((click)="createProject()")
+                                    span 시작하기
+                                    i.fa-solid.fa-person-running.ml-2
 
-            div(class="w-1/4 max-sm:w-full")
-                .sticky.top-0.pt-4(class="max-sm:pt-0")
-                    button.bg-blue-500.text-white.rounded-lg.py-2.px-3.w-full(class="max-sm:hidden hover:bg-blug-600", (click)="createProject()", *ngIf="service.auth.show.membership(['admin', 'staff', 'user'])")
-                        i.ti.ti-plus
-                        span.ml-2 새 프로젝트
+                    ng-container(*ngFor="let item of list")
+                        .card.card-hover([routerLink]="'/project/' + item.namespace")
+                            .row.g-0
+                                .col-auto
+                                    .card-body
+                                        .avatar.avatar-md(style='background-image: url({{item.icon}})')
+                                .col
+                                    .card-body.ps-0
+                                        .row
+                                            .col
+                                                h3.mb-0
+                                                    a {{item.title}}
+                                        .row
+                                            .col-md
+                                                .mt-2.list-inline.list-inline-dots.mb-0.text-muted
+                                                    .list-inline-item
+                                                        i.ti.ti-hash.mr-1
+                                                        span {{item.short}}
+                                                    
+                                                    .list-inline-item
+                                                        i.ti.ti-alarm.mr-1
+                                                        span {{displayDate(item.start)}}
+                                                        ng-container(*ngIf="item.end")
+                                                            i.ti.ti-arrow-narrow-right.mr-1.ml-1
+                                                            span {{displayDate(item.end)}}            
+                                                    .list-inline-item
+                                                        i.ti.ti-rotate-clockwise-2.mr-1
+                                                        span {{displayDate(item.updated)}}
+
+                                                    .list-inline-item(*ngIf="item.untrack")
+                                                        i.ti.ti-ban.mr-1
+                                                        span 추적하지 않음
+
+            .mt-4.mb-4
+                wiz-portal-season-pagenation(
+                    [current]="search.page", 
+                    [start]="pagenation.start", 
+                    [end]="pagenation.end", 
+                    (pageMove)="load($event)")
+
+        .col-md-3.container-menu
+            .sticky-top.pt-4.pb-4
+                .btn.btn-blue.btn-block.mb-3((click)="createProject()", *ngIf="service.auth.show.membership(['admin', 'staff', 'user'])")
+                    i.ti.ti-plus.mr-2
+                    span 새 프로젝트
+
+                .form-label 프로젝트명
+                .mb-4
+                    input.form-control(placeholder="검색어를 입력해주세요", [(ngModel)]="search.text", (keyup.enter)="load()")
+                
+                .form-label 프로젝트 범위
+                .mb-4
+                    label.form-check
+                        input.form-check-input(type='radio', name='project-range', value='join', [(ngModel)]="search.range", (change)="load()")
+                        span.form-check-label 참여 프로젝트
+                    label.form-check(*ngIf="service.auth.show.membership(['admin', 'staff', 'user'])")
+                        input.form-check-input(type='radio', name='project-range', value='manage', [(ngModel)]="search.range", (change)="load()")
+                        span.form-check-label 내 프로젝트
+                    label.form-check
+                        input.form-check-input(type='radio', name='project-range', value='all', [(ngModel)]="search.range", (change)="load()")
+                        span.form-check-label 전체 프로젝트
                     
-                    .text-sm.mt-4(class="max-sm:mt-0") 프로젝트명
-                    input.w-full.rounded-md.border-gray-400.text-sm.mt-2(placeholder="검색어를 입력해주세요", [(ngModel)]="search.text", (keyup.enter)="load()")
+                .form-label 프로젝트 상태
+                .mb-4
+                    label.form-check
+                        input.form-check-input(type='radio', name='project-status', value='open', [(ngModel)]="search.status", (change)="load()")
+                        span.form-check-label 진행중인 프로젝트
+                    label.form-check
+                        input.form-check-input(type='radio', name='project-status', value='close', [(ngModel)]="search.status", (change)="load()")
+                        span.form-check-label 종료된 프로젝트
+                
+                .form-label 프로젝트 정렬
+                .mb-4
+                    label.form-check
+                        input.form-check-input(type='radio', name='project-sort', value='updated', [(ngModel)]="search.sort", (change)="load()")
+                        span.form-check-label 업데이트순
+                    label.form-check
+                        input.form-check-input(type='radio', name='project-sort', value='title', [(ngModel)]="search.sort", (change)="load()")
+                        span.form-check-label 제목순
 
-                    .text-sm.mt-4 프로젝트 범위
-                    .mt-2(class="max-sm:w-auto max-sm:px-1 max-sm:inline-block")
-                        label(class="cursor-pointer text-slate-700 has-[:checked]:ring-indigo-200 has-[:checked]:text-indigo-900 has-[:checked]:bg-indigo-50 grid grid-cols-[24px_1fr_auto] items-center rounded-lg py-2 px-4 ring-1 ring-gray-200 hover:bg-slate-100")
-                            input(type="radio", name="project-range", value="join", [(ngModel)]="search.range", (change)="load()", class="box-content size-1.5 shadow-0 rounded-full border-[5px] border-white bg-white bg-clip-padding outline-none ring-1 ring-gray-950/10 checked:border-indigo-500 checked:ring-indigo-500 focus:!border-indigo-500 hover:!border-indigo-500")
-                            span.mx-2(class="max-sm:text-center") 참여 프로젝트
-                    .mt-2(*ngIf="service.auth.show.membership(['admin', 'staff', 'user'])", class="max-sm:w-auto max-sm:px-1 max-sm:inline-block")
-                        label(class="cursor-pointer text-slate-700 has-[:checked]:ring-indigo-200 has-[:checked]:text-indigo-900 has-[:checked]:bg-indigo-50 grid grid-cols-[24px_1fr_auto] items-center rounded-lg py-2 px-4 ring-1 ring-gray-200 hover:bg-slate-100")
-                            input(type="radio", name="project-range", value="manage", [(ngModel)]="search.range", (change)="load()", class="box-content size-1.5 shadow-0 rounded-full border-[5px] border-white bg-white bg-clip-padding outline-none ring-1 ring-gray-950/10 checked:border-indigo-500 checked:ring-indigo-500 focus:!border-indigo-500 hover:!border-indigo-500")
-                            span.mx-2(class="max-sm:text-center") 내 프로젝트
-                    .mt-2(class="max-sm:w-auto max-sm:px-1 max-sm:inline-block")
-                        label(class="cursor-pointer text-slate-700 has-[:checked]:ring-indigo-200 has-[:checked]:text-indigo-900 has-[:checked]:bg-indigo-50 grid grid-cols-[24px_1fr_auto] items-center rounded-lg py-2 px-4 ring-1 ring-gray-200 hover:bg-slate-100")
-                            input(type="radio", name="project-range", value="all", [(ngModel)]="search.range", (change)="load()", class="box-content size-1.5 shadow-0 rounded-full border-[5px] border-white bg-white bg-clip-padding outline-none ring-1 ring-gray-950/10 checked:border-indigo-500 checked:ring-indigo-500 focus:!border-indigo-500 hover:!border-indigo-500")
-                            span.mx-2(class="max-sm:text-center") 전체 프로젝트
-
-                    .text-sm.mt-4 프로젝트 상태
-                    .mt-2(class="max-sm:w-auto max-sm:px-1 max-sm:inline-block")
-                        label(class="cursor-pointer text-slate-700 has-[:checked]:ring-indigo-200 has-[:checked]:text-indigo-900 has-[:checked]:bg-indigo-50 grid grid-cols-[24px_1fr_auto] items-center rounded-lg py-2 px-4 ring-1 ring-gray-200 hover:bg-slate-100")
-                            input(type="radio", name="project-status", value="open", [(ngModel)]="search.status", (change)="load()", class="box-content size-1.5 shadow-0 rounded-full border-[5px] border-white bg-white bg-clip-padding outline-none ring-1 ring-gray-950/10 checked:border-indigo-500 checked:ring-indigo-500 focus:!border-indigo-500 hover:!border-indigo-500")
-                            span.mx-2(class="max-sm:text-center") 진행중인 프로젝트
-                    .mt-2(class="max-sm:w-auto max-sm:px-1 max-sm:inline-block")
-                        label(class="cursor-pointer text-slate-700 has-[:checked]:ring-indigo-200 has-[:checked]:text-indigo-900 has-[:checked]:bg-indigo-50 grid grid-cols-[24px_1fr_auto] items-center rounded-lg py-2 px-4 ring-1 ring-gray-200 hover:bg-slate-100")
-                            input(type="radio", name="project-status", value="close", [(ngModel)]="search.status", (change)="load()", class="box-content size-1.5 shadow-0 rounded-full border-[5px] border-white bg-white bg-clip-padding outline-none ring-1 ring-gray-950/10 checked:border-indigo-500 checked:ring-indigo-500 focus:!border-indigo-500 hover:!border-indigo-500")
-                            span.mx-2(class="max-sm:text-center") 종료된 프로젝트
-
-                    .text-sm.mt-4 프로젝트 정렬
-                    .mt-2(class="max-sm:w-auto max-sm:px-1 max-sm:inline-block")
-                        label(class="cursor-pointer text-slate-700 has-[:checked]:ring-indigo-200 has-[:checked]:text-indigo-900 has-[:checked]:bg-indigo-50 grid grid-cols-[24px_1fr_auto] items-center rounded-lg py-2 px-4 ring-1 ring-gray-200 hover:bg-slate-100")
-                            input(type="radio", name="project-sort", value="updated", [(ngModel)]="search.sort", (change)="load()", class="box-content size-1.5 shadow-0 rounded-full border-[5px] border-white bg-white bg-clip-padding outline-none ring-1 ring-gray-950/10 checked:border-indigo-500 checked:ring-indigo-500 focus:!border-indigo-500 hover:!border-indigo-500")
-                            span.mx-2(class="max-sm:text-center") 업데이트순
-                    .mt-2(class="max-sm:w-auto max-sm:px-1 max-sm:inline-block")
-                        label(class="cursor-pointer text-slate-700 has-[:checked]:ring-indigo-200 has-[:checked]:text-indigo-900 has-[:checked]:bg-indigo-50 grid grid-cols-[24px_1fr_auto] items-center rounded-lg py-2 px-4 ring-1 ring-gray-200 hover:bg-slate-100")
-                            input(type="radio", name="project-sort", value="title", [(ngModel)]="search.sort", (change)="load()", class="box-content size-1.5 shadow-0 rounded-full border-[5px] border-white bg-white bg-clip-padding outline-none ring-1 ring-gray-950/10 checked:border-indigo-500 checked:ring-indigo-500 focus:!border-indigo-500 hover:!border-indigo-500")
-                            span.mx-2(class="max-sm:text-center") 제목순
-
-    div(class="relative z-[99999]", *ngIf="newProject")
-        div(class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity")
-        div(class="fixed inset-0 z-50 w-screen overflow-y-auto")
-            div(class="flex min-h-full items-end justify-center text-center sm:items-center sm:p-0 w-4/5 max-w-[1440px] mx-auto")
-                div(class="relative flex flex-col transform rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 w-full max-h-[90vh] overflow-hidden")
-                    div(class="absolute top-0 right-0 size-8 flex items-center justify-center text-gray-500 hover:text-gray-900 text-xl cursor-pointer hover:scale-125 transition-all", (click)="closeCreateProjectModal()")
+.wiz-modal(*ngIf="newProject")
+    .modal
+        .modal-dialog(role='document')
+            .modal-content
+                .modal-header.p-3
+                    h3.modal-title 새 프로젝트
+                    .ml-auto
+                    .text-dark.close-btn((click)="closeCreateProjectModal()")
                         i.fa-solid.fa-xmark
-                    .flex.border-b.border-gray-300.py-3.px-5
-                        h3(class="text-base font-semibold leading-6 text-gray-900") 새 프로젝트
-                    div(class="flex-1 px-4 py-2 overflow-auto bg-slate-50")
-                        wiz-portal-works-project-info([hasSaveBtn]="false", [config]="config")
-
-                    div(class="flex border-t border-gray-300 py-3 px-5")
-                        button(class="rounded-md px-3 py-2 text-sm font-semibold text-gray-900 shadow-0 border border-gray-300 bg-white hover:border-black sm:mt-0 sm:w-auto transition-all", (click)="closeCreateProjectModal()") 닫기
-                        button(class="rounded-md px-3 py-2 text-sm font-semibold text-white shadow-0 bg-blue-500 hover:bg-blue-600 sm:mt-0 sm:w-auto ml-auto transition-all", (click)="updateCreateProject()") 시작하기
+            
+                .modal-body
+                    wiz-portal-works-project-info([hasSaveBtn]="false", [config]="config")
+                
+                .modal-footer.d-flex
+                    .btn.btn-white((click)="closeCreateProjectModal()") 닫기
+                    .ml-auto
+                    .btn.btn-blue((click)="updateCreateProject()") 시작하기
 

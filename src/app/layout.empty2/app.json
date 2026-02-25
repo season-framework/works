@@ -1,0 +1,20 @@
+{
+    "mode": "layout",
+    "id": "layout.empty2",
+    "title": "Empty2",
+    "namespace": "empty2",
+    "viewuri": "",
+    "category": "",
+    "controller": "",
+    "ng.build": {
+        "id": "layout.empty2",
+        "name": "LayoutEmpty2Component",
+        "path": "./layout.empty2/layout.empty2.component"
+    },
+    "ng": {
+        "selector": "wiz-layout-empty2",
+        "inputs": [],
+        "outputs": []
+    },
+    "template": "wiz-layout-empty2()"
+}

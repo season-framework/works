@@ -2,7 +2,7 @@
     "id": "switch",
     "title": "/switch/<path:path>",
     "route": "/switch/<path:path>",
-    "viewuri": "/test",
+    "viewuri": "",
     "category": "dev",
     "controller": "base"
 }

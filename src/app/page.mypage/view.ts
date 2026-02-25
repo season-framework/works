@@ -1,5 +1,6 @@
 import { OnInit } from '@angular/core';
 import { Service } from '@wiz/libs/portal/season/service';
+import moment from 'moment';
 
 export class Component implements OnInit {
     constructor(public service: Service) { }
@@ -8,7 +9,7 @@ export class Component implements OnInit {
 
     public async ngOnInit() {
         await this.service.init();
-        await this.service.auth.allow(true, "/authenticate");
+        await this.service.auth.allow(true, "/auth/login");
         await this.load();
     }
 
@@ -27,7 +28,7 @@ export class Component implements OnInit {
         const { data } = await wiz.call("session");
         let { user } = data;
         try {
-            if (user.birth) user.birth = new Date(user.birth).format("yyyy-MM-dd");
+            if (user.birth) user.birth = moment(user.birth).format("YYYY-MM-DD");
         } catch (e) {
             user.birth = null;
         }

@@ -1,5 +1,5 @@
 doctype html
-html(lang="en", class="overflow-hidden")
+html(lang="kr")
     head
         meta(charset="utf-8")
         title 시즌웍스
@@ -31,6 +31,5 @@ html(lang="en", class="overflow-hidden")
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.register('/sw.js', {scope: '/'}).then((reg) => {});
             }
-
-    body(class="overflow-hidden")
+    body
         app-root
