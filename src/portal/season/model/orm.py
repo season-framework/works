@@ -23,13 +23,10 @@ class Model:
 
     @staticmethod
     def cls(tablename=None, module=None):
-        try:
-            if module is not None:
-                orm = wiz.model(os.path.join("portal", module, "db", tablename))
-            else:
-                orm = wiz.model(os.path.join(ORM_BASE, tablename))
-        except Exception as e:
-            pass
+        if module is not None:
+            orm = wiz.model(os.path.join("portal", module, "db", tablename))
+        else:
+            orm = wiz.model(os.path.join(ORM_BASE, tablename))
         return orm
     
     @staticmethod
@@ -103,7 +100,7 @@ class Model:
                             qo = (qo) | (_qo)
 
                     query = query.where(qo)
-                except Exception as e:
+                except AttributeError:
                     pass
             
             if groupby is not None:
@@ -113,7 +110,7 @@ class Model:
                     try:
                         field = getattr(db, field)
                         groupby[i] = field
-                    except:
+                    except AttributeError:
                         pass
                 query = query.group_by(*groupby)
             
@@ -155,7 +152,7 @@ class Model:
                         qo = (qo) | (_qo)
                         
                 query = query.where(qo)
-            except Exception as e:
+            except AttributeError:
                 pass
 
         if groupby is not None:
@@ -165,7 +162,7 @@ class Model:
                 try:
                     field = getattr(db, field)
                     groupby[i] = field
-                except:
+                except AttributeError:
                     pass
             query = query.group_by(*groupby)
 
@@ -179,7 +176,7 @@ class Model:
                         orderby[i] = field.desc()
                     else:
                         orderby[i] = field
-                except:
+                except AttributeError:
                     pass
             query = query.order_by(*orderby)
 

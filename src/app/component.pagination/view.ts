@@ -10,9 +10,9 @@ export class Component implements OnInit, OnChanges {
 
     public disabledClass = "disabled:opacity-50 disabled:cursor-not-allowed";
     public list: Array<number> = [];
+    public Math = Math;
 
     public async ngOnInit() {
-        this.Math = Math;
     }
 
     public async ngOnChanges() {

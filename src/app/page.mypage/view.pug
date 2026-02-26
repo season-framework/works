@@ -29,7 +29,7 @@
             .flex.text-center.items-center.h-12
                 .flex.items-center.pl-4(class="w-1/6 h-full bg-blue-50 text-sm font-semibold") 아이콘
                 .flex-1.flex
-                    button.ml-2.self-center.size-9.border.border-gray-300.rounded-lg.bg-contain.bg-center.bg-cover.bg-no-repeat(style='background-image: url({{data.user.profile_image}})', (click)="updateIcon()")
+                    button.ml-2.self-center.size-9.border.border-gray-300.rounded-lg.bg-contain.bg-center.bg-cover.bg-no-repeat([ngStyle]="{'background-image': 'url(' + data.user.profile_image + ')'}", (click)="updateIcon()", aria-label="프로필 아이콘 변경")
                     button.ml-2.px-3.py-2.bg-gray-500.text-white.text-sm.font-semibold.rounded-md(class="hover:bg-gray-400", (click)="updateIcon()") 아이콘 등록
                     button.ml-2.px-3.py-2.text-blue-700.text-sm.font-semibold(*ngIf="data.user.profile_image", class="hover:underline", (click)="deleteIcon()") 아이콘 삭제
 

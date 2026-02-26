@@ -5,6 +5,8 @@ import math
 pid = wiz.request.query("project_id", True)
 projectModel = wiz.model("portal/works/project")
 project = projectModel.get(pid)
+if project is None:
+    wiz.response.status(404, "Project not found")
 
 def load():
     labels = project.issueboard.label.list()

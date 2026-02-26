@@ -14,24 +14,34 @@ projectModel = wiz.model("portal/works/project")
 project = projectModel.get(project_id)
 fs = wiz.model("portal/works/fs").use(f"project/{project_id}/drive")
 
+# 공통 null 체크 (FN-0008): load 외 모든 액션에서도 project 존재 확인
+if project is None and action != "load":
+    wiz.response.status(404)
+
+# Path Traversal 방어 함수 (FN-0003)
+def safe_path(user_path):
+    """사용자 입력 경로가 base 디렉토리를 벗어나지 못하도록 검증"""
+    base = os.path.realpath(fs.abspath(""))
+    resolved = os.path.realpath(fs.abspath(user_path))
+    if not resolved.startswith(base + os.sep) and resolved != base:
+        wiz.response.status(403, "접근이 허용되지 않는 경로입니다")
+    return user_path
+
 # Project API
-if action.startswith("load"):
+if action == "load":
     if project is None:
         wiz.response.status(404)
     wiz.response.status(200, project.data)
 
-if action.startswith("update"):
+elif action == "update":
     data = wiz.request.query("data", True)
     data = json.loads(data)
     data['id'] = project.data['id']
     
     namespaceChanged = False
     if project.data['namespace'] != data['namespace']:
-        try:
-            exists = projectModel.get(data['namespace'])
-            if exists is not None:
-                raise Excpetion("Exists Namespace")
-        except:
+        exists = projectModel.get(data['namespace'])
+        if exists is not None:
             wiz.response.status(400, 'Namespace가 사용중입니다')
         namespaceChanged = True
     
@@ -39,17 +49,17 @@ if action.startswith("update"):
     project = projectModel.get(data['namespace'])
     wiz.response.status(200, data=project.data, namespaceChanged=namespaceChanged)
 
-if action.startswith("untrack"):
+elif action == "untrack":
     status = wiz.request.query("status", True)
     project.untrack(status)
     wiz.response.status(200)
 
 # Member API
-if action.startswith("member/load"):
+elif action == "member/load":
     members = project.member.members()
     wiz.response.status(200, members)
 
-if action.startswith("member/create"):
+elif action == "member/create":
     try:
         user = wiz.request.query("user", True)
         role = wiz.request.query("role", True)
@@ -58,7 +68,7 @@ if action.startswith("member/create"):
         wiz.response.status(500, str(e))
     wiz.response.status(200)
 
-if action.startswith("member/remove"):
+elif action == "member/remove":
     try:
         user = wiz.request.query("user", True)
         project.member.remove(user)
@@ -66,7 +76,7 @@ if action.startswith("member/remove"):
         wiz.response.status(500, str(e))
     wiz.response.status(200)
 
-if action.startswith("member/update"):
+elif action == "member/update":
     try:
         user = wiz.request.query("user", True)
         role = wiz.request.query("role", True)
@@ -76,44 +86,24 @@ if action.startswith("member/update"):
     wiz.response.status(200)
 
 # Plan API
-if action.startswith("plan/load"):
+elif action == "plan/load":
     data = project.plan.load()
     wiz.response.status(200, data)
 
-if action.startswith("plan/update"):
+elif action == "plan/update":
     data = wiz.request.query("data", True)
     data = json.loads(data)
     project.plan.update(data)
     wiz.response.status(200)
 
 # Drive API
-def driveItem(path):
-    def convert_size():
-        size_bytes = os.path.getsize(fs.abspath(path)) 
-        if size_bytes == 0:
-            return "0B"
-        size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
-        i = int(math.floor(math.log(size_bytes, 1024)))
-        p = math.pow(1024, i)
-        s = round(size_bytes / p, 2)
-        return "%s %s" % (s, size_name[i])
-
-    item = dict()
-    item['id'] = path
-    item['type'] = 'folder' if fs.isdir(path) else 'file'
-    item['title'] = os.path.basename(path)
-    item['root_id'] = os.path.dirname(path)
-    item['created'] = datetime.datetime.fromtimestamp(os.stat(fs.abspath(path)).st_ctime).strftime('%Y-%m-%d %H:%M:%S')
-    item['modified'] = datetime.datetime.fromtimestamp(os.stat(fs.abspath(path)).st_mtime).strftime('%Y-%m-%d %H:%M:%S')
-    item['size'] = convert_size()
-    return item
-
-if action.startswith("drive/tree"):
+elif action == "drive/tree":
     try:
         project.member.accessLevel(['admin', 'manager', 'user', 'guest'])
     except Exception as e:
         wiz.response.status(401, str(e))
     path = wiz.request.query("path", "")
+    safe_path(path)
     fs.makedirs(path)
     root = driveItem(path)
     children = []
@@ -121,7 +111,7 @@ if action.startswith("drive/tree"):
         children.append(driveItem(os.path.join(path, item)))
     wiz.response.status(200, dict(root=root, children=children))
 
-if action.startswith("drive/create"):
+elif action == "drive/create":
     try:
         project.member.accessLevel(['admin', 'manager', 'user'])
     except Exception as e:
@@ -129,12 +119,13 @@ if action.startswith("drive/create"):
     root_id = wiz.request.query("root_id", "")
     title = wiz.request.query("title", True)
     path = os.path.join(root_id, title)
+    safe_path(path)
     if fs.exists(path):
         wiz.response.status(401)
     fs.makedirs(path)
     wiz.response.status(200)
 
-if action.startswith("drive/update"):
+elif action == "drive/update":
     try:
         project.member.accessLevel(['admin', 'manager', 'user'])
     except Exception as e:
@@ -142,13 +133,15 @@ if action.startswith("drive/update"):
     file_id = wiz.request.query("id", True)
     root_id = wiz.request.query("root_id", "")
     title = wiz.request.query("title", True)
+    safe_path(file_id)
     path = os.path.join(root_id, title)
+    safe_path(path)
     if fs.exists(path):
         wiz.response.status(401)
     fs.move(file_id, path)
     wiz.response.status(200)
 
-if action == "drive/delete":
+elif action == "drive/delete":
     try:
         project.member.accessLevel(['admin', 'manager', 'user'])
     except Exception as e:
@@ -156,10 +149,11 @@ if action == "drive/delete":
     path = wiz.request.query("id", "")
     if len(path) == 0:
         wiz.response.status(401)
+    safe_path(path)
     fs.remove(path)
     wiz.response.status(200)
 
-if action == "drive/deletes":
+elif action == "drive/deletes":
     try:
         project.member.accessLevel(['admin', 'manager', 'user'])
     except Exception as e:
@@ -167,10 +161,11 @@ if action == "drive/deletes":
     data = wiz.request.query("data", "")
     data = json.loads(data)
     for path in data:
+        safe_path(path)
         fs.remove(path)
     wiz.response.status(200)
 
-if action.startswith("drive/upload"):
+elif action == "drive/upload":
     try:
         project.member.accessLevel(['admin', 'manager', 'user'])
     except Exception as e:
@@ -179,31 +174,38 @@ if action.startswith("drive/upload"):
     filepath = None
     try:
         filepath = json.loads(wiz.request.query("path", ""))
-    except:
+    except Exception:
         pass
 
     segment = wiz.request.match("/api/works/project/<project_id>/drive/upload/<path:path>")
     path = segment.path
     if path is None: path = ""
+    safe_path(path)
     path = fs.abspath(path)
     files = wiz.request.files()
     for i in range(len(files)):
         f = files[i]
         try: fpath = filepath[i]
-        except: fpath = None
+        except Exception: fpath = None
         name = f.filename
         if fpath is not None:
             name = fpath
-        fs.write.file(os.path.join(path, name), f)
+        target = os.path.join(path, name)
+        # 업로드 파일명도 traversal 방어
+        base = os.path.realpath(fs.abspath(""))
+        if not os.path.realpath(target).startswith(base + os.sep):
+            continue
+        fs.write.file(target, f)
     wiz.response.status(200)
 
-if action.startswith("drive/download"):
+elif action == "drive/download":
     try:
         project.member.accessLevel(['admin', 'manager', 'user', 'guest'])
     except Exception as e:
         wiz.response.status(401, str(e))
     segment = wiz.request.match("/api/works/project/<project_id>/drive/download/<path:path>")
     path = segment.path
+    safe_path(path)
     path = fs.abspath(path)
 
     if fs.isdir(path):
@@ -212,20 +214,19 @@ if action.startswith("drive/download"):
         if len(zippath) < 10: 
             wiz.response.status(404)
         try:
-            shutil.remove(zippath)
-        except Exception as e:
+            os.remove(zippath)
+        except Exception:
             pass
-        os.makedirs(os.path.dirname(zippath))
-        zipdata = zipfile.ZipFile(zippath, 'w')
-        for folder, subfolders, files in os.walk(path):
-            for file in files:
-                zipdata.write(os.path.join(folder, file), os.path.relpath(os.path.join(folder,file), path), compress_type=zipfile.ZIP_DEFLATED)
-        zipdata.close()
+        os.makedirs(os.path.dirname(zippath), exist_ok=True)
+        with zipfile.ZipFile(zippath, 'w') as zipdata:
+            for folder, subfolders, files in os.walk(path):
+                for file in files:
+                    zipdata.write(os.path.join(folder, file), os.path.relpath(os.path.join(folder, file), path), compress_type=zipfile.ZIP_DEFLATED)
         path = zippath
 
     wiz.response.download(path)
 
-if action.startswith("attachment/list"):
+elif action.startswith("attachment/list"):
     try:
         project.member.accessLevel(['admin', 'manager', 'user', 'guest'])
     except Exception as e:
@@ -257,9 +258,31 @@ if action.startswith("attachment/list"):
                 if issue_id not in cache:
                     cache[issue_id] = project.issueboard.issue.get(issue_id)
                 row["issue_title"] = cache[issue_id]["title"]
-            except:
+            except Exception:
                 row["issue_title"] = None
 
     wiz.response.status(200, rows=rows, lastpage=math.ceil(total/dump), page=page)
 
-wiz.response.status(404)
+else:
+    wiz.response.status(404)
+
+def driveItem(path):
+    def convert_size():
+        size_bytes = os.path.getsize(fs.abspath(path)) 
+        if size_bytes == 0:
+            return "0B"
+        size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
+        i = int(math.floor(math.log(size_bytes, 1024)))
+        p = math.pow(1024, i)
+        s = round(size_bytes / p, 2)
+        return "%s %s" % (s, size_name[i])
+
+    item = dict()
+    item['id'] = path
+    item['type'] = 'folder' if fs.isdir(path) else 'file'
+    item['title'] = os.path.basename(path)
+    item['root_id'] = os.path.dirname(path)
+    item['created'] = datetime.datetime.fromtimestamp(os.stat(fs.abspath(path)).st_ctime).strftime('%Y-%m-%d %H:%M:%S')
+    item['modified'] = datetime.datetime.fromtimestamp(os.stat(fs.abspath(path)).st_mtime).strftime('%Y-%m-%d %H:%M:%S')
+    item['size'] = convert_size()
+    return item

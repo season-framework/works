@@ -11,29 +11,27 @@ segment = wiz.request.match("/api/wiki/attachment/<action>/<book_id>/<path:path>
 action = segment.action
 book_id = segment.book_id
 
-if wiz.session.get("access_book", None) != book_id:
-    book = wiz.model("portal/wiki/book").get(book_id)
-    book.access.accessLevel(["admin", "user", "guest", "visitor"])
-    wiz.session.set(access_book=book_id)
+# FN-0011: 세션 캐시 제거, 매 요청 시 인증 검증
+book = wiz.model("portal/wiki/book").get(book_id)
+if book is None:
+    wiz.response.status(404)
+book.access.accessLevel(["admin", "user", "guest", "visitor"])
 
 fs = wiz.model("portal/wiki/fs").use(f"book/{book_id}/attachment")
 cachefs = wiz.model("portal/wiki/fs").use(f"book/{book_id}/cache")
 
 if action == 'upload':
-    try:
-        orm = wiz.model("portal/season/orm")
-        book = wiz.model("portal/wiki/book").get(book_id)
-        file = wiz.request.file("upload")
-        if file is None: 
-            wiz.response.status(404)
+    orm = wiz.model("portal/season/orm")
+    book = wiz.model("portal/wiki/book").get(book_id)
+    file = wiz.request.file("upload")
+    if file is None: 
+        wiz.response.status(404)
 
-        filename = file.filename
-        filepath = book.content.update(dict(type="attachment", root_id="", title=filename))
-        fs.makedirs(".")
-        fs.write.file(filepath, file)
-        urlfilename = urllib.parse.quote(file.filename)
-    except Exception as e:
-        wiz.response.json(dict(code=500))
+    filename = file.filename
+    filepath = book.content.update(dict(type="attachment", root_id="", title=filename))
+    fs.makedirs(".")
+    fs.write.file(filepath, file)
+    urlfilename = urllib.parse.quote(file.filename)
 
     wiz.response.json(dict(
         code=200,
@@ -76,11 +74,11 @@ elif action == 'thumbnail':
             
             if cachefs.isfile(cachefilepath) == False:
                 cachefs.copy(fs.abspath(filepath), cachefilepath)
-                im = Image.open(cachefs.abspath(cachefilepath))
-                ratio = 512 / im.size[0]
-                size = (int(im.size[0] * ratio), int(im.size[1] * ratio))
-                im.thumbnail(size)
-                im.save(cachefs.abspath(cachefilepath))
+                with Image.open(cachefs.abspath(cachefilepath)) as im:
+                    ratio = 512 / im.size[0]
+                    size = (int(im.size[0] * ratio), int(im.size[1] * ratio))
+                    im.thumbnail(size)
+                    im.save(cachefs.abspath(cachefilepath))
             
             resfilepath = cachefs.abspath(cachefilepath)
     except Exception as e:

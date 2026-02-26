@@ -104,8 +104,21 @@ class Model:
 
         rows = messagedb.rows(page=1, dump=10, **kwargs)
 
+        # Batch fetch replies to avoid N+1 queries
+        parent_ids = [rows[i]['id'] for i in range(len(rows))]
+        if parent_ids:
+            all_replies = messagedb.rows(parent_id=parent_ids, issue_id=issue_id, order="ASC", orderby="id")
+            reply_map = {}
+            for reply in all_replies:
+                pid = reply['parent_id']
+                if pid not in reply_map:
+                    reply_map[pid] = []
+                reply_map[pid].append(reply)
+        else:
+            reply_map = {}
+
         for i in range(len(rows)):
-            rows[i]['reply'] = messagedb.rows(parent_id=rows[i]['id'], issue_id=issue_id, order="ASC", orderby="id")
+            rows[i]['reply'] = reply_map.get(rows[i]['id'], [])
 
         return rows
     
@@ -135,7 +148,20 @@ class Model:
 
         rows = messagedb.rows(**kwargs)
 
+        # Batch fetch replies to avoid N+1 queries
+        parent_ids = [rows[i]['id'] for i in range(len(rows))]
+        if parent_ids:
+            all_replies = messagedb.rows(parent_id=parent_ids, issue_id=issue_id, order="ASC", orderby="id")
+            reply_map = {}
+            for reply in all_replies:
+                pid = reply['parent_id']
+                if pid not in reply_map:
+                    reply_map[pid] = []
+                reply_map[pid].append(reply)
+        else:
+            reply_map = {}
+
         for i in range(len(rows)):
-            rows[i]['reply'] = messagedb.rows(parent_id=rows[i]['id'], issue_id=issue_id, order="ASC", orderby="id")
+            rows[i]['reply'] = reply_map.get(rows[i]['id'], [])
 
         return rows

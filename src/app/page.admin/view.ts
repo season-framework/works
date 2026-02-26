@@ -1,5 +1,5 @@
 import { OnInit } from "@angular/core";
-import { Service } from "src/libs/portal/season/service";
+import { Service } from '@wiz/libs/portal/season/service';
 
 export class Component implements OnInit {
 

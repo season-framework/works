@@ -10,7 +10,7 @@
 
                 ng-container(*ngIf="loaded")
                     .flex.flex-col.items-center.bg-white.rounded-lg.border.border-gray-300.py-10.w-full(*ngIf="list.length == 0")
-                        img.h-32.w-auto(src="/assets/portal/works/work.svg")
+                        img.h-32.w-auto(src="/assets/portal/works/work.svg", alt="위키 없음")
                         p.mt-8.text-xl 검색된 위키가 없습니다
                         p.mt-2.text-md.text-gray-500(*ngIf="service.auth.show.membership(['admin', 'staff', 'user'])") 아래 시작하기 버튼을 눌러서 위키를 시작해주세요.
                         button.bg-blue-500.text-white.rounded-lg.py-2.px-3.mt-6(*ngIf="service.auth.show.membership(['admin', 'staff', 'user'])", class="hover:bg-blue-600", (click)="createProject()")
@@ -18,7 +18,7 @@
                             i.fa-solid.fa-person-running.ml-2
                     ng-container(*ngFor="let item of list;let i = index")
                         a.flex.flex-wrap.bg-white.rounded-lg.border.border-gray-300.p-6.w-full.transition-all.duration-300.cursor-pointer(class="hover:text-blue-500 hover:border-blue-500", [routerLink]="'/wiki/' + item.namespace")
-                            img.bg-gray-50.border.border-gray-300.rounded-lg.bg-contain.bg-center.bg-cover.bg-no-repeat(class="size-14", style="background-image: url({{item.icon}})")
+                            div.bg-gray-50.border.border-gray-300.rounded-lg.bg-contain.bg-center.bg-cover.bg-no-repeat(class="size-14", [ngStyle]="{'background-image': 'url(' + item.icon + ')'}")
                             .flex-1.ml-5
                                 h3.ff-b {{item.title}}
                                 .flex.text-gray-500.text-sm.mt-2(class="max-sm:flex-col")
@@ -35,7 +35,7 @@
 
         div(class="w-1/4 max-sm:w-full")
             .sticky.top-0.pt-4(class="max-sm:pt-0")
-                button.w-full.bg-blue-500.text-white.rounded-lg.py-2.px-3.flex-1(*ngIf="service.auth.show.membership(['admin', 'staff', 'user'])", class="max-sm:hidden hover:bg-blue-600", (click)="createProject()")
+                button.w-full.bg-blue-500.text-white.rounded-lg.py-2.px-3.flex-1(*ngIf="service.auth.show.membership(['admin', 'staff', 'user'])", class="max-sm:hidden hover:bg-blue-600", (click)="createProject()", aria-label="새 위키 만들기")
                     i.ti.ti-plus
                     span.ml-2 새 위키 만들기
 

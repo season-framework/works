@@ -18,13 +18,20 @@ class Member:
         project_id = self.project_id
         workers = userdb.rows(fields="id")
         workers = [x['id'] for x in workers]
-        # workers = issuedb.rows(fields="user_id", project_id=project_id, groupby="user_id")
-        # workers = [x['user_id'] for x in workers]
 
         users = memberdb.rows(project_id=project_id)
         curworkers = []
+
+        # 일괄 사용자 정보 조회 (N+1 방지)
+        all_user_ids = list(set([u['user'] for u in users] + workers))
+        user_info_map = {}
+        if all_user_ids:
+            all_users = userdb.rows(id=all_user_ids, fields="id,email,membership,name,mobile,status,profile_image,created,last_access")
+            for u in all_users:
+                user_info_map[u['id']] = u
+
         for i in range(len(users)):
-            user = config.get_user_info(wiz, users[i]['user'])
+            user = user_info_map.get(users[i]['user'])
             if user is not None:
                 users[i]['meta'] = user
             else:
@@ -38,7 +45,7 @@ class Member:
             uinfo['project_id'] = project_id
             uinfo['role'] = 'guest'
             uinfo['user'] = user_id
-            user = config.get_user_info(wiz, user_id)
+            user = user_info_map.get(user_id)
             if user is not None:
                 uinfo['meta'] = user
             else:

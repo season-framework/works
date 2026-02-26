@@ -2,7 +2,7 @@
     wiz-component-nav-aside(*ngIf="!isAside")
 
     div(
-        class="hidden lg:flex fixed w-[16px] h-[64px] bg-slate-200 text-slate-700 bottom-[24px] z-50 items-center justify-center hover:bg-slate-300 cursor-pointer z-[1000]",
+        class="hidden lg:flex fixed w-[16px] h-[64px] bg-slate-200 text-slate-700 bottom-[24px] items-center justify-center hover:bg-slate-300 cursor-pointer z-[1000]",
         [ngClass]="isAside ? 'left-0' : 'left-[272px]'",
         (click)="hideAside()")
         i.fa-solid.fa-caret-left(*ngIf="!isAside")

@@ -87,11 +87,11 @@ class Model:
         data['level'] = int(data['level'])
         try:
             issue['planstart'] = issue['planstart'].strftime("%Y-%m-%d")
-        except:
+        except (AttributeError, TypeError):
             pass
         try:
             issue['planend'] = issue['planend'].strftime("%Y-%m-%d")
-        except:
+        except (AttributeError, TypeError):
             pass
 
         if data['planstart'] == '': data['planstart'] = None

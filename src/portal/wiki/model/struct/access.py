@@ -23,15 +23,15 @@ class Model:
                 accesses[i]['meta'] = dict()
         return accesses
 
-    def role(self, key, type='user'):
+    def role(self, key, access_type='user'):
         membership = self.book.membership()
         if membership in ['admin']:
             return 'admin'
         
-        if type == 'user':
+        if access_type == 'user':
             access = config.find_access(wiz, self.book_id, key)
         else:
-            access = accessdb.get(type=type, key=key, book_id=self.book_id)
+            access = accessdb.get(type=access_type, key=key, book_id=self.book_id)
             if access is not None:
                 access = access['role']
             else:
@@ -55,7 +55,7 @@ class Model:
         return self.role(user_id) 
 
     def accessLevel(self, allowed, raise_exception=True):
-        if type(allowed) == str:
+        if isinstance(allowed, str):
             allowed = [allowed]
         auth = self.auth()
         if auth in allowed:
@@ -64,7 +64,7 @@ class Model:
             wiz.response.abort(401)
         return False
     
-    def create(self, role, key, type="user"):
+    def create(self, role, key, access_type="user"):
         if role == 'admin':
             self.accessLevel(["admin"])
         else:
@@ -72,7 +72,7 @@ class Model:
 
         data = dict()
         data['book_id'] = self.book_id
-        data['type'] = type
+        data['type'] = access_type
         data['key'] = key
         data['role'] = role
         data['created'] = datetime.datetime.now()

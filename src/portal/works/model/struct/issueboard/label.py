@@ -1,4 +1,5 @@
 import datetime
+from collections import Counter
 
 config = wiz.model("portal/works/config")
 orm = wiz.model("portal/season/orm")
@@ -21,6 +22,12 @@ class Model:
         issues = [x['id'] for x in issues]
         classified = []
         undefined = -1
+
+        # Batch fetch close/cancel counts to avoid N+1 queries (2 queries instead of 2N)
+        close_issues = issuedb.rows(project_id=project_id, status="close", fields="label_id")
+        cancel_issues = issuedb.rows(project_id=project_id, status="cancel", fields="label_id")
+        close_counts = Counter(x['label_id'] for x in close_issues)
+        cancel_counts = Counter(x['label_id'] for x in cancel_issues)
         
         for i in range(len(labels)):
             labelIssues = []
@@ -29,8 +36,8 @@ class Model:
                     labelIssues.append(issue)
                     classified.append(issue)
             labels[i]['issues'] = labelIssues
-            labels[i]['closeCount'] = self.search("close", label_id=labels[i]['id'], as_count=True)
-            labels[i]['cancelCount'] = self.search("cancel", label_id=labels[i]['id'], as_count=True)
+            labels[i]['closeCount'] = close_counts.get(labels[i]['id'], 0)
+            labels[i]['cancelCount'] = cancel_counts.get(labels[i]['id'], 0)
 
             if labels[i]['mode'] == 1:
                 undefined = i

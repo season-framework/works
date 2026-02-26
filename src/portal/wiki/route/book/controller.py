@@ -1,29 +1,33 @@
 import json
 import markdown
 
+season_config = wiz.config("season")
+site_url = getattr(season_config, 'site_url', '')
+
 segment = wiz.request.match("/api/wiki/book/<book_id>/<path:path>")
 action = segment.path
 book_id = segment.book_id
 bookModel = wiz.model("portal/wiki/book")
 book = bookModel.get(book_id)
 
-if action.startswith("load"):
+# 공통 null 체크 (FN-0008)
+if book is None and action != "load":
+    wiz.response.status(404)
+
+if action == "load":
     if book is None:
         wiz.response.status(404)
     wiz.response.status(200, book.data)
 
-if action.startswith("update"):
+elif action == "update":
     data = wiz.request.query("data", True)
     data = json.loads(data)
     data['id'] = book.data['id']
     
     namespaceChanged = False
     if book.data['namespace'] != data['namespace']:
-        try:
-            exists = bookModel.get(data['namespace'])
-            if exists is not None:
-                raise Excpetion("Exists Namespace")
-        except:
+        exists = bookModel.get(data['namespace'])
+        if exists is not None:
             wiz.response.status(400, 'Namespace가 사용중입니다')
         namespaceChanged = True
     
@@ -31,30 +35,30 @@ if action.startswith("update"):
     book = bookModel.get(book_id)
     wiz.response.status(200, data=book.data, namespaceChanged=namespaceChanged)
 
-if action.startswith("content/load"):
+elif action.startswith("content/load"):
     segment = wiz.request.match("/api/wiki/book/<book_id>/content/load/<content_id>")
     content_id = segment.content_id
     content = book.content.load(content_id)
     wiz.response.status(200, content)
 
-if action.startswith("content/update"):
+elif action == "content/update":
     data = wiz.request.query()
     content_id = book.content.update(data)
     wiz.response.status(200, content_id)
 
-if action.startswith("content/delete"):
+elif action == "content/delete":
     content_id = wiz.request.query("id", True)
     book.content.delete(content_id)
     wiz.response.status(200)
 
-if action.startswith("tree"):
+elif action.startswith("tree"):
     segment = wiz.request.match("/api/wiki/book/<book_id>/tree/<node_id>")
     node_id = segment.node_id
     if node_id is None: node_id = ""
     rows = book.content.tree(node_id)
     wiz.response.status(200, rows)
 
-if action.startswith("download"):
+elif action == "download":
     tree = []
 
     def getChild(docid="", level=1):
@@ -84,27 +88,27 @@ if action.startswith("download"):
         if item['level'] == 1:
             contents = contents + "---\n\n"
 
-    contents = contents.replace("/api/wiki", "https://works.season.co.kr/api/wiki")
+    contents = contents.replace("/api/wiki", site_url + "/api/wiki")
     contents = markdown.markdown(contents)
     contents = '<html><head><style>body {overflow: auto !important;}</style><meta charset="utf-8">' \
-        + '<link href="https://works.season.co.kr/main.css" rel="stylesheet"></head>' \
+        + '<link href="' + site_url + '/main.css" rel="stylesheet"></head>' \
         + '<body><div class="container wiki-content">' + contents + '</div></body></html>'
 
     wiz.response.send(contents, content_type="text/html")
 
-if action.startswith("revision/load"):
+elif action.startswith("revision/load"):
     segment = wiz.request.match("/api/wiki/book/<book_id>/revision/load/<content_id>")
     content_id = segment.content_id
     revisions = book.revision.load(content_id)
     wiz.response.status(200, revisions)
 
-if action.startswith("revision/read"):
+elif action.startswith("revision/read"):
     segment = wiz.request.match("/api/wiki/book/<book_id>/revision/read/<revision_id>")
     revision_id = segment.revision_id
     res = book.revision.read(revision_id)
     wiz.response.status(200, res)
 
-if action.startswith("revision/commit"):
+elif action == "revision/commit":
     tag = wiz.request.query("tag", "")
     segment = wiz.request.match("/api/wiki/book/<book_id>/revision/commit/<content_id>")
     content_id = segment.content_id
@@ -112,11 +116,11 @@ if action.startswith("revision/commit"):
     wiz.response.status(200)
 
 # Access API
-if action.startswith("access/load"):
+elif action == "access/load":
     members = book.access.list()
     wiz.response.status(200, members)
 
-if action.startswith("access/create"):
+elif action == "access/create":
     try:
         data = wiz.request.query()
         book.access.create(data['role'], data['key'], data['type'])
@@ -124,7 +128,7 @@ if action.startswith("access/create"):
         wiz.response.status(500, str(e))
     wiz.response.status(200)
 
-if action.startswith("access/remove"):
+elif action == "access/remove":
     try:
         data = wiz.request.query()
         book.access.remove(data)
@@ -132,7 +136,7 @@ if action.startswith("access/remove"):
         wiz.response.status(500, str(e))
     wiz.response.status(200)
 
-if action.startswith("access/update"):
+elif action == "access/update":
     try:
         data = wiz.request.query()
         book.access.update(data)
@@ -140,4 +144,5 @@ if action.startswith("access/update"):
         wiz.response.status(500, str(e))
     wiz.response.status(200)
 
-wiz.response.status(404)
+else:
+    wiz.response.status(404)

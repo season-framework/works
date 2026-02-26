@@ -1,29 +1,8 @@
 import json
+import re
 
 config = wiz.model("portal/season/config")
 
-class Tool:
-    def checkId(self, id):
-        regex = re.compile(r'([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+')
-        if re.fullmatch(regex, id):
-            return True
-        return False
-
-    def checkEmail(self, email):
-        regex = re.compile(r'([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+')
-        if re.fullmatch(regex, email):
-            return True
-        return False
-
-    def sendEmailVerification(self, mail, onetimepass):
-        params = dict()
-        params['to'] = mail
-        params['title'] = 'SEASON 이메일 인증'
-        params['onetimepass'] = onetimepass
-        params['template'] = 'email_verify'
-        smtp.send(**params)
-
-tool = Tool()
 orm = wiz.model("portal/season/orm")
 db = orm.use("user")
 
@@ -43,16 +22,12 @@ def session():
 
 def update():
     user = json.loads(wiz.request.query("userinfo", True))
-    del user['id']
-    del user['status']
-    del user['last_access']
-    del user['created']
-    del user['membership']
-    del user['email']
-    del user['onetimepass']
-    del user['onetimepass_time']
+    allowed = ['name', 'mobile', 'profile_image']
+    update_data = {k: user[k] for k in allowed if k in user}
+    if len(update_data) == 0:
+        wiz.response.status(400, "수정할 항목이 없습니다")
     user_id = wiz.session.get("id")
-    db.update(user, id=user_id)
+    db.update(update_data, id=user_id)
     wiz.response.status(200, True)
 
 def change_password():

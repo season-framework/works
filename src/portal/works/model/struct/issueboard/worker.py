@@ -23,7 +23,7 @@ class Model:
             obj['created'] = datetime.datetime.now()
             try:
                 workerdb.insert(obj)
-            except:
+            except Exception:
                 pass
 
     def updateManager(self, issue_id, workers):
@@ -39,7 +39,7 @@ class Model:
             obj['created'] = datetime.datetime.now()
             try:
                 workerdb.insert(obj)
-            except:
+            except Exception:
                 pass
     
     # return: owner, manager, guest

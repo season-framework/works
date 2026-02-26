@@ -42,7 +42,7 @@ export class Component implements OnInit {
         let userinfo = JSON.stringify(this.data.user);
         const { code, data } = await wiz.call("update", { userinfo });
         if (code == 200) {
-            this.alert("저장되었습니다", 'success');
+            await this.alert("저장되었습니다", 'success');
             await this.load();
             await this.service.auth.init();
             return;

@@ -42,7 +42,7 @@ class Project:
         user = config.get_user_info(wiz, user_id)
         try:
             return user['membership']
-        except:
+        except (KeyError, TypeError):
             pass
         return "visitor"
 
@@ -74,7 +74,7 @@ class Project:
                     rows[i]['untrack'] = True
             total = projectdb.count(**where)
             return total, rows
-        except:
+        except Exception as e:
             pass
         return 0, []
 
@@ -137,6 +137,7 @@ class Project:
         cache[namespace] = Project(data)
         return cache[namespace]
 
+    @staticmethod
     def untracks():
         user_id = config.session_user_id()
         rows = projectconfigdb.rows(user_id=user_id, key="untrack", value="true")

@@ -139,7 +139,7 @@ export class Component implements OnInit {
         this.list.sort((a, b) => {
             a = this.items[a];
             b = this.items[b];
-            if (!a || !b) return;
+            if (!a || !b) return 0;
             return new Date(b.updated).getTime() - new Date(a.updated).getTime();
         });
 

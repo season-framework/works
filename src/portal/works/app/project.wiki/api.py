@@ -5,6 +5,8 @@ project_id = wiz.request.query("project_id", True)
 projectModel = wiz.model("portal/works/project")
 
 project = projectModel.get(project_id)
+if project is None:
+    wiz.response.status(404, "Project not found")
 bookModel = wiz.model("portal/wiki/book")
 
 def search():

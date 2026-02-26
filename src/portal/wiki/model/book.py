@@ -26,7 +26,7 @@ class Model:
         user = config.get_user_info(wiz, user_id)
         try:
             return user['membership']
-        except:
+        except (KeyError, TypeError):
             pass
         return "visitor"
     
@@ -50,7 +50,7 @@ class Model:
             rows = bookdb.rows(fields="id,namespace,title,visibility,created,updated,icon", **where)
             total = bookdb.count(**where)
             return total, rows
-        except Exception as e:
+        except Exception:
             pass
         return 0, []
     

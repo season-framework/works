@@ -14,15 +14,9 @@ export class Component implements OnInit {
             this.returnTo = returnTo;
     }
 
-    public getParam(sname, defaultvalue) {
-        let params = location.search.substring(location.search.indexOf("?") + 1);
-        let sval = defaultvalue;
-        params = params.split("&");
-        for (let i = 0; i < params.length; i++) {
-            let temp = params[i].split("=");
-            if ([temp[0]] == sname) { sval = temp[1]; }
-        }
-        return decodeURIComponent(sval);
+    public getParam(sname: string, defaultvalue: string = '') {
+        const params = new URLSearchParams(location.search);
+        return params.get(sname) || defaultvalue;
     }
 
     public view: string = 'login.email';

@@ -6,7 +6,7 @@
     "viewuri": "",
     "category": "project",
     "controller": "",
-    "type": "app",
+    "type": "widget",
     "template": "wiz-portal-works-widget-project-issueboard-issue([issue]=\"\")",
     "ng.build": {
         "id": "portal.works.widget.project.issueboard.issue",

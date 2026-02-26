@@ -22,8 +22,7 @@ export class Component implements OnInit {
 
     public async ngOnInit() {
         await this.service.init();
-        // await this.service.auth.allow(true, "/authenticate");
-        // await this.service.auth.allow.membership("admin", "/authenticate");
+        await this.service.auth.allow(true, "/authenticate");
         const { code, data } = await wiz.call("load", { id: this.DOC_ID });
         let editor = await this.wikibook.bindEditor(this.editorElement.nativeElement, false);
         if (editor) this.editor = editor;

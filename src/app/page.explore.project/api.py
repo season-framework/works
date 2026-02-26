@@ -50,11 +50,8 @@ def update():
     project_id = data['id']
     project = projectModel.get(project_id)
     if project.data['namespace'] != data['namespace']:
-        try:
-            exists = projectModel.get(data['namespace'])
-            if exists is not None:
-                raise Excpetion("Exists Namespace")
-        except:
+        exists = projectModel.get(data['namespace'])
+        if exists is not None:
             wiz.response.status(400, 'Namespace가 사용중입니다')
     data['status'] = 'open'
     project.update(data)
