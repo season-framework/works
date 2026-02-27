@@ -52,3 +52,26 @@ div(class="flex flex-col max-sm:flex-row max-sm:flex-wrap h-screen max-sm:h-auto
                     a(class="flex items-center gap-3 px-3 py-1.5 rounded-md text-sm text-neutral-500 hover:bg-neutral-200/60 transition-colors", [routerLink]="project.menuLink('issueboard')", routerLinkActive="font-medium text-neutral-900 bg-neutral-200/60", *ngIf="project.data().extra.menu.issueboard") 이슈보드
                     a(class="flex items-center gap-3 px-3 py-1.5 rounded-md text-sm text-neutral-500 hover:bg-neutral-200/60 transition-colors", [routerLink]="project.menuLink('wiki')", routerLinkActive="font-medium text-neutral-900 bg-neutral-200/60", *ngIf="project.data().extra.menu.wiki") 위키
                     a(class="flex items-center gap-3 px-3 py-1.5 rounded-md text-sm text-neutral-500 hover:bg-neutral-200/60 transition-colors", [routerLink]="project.menuLink('drive')", routerLinkActive="font-medium text-neutral-900 bg-neutral-200/60", *ngIf="project.data().extra.menu.drive") 드라이브
+
+        //- 프로젝트 스위칭 드롭다운
+        div(class="mt-auto px-2 pb-3 pt-2 border-t border-neutral-200 project-switcher-container", *ngIf="service.auth.show(true)")
+            div(class="relative")
+                //- 드롭다운 패널 (위로 열림)
+                div(class="absolute bottom-full left-0 right-0 mb-1 bg-white border border-neutral-200 rounded-lg shadow-lg overflow-hidden z-50", *ngIf="projectSwitcher.open")
+                    div(class="px-2.5 pt-2.5 pb-2")
+                        div(class="flex items-center border border-neutral-200 rounded-md bg-neutral-50 overflow-hidden", [class.border-blue-400]="projectSwitcher.searchFocused")
+                            i(class="ti ti-search text-neutral-400 pl-2 text-sm")
+                            input(class="w-full h-7 text-xs px-2 border-0 bg-transparent focus:outline-none placeholder-neutral-400", placeholder="프로젝트 검색", [(ngModel)]="projectSwitcher.keyword", (click)="$event.stopPropagation()", (focus)="projectSwitcher.searchFocused = true", (blur)="projectSwitcher.searchFocused = false")
+                    div(class="max-h-52 overflow-y-auto")
+                        ng-container(*ngIf="filteredProjects().length === 0")
+                            div(class="px-3 py-4 text-center text-xs text-neutral-400") 프로젝트가 없습니다
+                        ng-container(*ngFor="let p of filteredProjects()")
+                            div(class="flex items-center gap-2.5 px-3 py-2 cursor-pointer text-sm hover:bg-neutral-100 transition-colors", [class.bg-neutral-100]="project.status() && project.data().namespace === p.namespace", (click)="switchProject(p)")
+                                i(class="ti ti-folder text-neutral-400 text-base")
+                                div(class="flex-1 min-w-0")
+                                    div(class="truncate text-neutral-700", [class.font-medium]="project.status() && project.data().namespace === p.namespace") {{p.title}}
+                //- 트리거 버튼
+                button(class="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-sm text-neutral-600 hover:bg-neutral-200/60 transition-colors", (click)="toggleProjectSwitcher($event)")
+                    i(class="ti ti-arrows-exchange text-base text-neutral-400")
+                    span(class="truncate flex-1 text-left") 프로젝트 이동
+                    i(class="ti text-xs text-neutral-400", [ngClass]="projectSwitcher.open ? 'ti-chevron-down' : 'ti-chevron-up'")

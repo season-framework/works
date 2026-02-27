@@ -199,7 +199,7 @@ div(class="relative w-full h-full")
                 button(class="px-2.5 py-1.5 text-xs rounded-md text-neutral-500 hover:bg-neutral-100 transition-colors", [disabled]="boardData.page >= boardData.lastpage", (click)="boardChangePage(boardData.page + 1)")
                     i(class="ti ti-chevron-right")
 
-    //- ===== 플로팅 버튼 영역 (공통: 보기모드 토글 + 멤버 조회) =====
+    //- ===== 플로팅 버튼 영역 (공통: 상태필터 + 보기모드 토글 + 멤버 조회) =====
     div(class="absolute right-[24px] bottom-[24px] z-[1000]")
         //- 멤버 조회 팝업
         div(class="bg-neutral-900 rounded-lg text-white mb-3 z-[1000] py-1 px-0 m-0 min-w-44 shadow-xl", *ngIf="memberSearch")
@@ -213,6 +213,17 @@ div(class="relative w-full h-full")
 
         //- 버튼 그룹
         div(class="flex items-center gap-2")
+            //- 상태 필터
+            div(class="relative status-filter-container")
+                div(class="absolute bottom-full left-0 mb-1 bg-white border border-neutral-200 rounded-lg shadow-lg overflow-hidden z-50 min-w-36", *ngIf="statusFilterOpen")
+                    ng-container(*ngFor="let opt of statusFilterOptions")
+                        div(class="px-3 py-2 text-sm cursor-pointer hover:bg-neutral-100 transition-colors", [class.bg-neutral-100]="statusFilter === opt.value", [class.font-medium]="statusFilter === opt.value", (click)="setStatusFilter(opt.value); $event.stopPropagation()")
+                            span {{opt.label}}
+                button(class="flex items-center gap-1.5 bg-neutral-900 rounded-lg border border-neutral-700 px-3.5 text-sm font-medium text-white shadow-lg h-9 transition-all hover:bg-neutral-800", (click)="toggleStatusFilter($event)")
+                    i(class="ti ti-filter text-base")
+                    span(class="max-sm:hidden") {{statusFilterLabel()}}
+                    i(class="ti ti-chevron-up text-xs text-neutral-400 ml-0.5")
+
             //- 보기 모드 토글
             div(class="view-toggle-btn flex items-center bg-neutral-900 rounded-lg border border-neutral-700 overflow-hidden shadow-lg h-9")
                 button(class="flex items-center gap-1.5 px-3.5 h-full text-sm font-medium transition-all", [ngClass]="viewMode === 'kanban' ? 'text-white' : 'text-neutral-500 hover:text-neutral-300'", (click)="viewMode !== 'kanban' && toggleViewMode()")

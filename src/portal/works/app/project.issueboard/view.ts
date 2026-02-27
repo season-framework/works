@@ -1,4 +1,4 @@
-import { OnInit, OnDestroy } from '@angular/core';
+import { OnInit, OnDestroy, HostListener } from '@angular/core';
 import { ElementRef, ViewChild } from '@angular/core';
 import { Service } from '@wiz/libs/portal/season/service';
 import { Project } from '@wiz/libs/portal/works/project';
@@ -8,6 +8,14 @@ export class Component implements OnInit, OnDestroy {
         public service: Service,
         public project: Project
     ) { }
+
+    @HostListener('document:click')
+    public onDocumentClick() {
+        if (this.statusFilterOpen) {
+            this.statusFilterOpen = false;
+            this.service.render();
+        }
+    }
 
     @ViewChild('container')
     public workspace: ElementRef;
@@ -289,6 +297,10 @@ export class Component implements OnInit, OnDestroy {
 
     public onProcessIssue(issue: any) {
         if (!issue) return true;
+        // 상태 필터 적용
+        if (this.statusFilter) {
+            return issue.status === this.statusFilter;
+        }
         return ["open", "work", "finish", "noti", "event"].includes(issue.status);
     }
 
@@ -329,6 +341,40 @@ export class Component implements OnInit, OnDestroy {
     public targetMember: any = null;
     public memberSearch: boolean = false;
     public memberSearchText: string = '';
+
+    // ===== 상태 필터 (칸반/게시판 공통) =====
+    public statusFilter: string = '';
+    public statusFilterOpen: boolean = false;
+    public statusFilterOptions: any[] = [
+        { value: '', label: '전체' },
+        { value: 'noti', label: '공지' },
+        { value: 'event', label: '일정' },
+        { value: 'open', label: '예정' },
+        { value: 'work', label: '진행' },
+        { value: 'finish', label: '완료' }
+    ];
+
+    public toggleStatusFilter(event: any) {
+        event.stopPropagation();
+        this.statusFilterOpen = !this.statusFilterOpen;
+        this.service.render();
+    }
+
+    public async setStatusFilter(value: string) {
+        this.statusFilter = value;
+        this.statusFilterOpen = false;
+        if (this.viewMode === 'board') {
+            this.boardData.status = value || 'active';
+            this.boardData.page = 1;
+            await this.loadBoardData();
+        }
+        await this.service.render();
+    }
+
+    public statusFilterLabel(): string {
+        const opt = this.statusFilterOptions.find(o => o.value === this.statusFilter);
+        return opt ? opt.label : '전체';
+    }
 
     public async selectMember() {
         if (this.memberSearch) this.targetMember = null;
@@ -372,6 +418,12 @@ export class Component implements OnInit, OnDestroy {
     public async toggleViewMode() {
         this.viewMode = this.viewMode === 'kanban' ? 'board' : 'kanban';
         if (this.viewMode === 'board') {
+            // 상태 필터가 설정되어 있으면 게시판 상태에 반영
+            if (this.statusFilter) {
+                this.boardData.status = this.statusFilter;
+            } else {
+                this.boardData.status = 'active';
+            }
             this.boardData.page = 1;
             await this.loadBoardData();
         }
@@ -422,7 +474,7 @@ export class Component implements OnInit, OnDestroy {
     }
 
     public statusLabel(status: string): string {
-        const map = { open: '시작 전', work: '진행중', finish: '완료', close: '종료', cancel: '취소', noti: '공지', event: '일정' };
+        const map = { open: '예정', work: '진행중', finish: '완료', close: '종료', cancel: '취소', noti: '공지', event: '일정' };
         return map[status] || status;
     }
 

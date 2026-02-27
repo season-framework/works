@@ -39,3 +39,5 @@
 | 2026-02-28 | 035 | 대시보드 화면 전체 스크롤 버그 수정 | [상세](devlog/2026-02-28/035-dashboard-scroll-fix.md) |
 | 2026-02-28 | 036 | 멤버 검색 제외 범위를 프로젝트 실제 멤버로 한정 | [상세](devlog/2026-02-28/036-member-exclude-scope-fix.md) |
 | 2026-02-28 | 037 | 이슈보드 게시판 보기 공지/일정 탭 및 검색 기능 추가 | [상세](devlog/2026-02-28/037-issueboard-board-tags-search.md) |
+| 2026-02-28 | 038 | 사이드 메뉴 프로젝트 스위칭 드롭다운 추가 | [상세](devlog/2026-02-28/038-sidebar-project-switcher.md) |
+| 2026-02-28 | 039 | 이슈보드 진행 상태별 모아보기 필터 추가 | [상세](devlog/2026-02-28/039-issueboard-status-filter.md) |
