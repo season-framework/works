@@ -1,134 +1,134 @@
 .fixed.bg-no-repeat.bg-fixed.bg-center.bg-cover.inset-0.overflow-hidden(*ngIf="this.returnTo != 'notset'", style="background-image: url(/assets/bg/main.jpg)")
     .w-full.h-full.overflow-auto
-        .form(class="max-w-[600px] mx-auto my-0 py-[10vh] md:py-[15vh] px-4 md:px-0 min-h-full text-center flex flex-col justify-center overflow-hidden")
-            .relative.z-2.pt-5.pb-12.px-0.text-black.bg-white.rounded-md
-                .circle.flex.items-center.justify-center
+        .form(class="max-w-[520px] mx-auto my-0 py-[10vh] md:py-[15vh] px-4 md:px-0 min-h-full text-center flex flex-col justify-center overflow-hidden")
+            .relative.z-2.pt-8.pb-10.px-8.text-neutral-900.bg-white.rounded-xl.border.border-neutral-200
+                .flex.items-center.justify-center
                     .w-full.m-auto.max-w-20
-                        a.d-inline-block.cursor-pointer
+                        a.inline-block.cursor-pointer
                             img.w-full(src="/assets/portal/season/brand/icon.png")
-                
+
                 ng-container(*ngIf="view == 'login.email'")
-                    div(class="md:w-8/12 w-10/12 rounded-md bg-white m-auto mt-16")
-                        input(
+                    .mt-10(class="w-full")
+                        input.w-full.px-3.py-2.rounded-md.border.border-neutral-200.text-sm.outline-none.transition(
                             type="text",
                             placeholder="이메일을 입력해주세요",
-                            class="hover:bg-white focus:bg-white focus:w-full focus:text-black",
+                            class="focus:border-neutral-400 focus:ring-1 focus:ring-neutral-400",
                             [(ngModel)]="data.email",
                             (keydown.enter)="login()",
                             autofocus
                         )
 
-                    button.border.border-black.bg-black.rounded-lg.block.text-center.text-lg.text-white.duration-200.outline-0(class="w-10/12 md:w-8/12 m-auto mt-3 py-3 hover:text-gray-700 hover:bg-blue-50", (click)="login()") 다음
-                    
-                    div(class="w-10/12 md:w-8/12 m-auto text-sm mt-3")
-                        a.text-gray-500((click)="join_start()") 계정 만들기
+                    button.w-full.mt-3.py-2.rounded-md.bg-neutral-900.text-white.text-sm.font-medium.transition(class="hover:bg-neutral-800", (click)="login()") 다음
+
+                    .mt-4.text-sm
+                        a.text-neutral-500.cursor-pointer(class="hover:text-neutral-700", (click)="join_start()") 계정 만들기
                     wiz-portal-saml-providers
 
                 ng-container(*ngIf="view == 'login.password'")
-                    div(class="md:w-8/12 w-10/12 rounded-md bg-white m-auto mt-16")
-                        input(
+                    .mt-10(class="w-full")
+                        input.w-full.px-3.py-2.rounded-md.border.border-neutral-200.text-sm.outline-none.transition(
                             type="password",
                             placeholder="비밀번호를 입력해주세요",
-                            class="hover:bg-white focus:bg-white focus:w-full focus:text-black",
+                            class="focus:border-neutral-400 focus:ring-1 focus:ring-neutral-400",
                             [(ngModel)]="data.password",
                             (keydown.enter)="login()"
                         )
 
-                    button.border.border-black.bg-black.rounded-lg.block.text-center.text-lg.text-white.duration-200.outline-0(class="w-10/12 md:w-8/12 m-auto mt-3 py-3 hover:text-gray-700 hover:bg-blue-50", (click)="login()") 로그인
-                    div(class="w-10/12 md:w-8/12 m-auto text-sm mt-6")
-                        a.text-gray-500((click)="alert('준비중입니다', 'warning')") 이메일로 로그인하기
+                    button.w-full.mt-3.py-2.rounded-md.bg-neutral-900.text-white.text-sm.font-medium.transition(class="hover:bg-neutral-800", (click)="login()") 로그인
+                    .mt-4.text-sm
+                        a.text-neutral-500.cursor-pointer(class="hover:text-neutral-700", (click)="alert('준비중입니다', 'warning')") 이메일로 로그인하기
 
                 ng-container(*ngIf="view == 'join.email'")
-                    div(class="md:w-8/12 w-10/12 rounded-md bg-white m-auto mt-16")
-                        input(
+                    .mt-10(class="w-full")
+                        input.w-full.px-3.py-2.rounded-md.border.border-neutral-200.text-sm.outline-none.transition(
                             type="text",
                             placeholder="회원가입을 위한 이메일을 입력해주세요",
-                            class="hover:bg-white focus:bg-white focus:w-full focus:text-black",
+                            class="focus:border-neutral-400 focus:ring-1 focus:ring-neutral-400",
                             [(ngModel)]="data.email",
                             (keydown.enter)="join_email_check()",
                             autofocus
                         )
 
-                    button.border.border-black.bg-black.rounded-lg.block.text-center.text-lg.text-white.duration-200.outline-0(class="w-10/12 md:w-8/12 m-auto mt-3 py-3 hover:text-gray-700 hover:bg-blue-50", (click)="join_email_check()") 다음
+                    button.w-full.mt-3.py-2.rounded-md.bg-neutral-900.text-white.text-sm.font-medium.transition(class="hover:bg-neutral-800", (click)="join_email_check()") 다음
 
-                    div(class="w-10/12 md:w-8/12 m-auto text-sm mt-6")
-                        a.text-gray-500((click)="toLogin()") 로그인 하러가기
+                    .mt-4.text-sm
+                        a.text-neutral-500.cursor-pointer(class="hover:text-neutral-700", (click)="toLogin()") 로그인 하러가기
 
                 ng-container(*ngIf="view == 'join.terms'")
-                    .pt-4.pb-4(class="md:w-8/12 w-10/12 rounded-md bg-white m-auto mt-16")
-                        .text-left
-                            h2 개인정보의 수집 및 이용
-                            
-                            h4 귀하가 시즌웍스 계정을 생성할 때 시즌웍스가 수집하는 정보:
-                            p
-                                b 수집하는 개인정보 항목 및 이용 목적: 
-                                span 시즌웍스는 계정의 생성 및 관리, 서비스의 제공 및 개선, 고객의 계정 또는 서비스 관련 의사소통 및 고객요청 대응을 위해 다음과 같은 데이터를 수집합니다.
-                            ul
-                                li 이름 및 연락처 데이터: 사용자의 성과 이름, 메일 주소, 우편번호, 주소, 전화번호 및 기타 유사한 연락처 데이터.
-                                li 자격 증명: 비밀번호, 비밀번호 힌트 및 인증과 계정 액세스에 사용되는 유사한 보안 정보.
-                                li 인구 통계학적 데이터: 나이, 성별, 국가, 선호하는 언어 등 사용자에 대한 데이터.
-                            
-                            h4 개인정보의 보유 및 이용 기간
-                            p 시즌웍스는 서비스 제공을 위해서, 또는 법적 의무 준수, 분쟁 해결, 계약 이행과 같은 다른 중요한 목적을 위해 필요한 기간 동안 데이터를 유지합니다.
+                    .mt-10.text-left(class="w-full")
+                        h2.text-base.font-semibold.text-neutral-900.mb-4 개인정보의 수집 및 이용
 
-                    button.border.border-black.bg-black.rounded-lg.block.text-center.text-lg.text-white.duration-200.outline-0(class="w-10/12 md:w-8/12 m-auto mt-3 py-3 hover:text-gray-700 hover:bg-blue-50", (click)="termsAccept()")
-                        i.fa-solid.fa-check-circle
-                        span.ml-2 동의하기
+                        h4.text-sm.font-medium.text-neutral-700.mb-2 귀하가 시즌웍스 계정을 생성할 때 시즌웍스가 수집하는 정보:
+                        p.text-sm.text-neutral-600.mb-3
+                            span.font-medium 수집하는 개인정보 항목 및 이용 목적:
+                            |  시즌웍스는 계정의 생성 및 관리, 서비스의 제공 및 개선, 고객의 계정 또는 서비스 관련 의사소통 및 고객요청 대응을 위해 다음과 같은 데이터를 수집합니다.
+                        ul.text-sm.text-neutral-600.list-disc.pl-5.space-y-1.mb-4
+                            li 이름 및 연락처 데이터: 사용자의 성과 이름, 메일 주소, 우편번호, 주소, 전화번호 및 기타 유사한 연락처 데이터.
+                            li 자격 증명: 비밀번호, 비밀번호 힌트 및 인증과 계정 액세스에 사용되는 유사한 보안 정보.
+                            li 인구 통계학적 데이터: 나이, 성별, 국가, 선호하는 언어 등 사용자에 대한 데이터.
+
+                        h4.text-sm.font-medium.text-neutral-700.mb-2 개인정보의 보유 및 이용 기간
+                        p.text-sm.text-neutral-600 시즌웍스는 서비스 제공을 위해서, 또는 법적 의무 준수, 분쟁 해결, 계약 이행과 같은 다른 중요한 목적을 위해 필요한 기간 동안 데이터를 유지합니다.
+
+                    button.w-full.mt-4.py-2.rounded-md.bg-neutral-900.text-white.text-sm.font-medium.transition.inline-flex.items-center.justify-center.gap-2(class="hover:bg-neutral-800", (click)="termsAccept()")
+                        i.ti.ti-circle-check.text-base
+                        span 동의하기
 
                 ng-container(*ngIf="view == 'join.verify'")
-                    .text-left(class="md:w-8/12 w-10/12 rounded-md bg-white m-auto mt-16")
-                        label.text-gray-500 이메일
-                    .mt-2(class="md:w-8/12 w-10/12 rounded-md bg-white m-auto mt-16")
-                        input(
-                            type="text",
-                            placeholder="이메일을 입력해주세요",
-                            class="hover:bg-white focus:bg-white focus:w-full focus:text-black",
-                            [(ngModel)]="data.email",
-                            (keydown.enter)="login()",
-                            disabled
-                        )
-                    
-                    .mt-3.text-left(class="md:w-8/12 w-10/12 rounded-md bg-white m-auto mt-16")
-                        label.text-gray-500 인증코드 
-                    .mt-2(class="md:w-8/12 w-10/12 rounded-md bg-white m-auto mt-16")
-                        input.text-center(
-                            type="text",
-                            placeholder="인증코드",
-                            class="hover:bg-white focus:bg-white focus:w-full focus:text-black",
-                            autocomplete="off",
-                            [(ngModel)]="data.onetimepass",
-                            (keyup.enter)="emailVerify(data.email, data.onetimepass)"
-                        )
+                    .mt-10.space-y-4(class="w-full")
+                        div
+                            label.block.text-left.text-xs.font-medium.text-neutral-500.mb-1 이메일
+                            input.w-full.px-3.py-2.rounded-md.border.border-neutral-200.text-sm.outline-none.bg-neutral-50.text-neutral-400(
+                                type="text",
+                                placeholder="이메일을 입력해주세요",
+                                [(ngModel)]="data.email",
+                                disabled
+                            )
 
-                    button.border.border-black.bg-black.rounded-lg.block.text-center.text-lg.text-white.duration-200.outline-0(class="w-10/12 md:w-8/12 m-auto mt-4 py-3 hover:text-gray-700 hover:bg-blue-50", (click)="emailVerify(data.email, data.onetimepass)") 이메일 인증
-                    div(class="w-10/12 md:w-8/12 m-auto text-sm mt-6")
-                        a.text-gray-500((click)="emailAuthentication(data.email)") 인증 메일 다시 보내기
-                
+                        div
+                            label.block.text-left.text-xs.font-medium.text-neutral-500.mb-1 인증코드
+                            input.w-full.px-3.py-2.rounded-md.border.border-neutral-200.text-sm.outline-none.text-center.transition(
+                                type="text",
+                                placeholder="인증코드",
+                                class="focus:border-neutral-400 focus:ring-1 focus:ring-neutral-400",
+                                autocomplete="off",
+                                [(ngModel)]="data.onetimepass",
+                                (keyup.enter)="emailVerify(data.email, data.onetimepass)"
+                            )
+
+                    button.w-full.mt-4.py-2.rounded-md.bg-neutral-900.text-white.text-sm.font-medium.transition(class="hover:bg-neutral-800", (click)="emailVerify(data.email, data.onetimepass)") 이메일 인증
+                    .mt-4.text-sm
+                        a.text-neutral-500.cursor-pointer(class="hover:text-neutral-700", (click)="emailAuthentication(data.email)") 인증 메일 다시 보내기
+
                 ng-container(*ngIf="view == 'join.userrequired'")
-                    .text-left(class="md:w-8/12 w-10/12 rounded-md bg-white m-auto mt-16")
-                        label.text-gray-500 이메일*
-                    .mt-2(class="md:w-8/12 w-10/12 rounded-md bg-white m-auto mt-16")
-                        input([(ngModel)]="data.email", type="text", class="hover:bg-white focus:bg-white focus:w-full focus:text-black", placeholder="이메일을 입력해주세요", disabled)
-                    
-                    .mt-3.text-left(class="md:w-8/12 w-10/12 rounded-md bg-white m-auto mt-16")
-                        label.text-gray-500 이름*
-                    .mt-2(class="md:w-8/12 w-10/12 rounded-md bg-white m-auto mt-16")
-                        input.text-center([(ngModel)]="data.name", type="text", class="hover:bg-white focus:bg-white focus:w-full focus:text-black", placeholder="홍길동", autocomplete="off")
+                    .mt-10.space-y-4(class="w-full")
+                        div
+                            label.block.text-left.text-xs.font-medium.text-neutral-500.mb-1 이메일*
+                            input.w-full.px-3.py-2.rounded-md.border.border-neutral-200.text-sm.outline-none.bg-neutral-50.text-neutral-400(
+                                [(ngModel)]="data.email", type="text", placeholder="이메일을 입력해주세요", disabled)
 
-                    .mt-3.text-left(class="md:w-8/12 w-10/12 rounded-md bg-white m-auto mt-16")
-                        label.text-gray-500 비밀번호*
-                    .mt-2(class="md:w-8/12 w-10/12 rounded-md bg-white m-auto mt-16")
-                        input.text-center([(ngModel)]="data.password", type="password", class="hover:bg-white focus:bg-white focus:w-full focus:text-black", placeholder="비밀번호", autocomplete="off")
-                    
-                    .mt-3.text-left(class="md:w-8/12 w-10/12 rounded-md bg-white m-auto mt-16")
-                        label.text-gray-500 비밀번호 확인*
-                    .mt-2(class="md:w-8/12 w-10/12 rounded-md bg-white m-auto mt-16")
-                        input.text-center([(ngModel)]="data.password_repeat", type="password", class="hover:bg-white focus:bg-white focus:w-full focus:text-black", placeholder="비밀번호 확인", autocomplete="off")
-                    
-                    .mt-3.text-left(class="md:w-8/12 w-10/12 rounded-md bg-white m-auto mt-16")
-                        label.text-gray-500 휴대전화*
-                    .mt-2(class="md:w-8/12 w-10/12 rounded-md bg-white m-auto mt-16")
-                        input.text-center([(ngModel)]="data.mobile", type="text", class="hover:bg-white focus:bg-white focus:w-full focus:text-black", placeholder="010-1234-5678", autocomplete="off")
+                        div
+                            label.block.text-left.text-xs.font-medium.text-neutral-500.mb-1 이름*
+                            input.w-full.px-3.py-2.rounded-md.border.border-neutral-200.text-sm.outline-none.transition(
+                                [(ngModel)]="data.name", type="text", placeholder="홍길동", autocomplete="off",
+                                class="focus:border-neutral-400 focus:ring-1 focus:ring-neutral-400")
 
-                    button.border.border-black.bg-black.rounded-lg.block.text-center.text-lg.text-white.duration-200.outline-0(class="w-10/12 md:w-8/12 m-auto mt-5 py-3 hover:text-gray-700 hover:bg-blue-50", (click)="join()") 회원가입
-                
+                        div
+                            label.block.text-left.text-xs.font-medium.text-neutral-500.mb-1 비밀번호*
+                            input.w-full.px-3.py-2.rounded-md.border.border-neutral-200.text-sm.outline-none.transition(
+                                [(ngModel)]="data.password", type="password", placeholder="비밀번호", autocomplete="off",
+                                class="focus:border-neutral-400 focus:ring-1 focus:ring-neutral-400")
+
+                        div
+                            label.block.text-left.text-xs.font-medium.text-neutral-500.mb-1 비밀번호 확인*
+                            input.w-full.px-3.py-2.rounded-md.border.border-neutral-200.text-sm.outline-none.transition(
+                                [(ngModel)]="data.password_repeat", type="password", placeholder="비밀번호 확인", autocomplete="off",
+                                class="focus:border-neutral-400 focus:ring-1 focus:ring-neutral-400")
+
+                        div
+                            label.block.text-left.text-xs.font-medium.text-neutral-500.mb-1 휴대전화*
+                            input.w-full.px-3.py-2.rounded-md.border.border-neutral-200.text-sm.outline-none.transition(
+                                [(ngModel)]="data.mobile", type="text", placeholder="010-1234-5678", autocomplete="off",
+                                class="focus:border-neutral-400 focus:ring-1 focus:ring-neutral-400")
+
+                    button.w-full.mt-4.py-2.rounded-md.bg-neutral-900.text-white.text-sm.font-medium.transition(class="hover:bg-neutral-800", (click)="join()") 회원가입

@@ -27,6 +27,27 @@ def safe_path(user_path):
         wiz.response.status(403, "접근이 허용되지 않는 경로입니다")
     return user_path
 
+def driveItem(path):
+    def convert_size():
+        size_bytes = os.path.getsize(fs.abspath(path)) 
+        if size_bytes == 0:
+            return "0B"
+        size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
+        i = int(math.floor(math.log(size_bytes, 1024)))
+        p = math.pow(1024, i)
+        s = round(size_bytes / p, 2)
+        return "%s %s" % (s, size_name[i])
+
+    item = dict()
+    item['id'] = path
+    item['type'] = 'folder' if fs.isdir(path) else 'file'
+    item['title'] = os.path.basename(path)
+    item['root_id'] = os.path.dirname(path)
+    item['created'] = datetime.datetime.fromtimestamp(os.stat(fs.abspath(path)).st_ctime).strftime('%Y-%m-%d %H:%M:%S')
+    item['modified'] = datetime.datetime.fromtimestamp(os.stat(fs.abspath(path)).st_mtime).strftime('%Y-%m-%d %H:%M:%S')
+    item['size'] = convert_size()
+    return item
+
 # Project API
 if action == "load":
     if project is None:
@@ -265,24 +286,3 @@ elif action.startswith("attachment/list"):
 
 else:
     wiz.response.status(404)
-
-def driveItem(path):
-    def convert_size():
-        size_bytes = os.path.getsize(fs.abspath(path)) 
-        if size_bytes == 0:
-            return "0B"
-        size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
-        i = int(math.floor(math.log(size_bytes, 1024)))
-        p = math.pow(1024, i)
-        s = round(size_bytes / p, 2)
-        return "%s %s" % (s, size_name[i])
-
-    item = dict()
-    item['id'] = path
-    item['type'] = 'folder' if fs.isdir(path) else 'file'
-    item['title'] = os.path.basename(path)
-    item['root_id'] = os.path.dirname(path)
-    item['created'] = datetime.datetime.fromtimestamp(os.stat(fs.abspath(path)).st_ctime).strftime('%Y-%m-%d %H:%M:%S')
-    item['modified'] = datetime.datetime.fromtimestamp(os.stat(fs.abspath(path)).st_mtime).strftime('%Y-%m-%d %H:%M:%S')
-    item['size'] = convert_size()
-    return item

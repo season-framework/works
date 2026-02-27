@@ -1,58 +1,62 @@
-.w-full.h-full.overflow-hidden.flex.mx-auto.bg-white(class="max-sm:flex-col")
-    div(class="w-[340px] h-full overflow-hidden flex flex-col border-r border-gray-300 max-sm:w-full max-sm:flex-1 max-2xl:w-72 min-h-0", [ngClass]="tab == 'issue'?'max-sm:hidden':''")
-        .flex.px-3.py-2.bg-slate-100
-            input.w-full.rounded-md.border-gray-400.text-sm([(ngModel)]="searchText", placeholder="검색어를 입력해주세요", (ngModelChange)="changed()")
-            button.bg-blue-500.text-white.rounded-lg.py-2.px-3.ml-1((click)="load(true, 1)", class="hover:bg-blue-600", aria-label="새로고침")
-                i.fa-solid.fa-rotate-right
+div(class="w-full h-full overflow-hidden flex mx-auto bg-white max-sm:flex-col")
+    //- 좌측 이슈 리스트
+    div(class="w-[340px] h-full overflow-hidden flex flex-col border-r border-neutral-200 max-sm:w-full max-sm:flex-1 max-2xl:w-72 min-h-0", [ngClass]="tab == 'issue'?'max-sm:hidden':''")
+        //- 검색 바
+        div(class="flex items-center gap-2 px-3 py-2.5 bg-neutral-50 border-b border-neutral-200")
+            div(class="relative flex-1")
+                i(class="ti ti-search absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 text-base")
+                input(type="text", class="w-full pl-9 pr-3 py-1.5 text-sm border border-neutral-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 placeholder-neutral-400 transition-colors", [(ngModel)]="searchText", placeholder="검색어 입력", (ngModelChange)="changed()")
+            button(class="shrink-0 p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors", (click)="load(true, 1)", aria-label="새로고침")
+                i(class="ti ti-refresh text-base")
 
-        .flex.divide-x
-            button.flex-1.py-1.border-y.border-gray-300.transition-all((click)="load(true, 1, 'request')", class="hover:bg-blue-600 hover:text-white", [ngClass]="category == 'request'?'border-blue-600 bg-blue-600 text-white':'bg-blue-50 text-blue-600'")
-                span.text-sm 내요청
-            button.flex-1.py-1.border-y.border-gray-300.transition-all((click)="load(true, 1, 'work')", class="hover:bg-blue-600 hover:text-white", [ngClass]="category == 'work'?'border-blue-600 bg-blue-600 text-white':'bg-blue-50 text-blue-600'")
-                span.text-sm 내작업
-            button.flex-1.py-1.border-y.border-gray-300.transition-all((click)="load(true, 1, 'all')", class="hover:bg-blue-600 hover:text-white", [ngClass]="category == 'all'?'border-blue-600 bg-blue-600 text-white':'bg-blue-50 text-blue-600'")
-                span.text-sm 전체
+        //- 카테고리 탭
+        div(class="flex border-b border-neutral-200")
+            button(class="flex-1 py-2 text-sm font-medium transition-colors", (click)="load(true, 1, 'request')", [ngClass]="category == 'request' ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50/50' : 'text-neutral-500 hover:text-neutral-700 hover:bg-neutral-50'")
+                | 내요청
+            button(class="flex-1 py-2 text-sm font-medium transition-colors", (click)="load(true, 1, 'work')", [ngClass]="category == 'work' ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50/50' : 'text-neutral-500 hover:text-neutral-700 hover:bg-neutral-50'")
+                | 내작업
+            button(class="flex-1 py-2 text-sm font-medium transition-colors", (click)="load(true, 1, 'all')", [ngClass]="category == 'all' ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50/50' : 'text-neutral-500 hover:text-neutral-700 hover:bg-neutral-50'")
+                | 전체
 
-        div('#issuelist'='', (scroll)="onScrollIssue($event)", class="flex-1 min-h-0 overflow-auto")
+        //- 이슈 리스트
+        div(class="flex-1 min-h-0 overflow-auto", #issuelist="", (scroll)="onScrollIssue($event)")
             ng-container(*ngFor="let issue_id of list")
                 ng-container(*ngIf="getIssue(issue_id) as item")
-                    .flex.flex-wrap.border-b.border-b-gray-300.border-l-transparent.py-4.pr-3.pl-2.w-full.transition-all.duration-300.cursor-pointer(
+                    div(class="flex items-start border-b border-neutral-100 py-3 pr-3 pl-3 w-full transition-colors cursor-pointer hover:bg-neutral-50",
                         *ngIf="match(item)",
                         (click)="openIssue(item)",
-                        class="border-l-[6px] hover:bg-gray-100",
-                        [ngClass]="displayColor(item) + (issue.id == item.id?'!border-l-blue-600':'')",
-                    )
-                        div.mr-2.bg-gray-50.border.border-gray-300.rounded-lg.bg-contain.bg-center.bg-cover.bg-no-repeat(class="size-10", [ngStyle]="{'background-image': 'url(' + item.icon + ')'}")
-                        .flex-1
-                            .flex.text-sm
-                                .ff-b.truncate.ml-1(class="max-w-40") {{item.title}}
-                                .ml-auto.text-gray-400.text-nowrap {{displayDate(item.updated)}}
-                                .rounded-md.px-2.bg-red-600.text-white.ml-1(*ngIf="item.unread") N
-                            .text-gray-500.text-xs.leading-5.ff-b(class="max-sm:flex-col")
-                                span.rounded-md.px-2.max-w-20.ml-1([ngClass]="displayStatus(item.status).cls", class="py-0.5") {{displayStatus(item.status).text}}
-                                span.rounded-md.px-2.bg-blue-50.text-blue-500.truncate.ml-1(class="py-0.5 inline-flex max-w-[160px]") {{item.project.title}}
+                        [ngClass]="displayColor(item) + (issue.id == item.id ? ' !bg-blue-50/60 border-l-2 !border-l-blue-500' : ' border-l-2 border-l-transparent')")
+                        div(class="shrink-0 mr-3 w-10 h-10 rounded-lg bg-neutral-100 border border-neutral-200 bg-contain bg-center bg-cover bg-no-repeat", [ngStyle]="{'background-image': 'url(' + item.icon + ')'}")
+                        div(class="flex-1 min-w-0")
+                            div(class="flex items-center gap-1")
+                                span(class="text-sm font-medium truncate max-w-[160px]") {{item.title}}
+                                span(class="ml-auto text-xs text-neutral-400 whitespace-nowrap") {{displayDate(item.updated)}}
+                                span(class="shrink-0 rounded-full px-1.5 text-xs bg-red-500 text-white ml-1", *ngIf="item.unread") N
+                            div(class="flex flex-wrap items-center gap-1 mt-1 text-xs")
+                                span(class="rounded-full px-2 ring-1 ring-inset", [ngClass]="displayStatus(item.status).cls", class="py-0.5") {{displayStatus(item.status).text}}
+                                span(class="rounded-full px-2 bg-blue-50 text-blue-600 ring-1 ring-inset ring-blue-200 truncate max-w-[140px]", class="py-0.5") {{item.project.title}}
                                 ng-container(*ngIf="category != 'work'")
                                     ng-container(*ngFor="let worker of item.worker")
-                                        span.rounded-md.px-2.max-w-20.bg-slate-100.text-nowrap.text-gray-500.ml-1(*ngIf="getUserInfo(worker)", class="py-0.5")
-                                            span {{getUserInfo(worker).name}}
-
+                                        span(class="rounded-full px-2 bg-neutral-100 text-neutral-500 ring-1 ring-inset ring-neutral-200 whitespace-nowrap", *ngIf="getUserInfo(worker)", class="py-0.5")
+                                            | {{getUserInfo(worker).name}}
                                 ng-container(*ngIf="category == 'work'")
-                                    span.rounded-md.px-2.max-w-20.bg-slate-100.text-nowrap.text-gray-500.ml-1(*ngIf="getUserInfo(item.user_id)", class="py-0.5")
-                                        span {{getUserInfo(item.user_id).name}}
+                                    span(class="rounded-full px-2 bg-neutral-100 text-neutral-500 ring-1 ring-inset ring-neutral-200 whitespace-nowrap", *ngIf="getUserInfo(item.user_id)", class="py-0.5")
+                                        | {{getUserInfo(item.user_id).name}}
 
+            //- 로딩 스켈레톤
             ng-container(*ngIf="!isLast")
-                .flex.flex-wrap.gap-y-3.border-b.border-b-gray-300.border-l-2.border-l-transparent.p-4.w-full
-                    .bg-gray-300.rounded-full.h-4(class="w-9/12")
-                    .bg-gray-300.rounded-full.h-3.mb-1(class="w-10/12")
-                    .bg-gray-300.rounded-full.h-3(class="w-11/12")
+                div(class="flex items-start gap-3 border-b border-neutral-100 p-4 w-full")
+                    div(class="bg-neutral-100 rounded-lg w-10 h-10 animate-pulse")
+                    div(class="flex-1 space-y-2")
+                        div(class="bg-neutral-100 rounded h-4 w-3/4 animate-pulse")
+                        div(class="bg-neutral-100 rounded h-3 w-1/2 animate-pulse")
 
-    div(class="w-full h-full overflow-auto flex-1 min-w-0 border-r border-gray-300", [class.max-sm:hidden]="tab == 'list'")
+    //- 우측 이슈 상세
+    div(class="w-full h-full overflow-auto flex-1 min-w-0 border-r border-neutral-200", [class.max-sm:hidden]="tab == 'list'")
         ng-container(*ngIf="issue.id")
             wiz-portal-works-project-issueboard-issue([issue]="issue", [isMovable]="false", [hidden]="!issue.loaded")
 
         div(*ngIf="issue.id && !issue.loaded", class="w-full h-full flex justify-center items-center")
             div(class="flex flex-col items-center")
                 wiz-portal-season-loading-season([height]="36")
-                .text-gray-500.my-3 불러오는 중...
-                // .progress.progress-sm
-                //     .progress-bar.progress-bar-indeterminate
+                p(class="text-neutral-400 text-sm my-3") 불러오는 중...

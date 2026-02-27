@@ -55,14 +55,14 @@ export class Component implements OnInit {
 
     public displayColor(issue: any) {
         if (!issue) return '';
-        if (issue.status == 'close' || issue.status == 'cancel') return '!bg-gray-100 !text-gray-600 ';
-        if (issue.status == 'finish') return '!bg-emerald-50 !text-green-600 ';
+        if (issue.status == 'close' || issue.status == 'cancel') return '!bg-neutral-50 !text-neutral-500 ';
+        if (issue.status == 'finish') return '!bg-green-50/50 !text-green-700 ';
         if (issue.planend) {
             try {
                 let endtime = new Date(issue.planend).getTime();
                 let now = new Date().getTime();
                 if (now - endtime > 1000 * 60 * 60 * 24)
-                    return '!bg-red-100 !text-red-600 ';
+                    return '!bg-red-50 !text-red-700 ';
             } catch (e) {
             }
         }
@@ -81,13 +81,13 @@ export class Component implements OnInit {
     }
 
     public displayStatus(status: any) {
-        if (status == 'noti') return { text: "공지/알림", cls: 'bg-slate-100 text-gray-500' };
-        if (status == 'open') return { text: "대기", cls: 'bg-slate-100 text-gray-500' };
-        if (status == 'work') return { text: "진행", cls: 'bg-lime-100 !text-lime-600' };
-        if (status == 'close') return { text: "종료", cls: 'bg-red-100 text-red-500' };
-        if (status == 'cancel') return { text: "취소", cls: 'bg-red-100 text-red-500' };
-        if (status == 'finish') return { text: "완료", cls: 'bg-red-100 text-red-500' };
-        return { text: "", cls: 'bg-slate-100 text-gray-500' };
+        if (status == 'noti') return { text: "공지/알림", cls: 'bg-neutral-100 text-neutral-500 ring-neutral-200' };
+        if (status == 'open') return { text: "대기", cls: 'bg-neutral-100 text-neutral-500 ring-neutral-200' };
+        if (status == 'work') return { text: "진행", cls: 'bg-blue-50 text-blue-700 ring-blue-200' };
+        if (status == 'close') return { text: "종료", cls: 'bg-red-50 text-red-700 ring-red-200' };
+        if (status == 'cancel') return { text: "취소", cls: 'bg-red-50 text-red-700 ring-red-200' };
+        if (status == 'finish') return { text: "완료", cls: 'bg-green-50 text-green-700 ring-green-200' };
+        return { text: "", cls: 'bg-neutral-100 text-neutral-500 ring-neutral-200' };
     }
 
     public tab: string = 'list';

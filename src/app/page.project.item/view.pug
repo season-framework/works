@@ -1,9 +1,9 @@
 ng-container(*ngIf="loaded")
-    .min-h-full.ml-6.py-4(*ngIf="MENU == 'info'", class="max-2xl:ml-auto")
+    div(class="min-h-full px-6 py-4", *ngIf="MENU == 'info'")
         wiz-portal-works-project-info
 
     ng-container(*ngIf="project.accessLevel(['admin', 'manager', 'user', 'guest'])")
-        .min-h-full.mx-6.py-4(*ngIf="MENU == 'member'", class="max-2xl:ml-auto")
+        div(class="min-h-full px-6 py-4", *ngIf="MENU == 'member'")
             wiz-portal-works-project-member
         ng-container(*ngIf="MENU == 'issueboard'")
             wiz-portal-works-project-issueboard
@@ -11,15 +11,16 @@ ng-container(*ngIf="loaded")
             wiz-portal-works-project-meeting
         ng-container(*ngIf="MENU == 'drive'")
             wiz-portal-works-project-drive
-        .min-h-full.mx-6.py-4(*ngIf="MENU == 'wiki'", class="max-2xl:ml-auto")
+        div(class="min-h-full px-6 py-4", *ngIf="MENU == 'wiki'")
             wiz-portal-works-project-wiki
-    
+
     ng-container(*ngIf="project.accessLevel(['visitor'])")
-        .p-4(*ngIf="MENU != 'info'")
-            .flex.flex-col.items-center.bg-white.rounded-lg.border.border-gray-300.py-10.w-full
-                img.h-32.w-auto(src="/assets/portal/works/work.svg")
-                p.mt-8.text-xl 접근 권한이 없습니다
-                p.mt-2.text-md.text-gray-500 아래 참가하기 버튼을 눌러 프로젝트에 참가해주세요
-                button.bg-blue-500.text-white.rounded-lg.py-2.px-3.mt-6(class="hover:bg-blue-400", (click)="joinProject()")
-                    span 참가하기
-                    i.fa-solid.fa-person-running.ml-2
+        div(class="p-8", *ngIf="MENU != 'info'")
+            div(class="bg-white rounded-lg border border-neutral-200 py-16 text-center")
+                div(class="flex flex-col items-center justify-center")
+                    i(class="ti ti-lock text-5xl text-neutral-300 mb-4")
+                    p(class="text-base font-medium text-neutral-700") 접근 권한이 없습니다
+                    p(class="mt-1 text-sm text-neutral-400") 아래 참가하기 버튼을 눌러 프로젝트에 참가해주세요
+                    button(class="inline-flex items-center gap-2 px-4 py-2 mt-6 bg-blue-500 text-white text-sm font-medium rounded-md hover:bg-blue-600 transition-colors", (click)="joinProject()")
+                        i(class="ti ti-user-plus text-base")
+                        | 참가하기

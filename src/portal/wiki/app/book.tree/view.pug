@@ -1,59 +1,59 @@
-.border-b.border-gray-300.text-white
-    .flex.py-3.px-4.text-left.bg-blue-500
-        img.bg-gray-50.rounded-lg.bg-contain.bg-center.bg-cover.bg-no-repeat.size-8.mr-1(style="background-image: url({{wikibook.data().icon}})", (click)="updateIcon()")
-        .flex.flex-auto.items-center.flex-1.text-lg.ff-b.break-all.whitespace-break-spaces.pl-2(*ngIf="wikibook.data().title", [routerLink]="wikibook.uistat.contentLink('home')") {{wikibook.data().title}}
-        .flex.items-center.justify-center.ml-auto.cursor-pointer(*ngIf="wikibook.accessLevel(['admin'])")
-            a.mr-3([routerLink]="'/wikidownload/' + wikibook.data().id", target="_blank")
-                i.fa-solid.fa-download(class="hover:scale-110")
-            i.fa-solid.fa-gear(class="hover:scale-110", [routerLink]="wikibook.uistat.contentLink('setting')")
-    
-    .flex.bg-slate-50.divide-x.text-sm(*ngIf="wikibook.accessLevel(['admin', 'user'])")
-        button.flex-1.text-blue-500.py-1(class="hover:bg-blue-400 hover:text-white", (click)="newContent()")
+div(class="border-b border-neutral-200")
+    div(class="flex items-center py-3 px-4 text-left bg-neutral-800")
+        img(class="bg-neutral-100 rounded-lg bg-contain bg-center bg-cover bg-no-repeat size-8 mr-2", style="background-image: url({{wikibook.data().icon}})", (click)="updateIcon()")
+        div(class="flex flex-auto items-center flex-1 text-base font-semibold text-white break-all whitespace-break-spaces pl-1 cursor-pointer", *ngIf="wikibook.data().title", [routerLink]="wikibook.uistat.contentLink('home')") {{wikibook.data().title}}
+        div(class="flex items-center gap-2 ml-auto text-white/70", *ngIf="wikibook.accessLevel(['admin'])")
+            a(class="hover:text-white transition-colors", [routerLink]="'/wikidownload/' + wikibook.data().id", target="_blank")
+                i(class="ti ti-download text-lg")
+            i(class="ti ti-settings text-lg hover:text-white transition-colors cursor-pointer", [routerLink]="wikibook.uistat.contentLink('setting')")
+
+    div(class="flex bg-neutral-50 divide-x divide-neutral-200 text-sm", *ngIf="wikibook.accessLevel(['admin', 'user'])")
+        button(class="flex-1 py-2 text-blue-600 hover:bg-blue-50 transition-colors", (click)="newContent()")
             span 문서생성
-            i.fa-solid.fa-plus.ml-3
+            i(class="ti ti-plus ml-2 text-base")
 
-        button.flex-1.text-blue-500.py-1(class="hover:bg-blue-400 hover:text-white", (click)="create(treeConfig.rootNode())")
+        button(class="flex-1 py-2 text-blue-600 hover:bg-blue-50 transition-colors", (click)="create(treeConfig.rootNode())")
             span 그룹생성
-            i.fa-solid.fa-folder-plus.ml-3
+            i(class="ti ti-folder-plus ml-2 text-base")
 
-.flex-auto.overflow-y-auto.overflow-x-hidden.text-lg
-    .container.p-3
+div(class="flex-auto overflow-y-auto overflow-x-hidden text-sm")
+    div(class="p-3")
         ng-container(*ngIf="treeConfig.rootNode && treeConfig.rootNode().newItem")
-            .flex.w-full.py-1.cursor-pointer(class="hover:text-blue-500 hover:bg-blue-50")
-                i.flex.items-center.justify-center.w-5.fa-regular.fa-folder.mr-2
-                .flex-auto.overflow-hidden.whitespace-nowrap
-                    input.text-xs.rounded-sm.w-full.py-0.px-1.shadow-0([(ngModel)]="treeConfig.rootNode().newItem.title", placeholder="폴더명", (keyup.enter)="createNode(treeConfig.rootNode())")
-                i.flex.items-center.justify-center.ml-1.text-blue-500.fa-solid.fa-xmark(class="hover:scale-125", (click)="cancelCreate(treeConfig.rootNode()); $event.stopPropagation();")
-                i.flex.items-center.justify-center.ml-1.text-blue-500.fa-solid.fa-check(class="hover:scale-125", (click)="createNode(treeConfig.rootNode()); $event.stopPropagation();")
+            div(class="flex items-center w-full py-1.5 cursor-pointer hover:bg-neutral-100 rounded-md px-1 transition-colors")
+                i(class="flex items-center justify-center w-5 ti ti-folder mr-2 text-neutral-400")
+                div(class="flex-auto overflow-hidden whitespace-nowrap")
+                    input(class="text-xs rounded-md w-full py-0.5 px-1.5 shadow-none border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400", [(ngModel)]="treeConfig.rootNode().newItem.title", placeholder="폴더명", (keyup.enter)="createNode(treeConfig.rootNode())")
+                i(class="flex items-center justify-center w-5 ti ti-x text-red-400 ml-1.5 hover:text-red-600 cursor-pointer transition-colors", (click)="cancelCreate(treeConfig.rootNode()); $event.stopPropagation();")
+                i(class="flex items-center justify-center w-5 ti ti-check text-blue-500 ml-1.5 hover:text-blue-700 cursor-pointer transition-colors", (click)="createNode(treeConfig.rootNode()); $event.stopPropagation();")
 
         wiz-portal-season-viewer-tree([config]="treeConfig")
             ng-template('#fileTemplate'='', let-data='')
-                .flex.w-full.py-1.cursor-pointer(class="hover:text-blue-500 hover:bg-blue-50 group {{data.isActive()?'text-blue-500 bg-blue-50':''}}", (click)="data.select()")
+                div(class="flex items-center w-full py-1.5 cursor-pointer hover:bg-neutral-100 rounded-md px-1 group transition-colors", [ngClass]="data.isActive() ? 'bg-neutral-100 text-neutral-900 font-medium' : 'text-neutral-600'", (click)="data.select()")
                     ng-container(*ngIf="data.id == wikibook.data().home")
                         ng-container(*ngIf="data.type == 'folder'")
-                            i.flex.items-center.justify-center.w-5.mr-1([ngClass]="data.isOpen() ? 'fa-solid fa-home' : 'fa-solid fa-home'", (click)="data.toggle(); $event.stopPropagation(); service.render();")
+                            i(class="flex items-center justify-center w-5 mr-1 ti ti-home text-neutral-500", (click)="data.toggle(); $event.stopPropagation(); service.render();")
                         ng-container(*ngIf="data.type != 'folder'")
-                            i.flex.items-center.justify-center.w-5.mr-1.fa-solid.fa-home
+                            i(class="flex items-center justify-center w-5 mr-1 ti ti-home text-neutral-500")
 
                     ng-container(*ngIf="data.id != wikibook.data().home")
                         ng-container(*ngIf="data.type == 'folder'")
-                            i.flex.items-center.justify-center.w-5.ti.mr-1([ngClass]="data.isOpen() ? 'ti-arrow-badge-down-filled' : 'ti-arrow-badge-right-filled'", (click)="data.toggle(); $event.stopPropagation(); service.render();")
+                            i(class="flex items-center justify-center w-5 mr-1 ti", [ngClass]="data.isOpen() ? 'ti-chevron-down' : 'ti-chevron-right'", (click)="data.toggle(); $event.stopPropagation(); service.render();")
                         ng-container(*ngIf="data.type != 'folder'")
-                            i.flex.items-center.justify-center.w-5.mr-1.ti.ti-arrow-badge-right
+                            i(class="flex items-center justify-center w-5 mr-1 ti ti-file-text text-neutral-400")
 
-                    .flex-auto.overflow-hidden.whitespace-nowrap
+                    div(class="flex-auto overflow-hidden whitespace-nowrap")
                         span(*ngIf="!data.editable") {{data.title}}
-                        input.text-xs.rounded-sm.w-full.py-0.px-1.shadow-0([(ngModel)]="data.rename", placeholder="폴더명", (keyup.enter)="data.update();", *ngIf="data.editable", (click)="$event.stopPropagation();")
+                        input(class="text-xs rounded-md w-full py-0.5 px-1.5 shadow-none border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400", [(ngModel)]="data.rename", placeholder="폴더명", (keyup.enter)="data.update();", *ngIf="data.editable", (click)="$event.stopPropagation();")
 
                     ng-container(*ngIf="data.type == 'folder'")
-                        i.flex.items-center.justify-center.w-5.text-gray-300.hidden.fa-solid.fa-folder-plus(class="hover:!text-blue-500 group-hover:!flex", (click)="create(data); $event.stopPropagation();")
-                        i.flex.items-center.justify-center.w-5.text-gray-300.hidden.fa-solid.fa-plus(class="hover:!text-blue-500 group-hover:!flex", (click)="createDoc(data); $event.stopPropagation();")
+                        i(class="flex items-center justify-center w-5 text-neutral-300 hidden group-hover:!flex ti ti-folder-plus hover:text-blue-500 transition-colors", (click)="create(data); $event.stopPropagation();")
+                        i(class="flex items-center justify-center w-5 text-neutral-300 hidden group-hover:!flex ti ti-plus hover:text-blue-500 transition-colors", (click)="createDoc(data); $event.stopPropagation();")
 
                 ng-container(*ngIf="data.newItem")
-                    .pl-4
-                        .flex.w-full.py-1.cursor-pointer(class="hover:text-blue-500 hover:bg-blue-50")
-                            i.flex.items-center.justify-center.w-5.fa-regular.fa-folder.mr-2
-                            .flex-auto.overflow-hidden.whitespace-nowrap
-                                input.text-xs.rounded-sm.w-full.py-0.px-1.shadow-0([(ngModel)]="data.newItem.title", placeholder="폴더명", (keyup.enter)="createNode(data)")
-                            i.flex.items-center.justify-center.ml-1.text-blue-500.fa-solid.fa-xmark(class="hover:scale-125", (click)="cancelCreate(data); $event.stopPropagation();")
-                            i.flex.items-center.justify-center.ml-1.text-blue-500.fa-solid.fa-check(class="hover:scale-125", (click)="createNode(data); $event.stopPropagation();")
+                    div(class="pl-4")
+                        div(class="flex items-center w-full py-1.5 cursor-pointer hover:bg-neutral-100 rounded-md px-1 transition-colors")
+                            i(class="flex items-center justify-center w-5 ti ti-folder mr-2 text-neutral-400")
+                            div(class="flex-auto overflow-hidden whitespace-nowrap")
+                                input(class="text-xs rounded-md w-full py-0.5 px-1.5 shadow-none border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400", [(ngModel)]="data.newItem.title", placeholder="폴더명", (keyup.enter)="createNode(data)")
+                            i(class="flex items-center justify-center w-5 ti ti-x text-red-400 ml-1.5 hover:text-red-600 cursor-pointer transition-colors", (click)="cancelCreate(data); $event.stopPropagation();")
+                            i(class="flex items-center justify-center w-5 ti ti-check text-blue-500 ml-1.5 hover:text-blue-700 cursor-pointer transition-colors", (click)="createNode(data); $event.stopPropagation();")

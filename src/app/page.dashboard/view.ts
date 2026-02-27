@@ -71,27 +71,27 @@ export class Component implements OnInit {
     }
 
     public displayStatus(status: string) {
-        if (status == 'open') return { text: '대기', cls: 'bg-slate-100 text-gray-500' };
-        if (status == 'work') return { text: '진행', cls: 'bg-lime-100 text-lime-600' };
-        if (status == 'finish') return { text: '완료', cls: 'bg-emerald-100 text-emerald-600' };
-        if (status == 'close') return { text: '종료', cls: 'bg-red-100 text-red-500' };
-        if (status == 'cancel') return { text: '취소', cls: 'bg-red-100 text-red-500' };
-        return { text: status, cls: 'bg-slate-100 text-gray-500' };
+        if (status == 'open') return { text: '대기', cls: 'bg-neutral-100 text-neutral-500 ring-neutral-200' };
+        if (status == 'work') return { text: '진행', cls: 'bg-blue-50 text-blue-700 ring-blue-200' };
+        if (status == 'finish') return { text: '완료', cls: 'bg-green-50 text-green-700 ring-green-200' };
+        if (status == 'close') return { text: '종료', cls: 'bg-neutral-100 text-neutral-500 ring-neutral-200' };
+        if (status == 'cancel') return { text: '취소', cls: 'bg-red-50 text-red-700 ring-red-200' };
+        return { text: status, cls: 'bg-neutral-100 text-neutral-500 ring-neutral-200' };
     }
 
     public displayRole(role: string) {
-        if (role == 'admin') return { text: '관리자', cls: 'bg-purple-100 text-purple-600' };
-        if (role == 'manager') return { text: '매니저', cls: 'bg-blue-100 text-blue-600' };
-        if (role == 'user') return { text: '멤버', cls: 'bg-green-100 text-green-600' };
-        if (role == 'guest') return { text: '게스트', cls: 'bg-gray-100 text-gray-500' };
-        return { text: role, cls: 'bg-gray-100 text-gray-500' };
+        if (role == 'admin') return { text: '관리자', cls: 'bg-purple-50 text-purple-700 ring-purple-200' };
+        if (role == 'manager') return { text: '매니저', cls: 'bg-blue-50 text-blue-700 ring-blue-200' };
+        if (role == 'user') return { text: '멤버', cls: 'bg-green-50 text-green-700 ring-green-200' };
+        if (role == 'guest') return { text: '게스트', cls: 'bg-neutral-100 text-neutral-500 ring-neutral-200' };
+        return { text: role, cls: 'bg-neutral-100 text-neutral-500 ring-neutral-200' };
     }
 
     public displayPlanStatus(status: string) {
-        if (status == 'ready') return { text: '준비', cls: 'bg-slate-100 text-gray-500' };
-        if (status == 'active') return { text: '진행', cls: 'bg-lime-100 text-lime-600' };
-        if (status == 'finish') return { text: '완료', cls: 'bg-emerald-100 text-emerald-600' };
-        return { text: status, cls: 'bg-slate-100 text-gray-500' };
+        if (status == 'ready') return { text: '준비', cls: 'bg-amber-50 text-amber-700 ring-amber-200' };
+        if (status == 'active') return { text: '진행', cls: 'bg-blue-50 text-blue-700 ring-blue-200' };
+        if (status == 'finish') return { text: '완료', cls: 'bg-green-50 text-green-700 ring-green-200' };
+        return { text: status, cls: 'bg-neutral-100 text-neutral-500 ring-neutral-200' };
     }
 
     public isOverdue(planend: any) {

@@ -1,137 +1,147 @@
-.w-full.h-full.overflow-auto.bg-gray-50
-    .container.py-6.px-4.mx-auto(class="max-w-6xl")
+div(class="h-full overflow-y-auto")
+    div(class="max-w-6xl mx-auto px-8 py-8")
         //- 헤더
-        .mb-6
-            h1.text-xl.ff-b.text-gray-800 대시보드
-            p.text-sm.text-gray-500.mt-1 내 프로젝트와 작업 현황을 한눈에 확인하세요
+        div(class="mb-8")
+            h1(class="text-2xl font-bold text-neutral-900") 대시보드
+            p(class="mt-1 text-sm text-neutral-500") 내 프로젝트와 작업 현황을 한눈에 확인하세요
 
         //- 로딩
         ng-container(*ngIf="!loaded")
-            .grid.gap-4(class="grid-cols-1 md:grid-cols-2")
-                .bg-white.rounded-lg.border.border-gray-200.p-6(*ngFor="let i of [1,2,3,4]")
-                    .bg-gray-200.rounded.h-5.mb-4(class="w-1/3", style="animation: pulse 1.5s infinite")
-                    .bg-gray-100.rounded.h-4.mb-2(class="w-2/3", style="animation: pulse 1.5s infinite")
-                    .bg-gray-100.rounded.h-4(class="w-1/2", style="animation: pulse 1.5s infinite")
+            div(class="grid gap-4 grid-cols-1 md:grid-cols-2")
+                div(class="bg-white rounded-lg border border-neutral-200 p-6", *ngFor="let i of [1,2,3,4]")
+                    div(class="bg-neutral-100 rounded h-5 mb-4 w-1/3 animate-pulse")
+                    div(class="bg-neutral-100 rounded h-4 mb-2 w-2/3 animate-pulse")
+                    div(class="bg-neutral-100 rounded h-4 w-1/2 animate-pulse")
 
         ng-container(*ngIf="loaded")
             //- 이슈 요약 카운트
-            .grid.gap-4.mb-6(class="grid-cols-3 max-sm:grid-cols-3")
-                .bg-white.rounded-lg.border.border-gray-200.p-4.text-center.cursor-pointer.transition-all(class="hover:border-blue-400 hover:shadow-sm", (click)="navigateIssues()")
-                    .text-2xl.ff-b.text-gray-700 {{issues.counts.open}}
-                    .text-xs.text-gray-500.mt-1 대기
-                .bg-white.rounded-lg.border.border-gray-200.p-4.text-center.cursor-pointer.transition-all(class="hover:border-blue-400 hover:shadow-sm", (click)="navigateIssues()")
-                    .text-2xl.ff-b.text-lime-600 {{issues.counts.work}}
-                    .text-xs.text-gray-500.mt-1 진행
-                .bg-white.rounded-lg.border.border-gray-200.p-4.text-center.cursor-pointer.transition-all(class="hover:border-blue-400 hover:shadow-sm", (click)="navigateIssues()")
-                    .text-2xl.ff-b.text-emerald-600 {{issues.counts.finish}}
-                    .text-xs.text-gray-500.mt-1 완료
+            div(class="grid gap-4 mb-6 grid-cols-3")
+                div(class="bg-white rounded-lg border border-neutral-200 p-4 text-center cursor-pointer hover:bg-neutral-50 transition-colors", (click)="navigateIssues()")
+                    div(class="text-2xl font-bold text-neutral-700") {{issues.counts.open}}
+                    div(class="text-xs text-neutral-500 mt-1") 대기
+                div(class="bg-white rounded-lg border border-neutral-200 p-4 text-center cursor-pointer hover:bg-neutral-50 transition-colors", (click)="navigateIssues()")
+                    div(class="text-2xl font-bold text-blue-600") {{issues.counts.work}}
+                    div(class="text-xs text-neutral-500 mt-1") 진행
+                div(class="bg-white rounded-lg border border-neutral-200 p-4 text-center cursor-pointer hover:bg-neutral-50 transition-colors", (click)="navigateIssues()")
+                    div(class="text-2xl font-bold text-green-600") {{issues.counts.finish}}
+                    div(class="text-xs text-neutral-500 mt-1") 완료
 
-            .grid.gap-4(class="grid-cols-1 md:grid-cols-2")
+            div(class="grid gap-4 grid-cols-1 md:grid-cols-2")
                 //- 내 프로젝트 섹션
-                .bg-white.rounded-lg.border.border-gray-200.overflow-hidden
-                    .flex.items-center.justify-between.px-4.py-3.border-b.border-gray-100.bg-gray-50
-                        .flex.items-center
-                            i.ti.ti-brand-asana.text-blue-500.mr-2
-                            span.text-sm.ff-b.text-gray-700 내 프로젝트
-                        span.text-xs.text-gray-400 {{projects.length}}건
-                    .divide-y.divide-gray-100(style="max-height: 360px; overflow-y: auto")
+                div(class="bg-white rounded-lg border border-neutral-200 overflow-hidden")
+                    div(class="flex items-center justify-between px-5 py-4 border-b border-neutral-200")
+                        div(class="flex items-center gap-2")
+                            i(class="ti ti-folder text-[18px] text-neutral-400")
+                            span(class="text-base font-medium text-neutral-800") 내 프로젝트
+                        span(class="text-xs text-neutral-400") {{projects.length}}건
+                    div(class="divide-y divide-neutral-100", style="max-height: 360px; overflow-y: auto")
                         ng-container(*ngIf="projects.length === 0")
-                            .py-8.text-center.text-sm.text-gray-400 참여 중인 프로젝트가 없습니다
+                            div(class="flex flex-col items-center justify-center py-12 text-center")
+                                i(class="ti ti-folder-off text-4xl text-neutral-300 mb-3")
+                                p(class="text-sm text-neutral-500") 참여 중인 프로젝트가 없습니다
                         ng-container(*ngFor="let item of projects")
-                            a.flex.items-center.px-4.py-3.cursor-pointer.transition-all([routerLink]="'/project/' + item.namespace", class="hover:bg-blue-50")
-                                div.bg-gray-50.border.border-gray-200.rounded-lg.bg-contain.bg-center.bg-cover.bg-no-repeat.shrink-0(class="size-9", [ngStyle]="{'background-image': 'url(' + item.icon + ')'}")
-                                .flex-1.ml-3.min-w-0
-                                    .flex.items-center
-                                        span.text-sm.ff-b.text-gray-700.truncate {{item.title}}
-                                        span.text-xs.rounded.px-1.ml-2.shrink-0(class="py-0.5", [ngClass]="displayRole(item.role).cls") {{displayRole(item.role).text}}
-                                    .text-xs.text-gray-400.mt-1 {{displayDate(item.updated)}}
+                            a(class="flex items-center px-5 py-3 cursor-pointer hover:bg-neutral-50 transition-colors", [routerLink]="'/project/' + item.namespace")
+                                div(class="shrink-0 w-9 h-9 rounded-md bg-neutral-100 border border-neutral-200 bg-contain bg-center bg-cover bg-no-repeat", [ngStyle]="{'background-image': 'url(' + item.icon + ')'}")
+                                div(class="flex-1 ml-3 min-w-0")
+                                    div(class="flex items-center")
+                                        span(class="text-sm font-medium text-neutral-800 truncate") {{item.title}}
+                                        span(class="text-xs rounded-full px-2 py-0.5 ml-2 shrink-0 ring-1 ring-inset", [ngClass]="displayRole(item.role).cls") {{displayRole(item.role).text}}
+                                    div(class="text-xs text-neutral-400 mt-0.5") {{displayDate(item.updated)}}
 
-                //- 내 이슈 섹션
-                .bg-white.rounded-lg.border.border-gray-200.overflow-hidden
-                    .flex.items-center.justify-between.px-4.py-3.border-b.border-gray-100.bg-gray-50
-                        .flex.items-center
-                            i.ti.ti-brand-wechat.text-orange-500.mr-2
-                            span.text-sm.ff-b.text-gray-700 배정된 이슈
-                        a.text-xs.text-blue-500.cursor-pointer(routerLink="/issues", class="hover:underline") 전체보기
-                    .divide-y.divide-gray-100(style="max-height: 360px; overflow-y: auto")
+                //- 배정된 이슈 섹션
+                div(class="bg-white rounded-lg border border-neutral-200 overflow-hidden")
+                    div(class="flex items-center justify-between px-5 py-4 border-b border-neutral-200")
+                        div(class="flex items-center gap-2")
+                            i(class="ti ti-message-circle text-[18px] text-neutral-400")
+                            span(class="text-base font-medium text-neutral-800") 배정된 이슈
+                        a(class="text-xs text-blue-600 cursor-pointer hover:underline", routerLink="/issues") 전체보기
+                    div(class="divide-y divide-neutral-100", style="max-height: 360px; overflow-y: auto")
                         ng-container(*ngIf="issues.recent.length === 0")
-                            .py-8.text-center.text-sm.text-gray-400 배정된 이슈가 없습니다
+                            div(class="flex flex-col items-center justify-center py-12 text-center")
+                                i(class="ti ti-message-circle-off text-4xl text-neutral-300 mb-3")
+                                p(class="text-sm text-neutral-500") 배정된 이슈가 없습니다
                         ng-container(*ngFor="let item of issues.recent")
-                            a.flex.items-start.px-4.py-3.cursor-pointer.transition-all(routerLink="/issues", class="hover:bg-orange-50")
-                                .flex-1.min-w-0
-                                    .flex.items-center
-                                        span.text-xs.rounded.px-1.shrink-0(class="py-0.5", [ngClass]="displayStatus(item.status).cls") {{displayStatus(item.status).text}}
-                                        span.text-sm.text-gray-700.truncate.ml-2 {{item.title}}
-                                    .flex.items-center.mt-1.text-xs.text-gray-400
-                                        span.truncate(class="max-w-[120px]") {{item.project?.title}}
-                                        span.mx-1 ·
+                            a(class="flex items-start px-5 py-3 cursor-pointer hover:bg-neutral-50 transition-colors", routerLink="/issues")
+                                div(class="flex-1 min-w-0")
+                                    div(class="flex items-center")
+                                        span(class="text-xs rounded-full px-2 py-0.5 shrink-0 ring-1 ring-inset", [ngClass]="displayStatus(item.status).cls") {{displayStatus(item.status).text}}
+                                        span(class="text-sm text-neutral-700 truncate ml-2") {{item.title}}
+                                    div(class="flex items-center mt-1 text-xs text-neutral-400")
+                                        span(class="truncate max-w-[120px]") {{item.project?.title}}
+                                        span(class="mx-1") ·
                                         span {{displayDate(item.updated)}}
                                         ng-container(*ngIf="item.planend")
-                                            span.mx-1 ·
-                                            span([ngClass]="isOverdue(item.planend) ? 'text-red-500 ff-b' : ''") 마감 {{displayShortDate(item.planend)}}
+                                            span(class="mx-1") ·
+                                            span([ngClass]="isOverdue(item.planend) ? 'text-red-500 font-medium' : ''") 마감 {{displayShortDate(item.planend)}}
 
                 //- 내가 생성한 미완료 이슈
-                .bg-white.rounded-lg.border.border-gray-200.overflow-hidden
-                    .flex.items-center.justify-between.px-4.py-3.border-b.border-gray-100.bg-gray-50
-                        .flex.items-center
-                            i.ti.ti-pencil.text-indigo-500.mr-2
-                            span.text-sm.ff-b.text-gray-700 내가 생성한 이슈
-                        span.text-xs.text-gray-400 {{createdIssues.length}}건
-                    .divide-y.divide-gray-100(style="max-height: 360px; overflow-y: auto")
+                div(class="bg-white rounded-lg border border-neutral-200 overflow-hidden")
+                    div(class="flex items-center justify-between px-5 py-4 border-b border-neutral-200")
+                        div(class="flex items-center gap-2")
+                            i(class="ti ti-edit text-[18px] text-neutral-400")
+                            span(class="text-base font-medium text-neutral-800") 내가 생성한 이슈
+                        span(class="text-xs text-neutral-400") {{createdIssues.length}}건
+                    div(class="divide-y divide-neutral-100", style="max-height: 360px; overflow-y: auto")
                         ng-container(*ngIf="createdIssues.length === 0")
-                            .py-8.text-center.text-sm.text-gray-400 미완료 이슈가 없습니다
+                            div(class="flex flex-col items-center justify-center py-12 text-center")
+                                i(class="ti ti-checkbox text-4xl text-neutral-300 mb-3")
+                                p(class="text-sm text-neutral-500") 미완료 이슈가 없습니다
                         ng-container(*ngFor="let item of createdIssues")
-                            a.flex.items-start.px-4.py-3.cursor-pointer.transition-all(routerLink="/issues", class="hover:bg-indigo-50")
-                                .flex-1.min-w-0
-                                    .flex.items-center
-                                        span.text-xs.rounded.px-1.shrink-0(class="py-0.5", [ngClass]="displayStatus(item.status).cls") {{displayStatus(item.status).text}}
-                                        span.text-sm.text-gray-700.truncate.ml-2 {{item.title}}
-                                    .flex.items-center.mt-1.text-xs.text-gray-400
-                                        span.truncate(class="max-w-[120px]") {{item.project?.title}}
-                                        span.mx-1 ·
+                            a(class="flex items-start px-5 py-3 cursor-pointer hover:bg-neutral-50 transition-colors", routerLink="/issues")
+                                div(class="flex-1 min-w-0")
+                                    div(class="flex items-center")
+                                        span(class="text-xs rounded-full px-2 py-0.5 shrink-0 ring-1 ring-inset", [ngClass]="displayStatus(item.status).cls") {{displayStatus(item.status).text}}
+                                        span(class="text-sm text-neutral-700 truncate ml-2") {{item.title}}
+                                    div(class="flex items-center mt-1 text-xs text-neutral-400")
+                                        span(class="truncate max-w-[120px]") {{item.project?.title}}
+                                        span(class="mx-1") ·
                                         span {{displayDate(item.updated)}}
 
                 //- 최근 회의록 섹션
-                .bg-white.rounded-lg.border.border-gray-200.overflow-hidden
-                    .flex.items-center.justify-between.px-4.py-3.border-b.border-gray-100.bg-gray-50
-                        .flex.items-center
-                            i.ti.ti-notes.text-teal-500.mr-2
-                            span.text-sm.ff-b.text-gray-700 최근 회의록
-                        span.text-xs.text-gray-400 {{meetings.length}}건
-                    .divide-y.divide-gray-100(style="max-height: 360px; overflow-y: auto")
+                div(class="bg-white rounded-lg border border-neutral-200 overflow-hidden")
+                    div(class="flex items-center justify-between px-5 py-4 border-b border-neutral-200")
+                        div(class="flex items-center gap-2")
+                            i(class="ti ti-notes text-[18px] text-neutral-400")
+                            span(class="text-base font-medium text-neutral-800") 최근 회의록
+                        span(class="text-xs text-neutral-400") {{meetings.length}}건
+                    div(class="divide-y divide-neutral-100", style="max-height: 360px; overflow-y: auto")
                         ng-container(*ngIf="meetings.length === 0")
-                            .py-8.text-center.text-sm.text-gray-400 최근 회의록이 없습니다
+                            div(class="flex flex-col items-center justify-center py-12 text-center")
+                                i(class="ti ti-notes-off text-4xl text-neutral-300 mb-3")
+                                p(class="text-sm text-neutral-500") 최근 회의록이 없습니다
                         ng-container(*ngFor="let item of meetings")
-                            a.flex.items-start.px-4.py-3.cursor-pointer.transition-all([routerLink]="'/project/' + item.project?.namespace + '/meeting'", class="hover:bg-teal-50")
-                                .flex-1.min-w-0
-                                    .flex.items-center
-                                        span.text-sm.text-gray-700.truncate {{item.title}}
-                                    .flex.items-center.mt-1.text-xs.text-gray-400
-                                        span.truncate(class="max-w-[120px]") {{item.project?.title}}
-                                        span.mx-1 ·
+                            a(class="flex items-start px-5 py-3 cursor-pointer hover:bg-neutral-50 transition-colors", [routerLink]="'/project/' + item.project?.namespace + '/meeting'")
+                                div(class="flex-1 min-w-0")
+                                    div(class="flex items-center")
+                                        span(class="text-sm text-neutral-700 truncate") {{item.title}}
+                                    div(class="flex items-center mt-1 text-xs text-neutral-400")
+                                        span(class="truncate max-w-[120px]") {{item.project?.title}}
+                                        span(class="mx-1") ·
                                         span {{displayShortDate(item.meetdate)}}
-                                        span.mx-1 ·
+                                        span(class="mx-1") ·
                                         span {{getUserName(item.user_id)}}
 
             //- 내 계획 섹션 (전체 너비)
-            .mt-4
-                .bg-white.rounded-lg.border.border-gray-200.overflow-hidden
-                    .flex.items-center.justify-between.px-4.py-3.border-b.border-gray-100.bg-gray-50
-                        .flex.items-center
-                            i.ti.ti-calendar-event.text-violet-500.mr-2
-                            span.text-sm.ff-b.text-gray-700 내 계획
-                        span.text-xs.text-gray-400 {{plans.length}}건
-                    .divide-y.divide-gray-100(style="max-height: 300px; overflow-y: auto")
+            div(class="mt-4")
+                div(class="bg-white rounded-lg border border-neutral-200 overflow-hidden")
+                    div(class="flex items-center justify-between px-5 py-4 border-b border-neutral-200")
+                        div(class="flex items-center gap-2")
+                            i(class="ti ti-calendar text-[18px] text-neutral-400")
+                            span(class="text-base font-medium text-neutral-800") 내 계획
+                        span(class="text-xs text-neutral-400") {{plans.length}}건
+                    div(class="divide-y divide-neutral-100", style="max-height: 300px; overflow-y: auto")
                         ng-container(*ngIf="plans.length === 0")
-                            .py-8.text-center.text-sm.text-gray-400 진행 중인 계획이 없습니다
+                            div(class="flex flex-col items-center justify-center py-12 text-center")
+                                i(class="ti ti-calendar-off text-4xl text-neutral-300 mb-3")
+                                p(class="text-sm text-neutral-500") 진행 중인 계획이 없습니다
                         ng-container(*ngFor="let item of plans")
-                            a.flex.items-center.px-4.py-3.cursor-pointer.transition-all([routerLink]="'/project/' + item.project?.namespace + '/info'", class="hover:bg-violet-50")
-                                .flex-1.min-w-0
-                                    .flex.items-center
-                                        span.text-xs.rounded.px-1.shrink-0(class="py-0.5", [ngClass]="displayPlanStatus(item.status).cls") {{displayPlanStatus(item.status).text}}
-                                        span.text-sm.text-gray-700.truncate.ml-2 {{item.title}}
-                                    .flex.items-center.mt-1.text-xs.text-gray-400
-                                        span.truncate(class="max-w-[120px]") {{item.project?.title}}
+                            a(class="flex items-center px-5 py-3 cursor-pointer hover:bg-neutral-50 transition-colors", [routerLink]="'/project/' + item.project?.namespace + '/info'")
+                                div(class="flex-1 min-w-0")
+                                    div(class="flex items-center")
+                                        span(class="text-xs rounded-full px-2 py-0.5 shrink-0 ring-1 ring-inset", [ngClass]="displayPlanStatus(item.status).cls") {{displayPlanStatus(item.status).text}}
+                                        span(class="text-sm text-neutral-700 truncate ml-2") {{item.title}}
+                                    div(class="flex items-center mt-1 text-xs text-neutral-400")
+                                        span(class="truncate max-w-[120px]") {{item.project?.title}}
                                         ng-container(*ngIf="item.start || item.end")
-                                            span.mx-1 ·
+                                            span(class="mx-1") ·
                                             span {{displayShortDate(item.start)}} ~ {{displayShortDate(item.end)}}

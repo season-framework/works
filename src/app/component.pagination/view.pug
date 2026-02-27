@@ -1,35 +1,35 @@
 div(class="flex items-center justify-center gap-x-1")
     button(
-        class="text-gray-500 bg-gray-200 rounded-full hover:bg-gray-300 focus:outline-none focus:ring focus:ring-gray-400 {{buttonClass}}",
+        class="text-neutral-500 bg-neutral-100 rounded-md hover:bg-neutral-200 focus:outline-none transition-colors {{buttonClass}}",
         (click)="move(Math.floor((current - 1) / maxlength) * maxlength - (maxlength - 1))",
         [disabled]="(current-1)/maxlength < 1",
         [ngClass]="(current-1)/maxlength < 1 ? disabledClass : ''",
     )
-        i.fas.fa-angle-double-left
+        i(class="ti ti-chevrons-left text-sm")
     button(
-        class="text-gray-500 bg-gray-200 rounded-full hover:bg-gray-300 focus:outline-none focus:ring focus:ring-gray-400 {{buttonClass}}",
+        class="text-neutral-500 bg-neutral-100 rounded-md hover:bg-neutral-200 focus:outline-none transition-colors {{buttonClass}}",
         (click)="move(current - 1)",
         [ngClass]="current == 1 ? disabledClass : ''",
         [disabled]="current == 1",
     )
-        i.fas.fa-angle-left
+        i(class="ti ti-chevron-left text-sm")
     div(class="flex space-x-1")
         ng-container(*ngFor="let page of list")
             ng-container(*ngIf="page == current")
-                button(class="text-white bg-blue-500 rounded-full focus:outline-none focus:ring focus:ring-blue-300 {{buttonClass}}", (click)="move(page)") {{page}}
+                button(class="text-white bg-neutral-800 rounded-md focus:outline-none {{buttonClass}}", (click)="move(page)") {{page}}
             ng-container(*ngIf="page != current")
-                button(class="text-gray-500 bg-gray-200 rounded-full hover:bg-gray-300 focus:outline-none focus:ring focus:ring-gray-400 {{buttonClass}}", (click)="move(page)") {{page}}
+                button(class="text-neutral-500 bg-neutral-100 rounded-md hover:bg-neutral-200 focus:outline-none transition-colors {{buttonClass}}", (click)="move(page)") {{page}}
     button(
-        class="text-gray-500 bg-gray-200 rounded-full hover:bg-gray-300 focus:outline-none focus:ring focus:ring-gray-400 {{buttonClass}}",
+        class="text-neutral-500 bg-neutral-100 rounded-md hover:bg-neutral-200 focus:outline-none transition-colors {{buttonClass}}",
         (click)="move(current+1)",
         [disabled]="current+1 > end",
         [ngClass]="current+1 > end ? disabledClass : ''",
     )
-        i.fas.fa-angle-right
+        i(class="ti ti-chevron-right text-sm")
     button(
-        class="text-gray-500 bg-gray-200 rounded-full hover:bg-gray-300 focus:outline-none focus:ring focus:ring-gray-400 {{buttonClass}}",
+        class="text-neutral-500 bg-neutral-100 rounded-md hover:bg-neutral-200 focus:outline-none transition-colors {{buttonClass}}",
         (click)="move(Math.ceil(current / maxlength) * maxlength + 1)",
         [disabled]="Math.ceil(current / maxlength) * maxlength + 1 > end",
-        [ngClass]="Math.ceil(current / maxlength) * maxlength + 1 > end?disabledClass:''",
+        [ngClass]="Math.ceil(current / maxlength) * maxlength + 1 > end ? disabledClass : ''",
     )
-        i.fas.fa-angle-double-right
+        i(class="ti ti-chevrons-right text-sm")

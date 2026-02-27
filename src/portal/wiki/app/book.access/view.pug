@@ -1,46 +1,47 @@
-.flex.flex-wrap.flex-col.border.border-gray-300.rounded-2xl.bg-white
-    .flex.flex-wrap.p-5.gap-x-2(*ngIf="!readOnly")
-        .w-96.flex.flex-col
-            label.mb-2 사용자 이메일
-            input.text-sm.py-1.w-full.border-gray-300.rounded-sm([(ngModel)]="newuser.email", placeholder="user@season.co.kr", (keyup.enter)="create()")
-        .w-24.flex.flex-col
-            label.mb-2 권한
-            select.text-sm.py-1.w-full.border-gray-300.rounded-sm(class="shadow-0 hover:bg-slate-50", [(ngModel)]="newuser.role")
-                option(value='admin', *ngIf="wikibook.accessLevel(['admin'])") 관리자
-                option(value='user') 구성원
-                option(value='guest') 손님
-        .w-36.flex.flex-col-reverse
-            button.bg-blue-500.text-white.rounded-sm.text-sm.py-1(class="hover:bg-blue-600", (click)="create()") 추가
+div(class="flex flex-col border border-neutral-200 rounded-lg bg-white overflow-hidden")
+    //- 사용자 추가 폼
+    div(class="flex flex-wrap p-5 gap-3", *ngIf="!readOnly")
+        div(class="w-96 flex flex-col")
+            label(class="mb-2 text-sm font-medium text-neutral-600") 사용자 이메일
+            input(class="w-full px-3 py-2 text-sm border border-neutral-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 placeholder-neutral-400 transition-colors", [(ngModel)]="newuser.email", placeholder="user@season.co.kr", (keyup.enter)="create()")
+        div(class="w-24 flex flex-col")
+            label(class="mb-2 text-sm font-medium text-neutral-600") 권한
+            select(class="px-3 py-2 text-sm border border-neutral-200 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-colors", [(ngModel)]="newuser.role")
+                option(value="admin", *ngIf="wikibook.accessLevel(['admin'])") 관리자
+                option(value="user") 구성원
+                option(value="guest") 손님
+        div(class="w-36 flex flex-col-reverse")
+            button(class="px-4 py-2 bg-blue-500 text-white text-sm font-medium rounded-md hover:bg-blue-600 transition-colors", (click)="create()") 추가
 
-    .overflow-x-auto
-        table.min-w-full
-            thead.border-y.border-gray-300
-                tr.text-xs.ff-b.text-left(class="*:py-2 *:px-4 *:bg-slate-50")
+    //- 접근 권한 테이블
+    div(class="overflow-x-auto")
+        table(class="min-w-full")
+            thead(class="border-y border-neutral-200")
+                tr(class="text-xs font-medium text-neutral-500 uppercase tracking-wider text-left *:py-3 *:px-4 *:bg-neutral-50")
                     th 구성원
-                    th.w-1.text-nowrap 참가일
-                    th.w-1.text-nowrap 권한
-                    th.w-1.text-nowrap.area-round.text-right(*ngIf="!readOnly")
+                    th(class="w-1 text-nowrap") 참가일
+                    th(class="w-1 text-nowrap") 권한
+                    th(class="w-1 text-nowrap text-right", *ngIf="!readOnly")
 
-            tbody.text-sm.divide-y
+            tbody(class="text-sm divide-y divide-neutral-100")
                 ng-container(*ngFor="let user of wikibook.access.list()")
-                    tr(*ngIf="user.id", class="*:py-2 *:px-4 hover:bg-slate-50")
+                    tr(*ngIf="user.id", class="*:py-3 *:px-4 hover:bg-neutral-50 transition-colors")
                         td(*ngIf="user.meta.email")
-                            div
+                            div(class="text-neutral-800")
                                 span {{user.meta.name}}
-                                span.ml-2.bg-orange-500.rounded-sm.text-xs.text-white(*ngIf="service.auth.session.id == user.meta.id", class="py-[3px] px-[6px]") It's Me!
-                            small.text-gray-500 {{user.meta.email}}
-                        td.text-nowrap(*ngIf="!user.meta.email")
-                            div {{user.user}}
-                            small.text-gray-500 아직 시즌웍스에 가입되지 않은 사용자입니다
-                        td.text-nowrap.text-gray-500 {{user.created.substring(0, 10)}}
-                        td.text-nowrap(*ngIf="user.meta.type == 'user'")
-                            select.text-sm.py-1.w-24.border-gray-300.rounded-sm(class="shadow-0 hover:bg-slate-50 disabled:bg-slate-100", [(ngModel)]="user.role", (change)="roleChanged(user)", [disabled]="readOnly || service.auth.session.id == user.meta.id || (project.accessLevel(['manager']) && ['admin', 'manager'].includes(user.role))")
-                                option(value='admin', [disabled]="!wikibook.accessLevel(['admin'])") 관리자
-                                option(value='user') 구성원
-                                option(value='guest') 손님
+                                span(class="ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-amber-50 text-amber-700 ring-1 ring-inset ring-amber-200", *ngIf="service.auth.session.id == user.meta.id") It's Me!
+                            small(class="text-neutral-400") {{user.meta.email}}
+                        td(class="text-nowrap", *ngIf="!user.meta.email")
+                            div(class="text-neutral-800") {{user.user}}
+                            small(class="text-neutral-400") 아직 시즌웍스에 가입되지 않은 사용자입니다
+                        td(class="text-nowrap text-neutral-400") {{user.created.substring(0, 10)}}
+                        td(class="text-nowrap", *ngIf="user.meta.type == 'user'")
+                            select(class="px-2 py-1 text-sm border border-neutral-200 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 disabled:bg-neutral-50 disabled:text-neutral-400 transition-colors w-24", [(ngModel)]="user.role", (change)="roleChanged(user)", [disabled]="readOnly || service.auth.session.id == user.meta.id || (project.accessLevel(['manager']) && ['admin', 'manager'].includes(user.role))")
+                                option(value="admin", [disabled]="!wikibook.accessLevel(['admin'])") 관리자
+                                option(value="user") 구성원
+                                option(value="guest") 손님
                         td(*ngIf="user.meta.type == 'project'")
-                            .text-sm.py-1.w-24.bg-slate-100 프로젝트
-                        td.w-1.text-nowrap(*ngIf="!readOnly")
-                            button.rounded-full.bg-red-500.text-white.px-3.py-1(*ngIf="service.auth.session.id != user.meta.id && !(wikibook.accessLevel(['manager']) && ['admin', 'manager'].includes(user.role))", (click)="remove(user)")
-                                i.fa-solid.fa-xmark
-
+                            div(class="px-2 py-1 text-sm bg-neutral-100 text-neutral-500 rounded-md w-24 text-center") 프로젝트
+                        td(class="w-1 text-nowrap", *ngIf="!readOnly")
+                            button(class="inline-flex items-center justify-center size-7 rounded-md bg-red-50 text-red-500 hover:bg-red-100 transition-colors", *ngIf="service.auth.session.id != user.meta.id && !(wikibook.accessLevel(['manager']) && ['admin', 'manager'].includes(user.role))", (click)="remove(user)")
+                                i(class="ti ti-x text-base")
