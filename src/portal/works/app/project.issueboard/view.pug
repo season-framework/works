@@ -1,119 +1,230 @@
 div(class="relative w-full h-full")
-    div(class="px-6 absolute inset-0 overflow-x-auto overflow-y-hidden z-[999]", *ngIf="cache.loaded", #container="")
-        //- 빈 상태
-        ng-container(*ngIf="labels.length == 0")
-            div(class="p-4")
-                div(class="bg-white rounded-lg border border-neutral-200 py-16 text-center")
-                    div(class="flex flex-col items-center justify-center")
-                        i(class="ti ti-layout-kanban text-5xl text-neutral-300 mb-4")
-                        p(class="text-base font-medium text-neutral-700") 이슈보드가 시작되지 않았습니다
-                        p(class="mt-1 text-sm text-neutral-400", *ngIf="!readOnly") 아래 시작하기 버튼을 눌러서 이슈보드를 시작해주세요
-                        button(class="inline-flex items-center gap-2 px-4 py-2 mt-6 bg-blue-500 text-white text-sm font-medium rounded-md hover:bg-blue-600 transition-colors", *ngIf="!readOnly", (click)="start()")
-                            i(class="ti ti-plus text-base")
-                            | 시작하기
+    //- ===== 칸반 보기 모드 =====
+    ng-container(*ngIf="viewMode === 'kanban'")
+        div(class="px-6 absolute inset-0 overflow-x-auto overflow-y-hidden z-[999]", *ngIf="cache.loaded", #container="")
+            //- 빈 상태
+            ng-container(*ngIf="labels.length == 0")
+                div(class="p-4")
+                    div(class="bg-white rounded-lg border border-neutral-200 py-16 text-center")
+                        div(class="flex flex-col items-center justify-center")
+                            i(class="ti ti-layout-kanban text-5xl text-neutral-300 mb-4")
+                            p(class="text-base font-medium text-neutral-700") 이슈보드가 시작되지 않았습니다
+                            p(class="mt-1 text-sm text-neutral-400", *ngIf="!readOnly") 아래 시작하기 버튼을 눌러서 이슈보드를 시작해주세요
+                            button(class="inline-flex items-center gap-2 px-4 py-2 mt-6 bg-blue-500 text-white text-sm font-medium rounded-md hover:bg-blue-600 transition-colors", *ngIf="!readOnly", (click)="start()")
+                                i(class="ti ti-plus text-base")
+                                | 시작하기
 
-        //- 칸반 보드
-        ng-container(*ngIf="labels.length > 0")
-            div(class="table w-max h-full overflow-hidden")
-                div(class="table h-full w-max overflow-hidden", [sortablejs]="labels", [sortablejsOptions]="config.labelSorted")
-                    //- 라벨 컬럼
-                    div(class="table-cell p-0 h-full overflow-hidden border-r border-neutral-200", *ngFor="let label of labels", [ngClass]="labelExtended[label.id] ? 'w-[640px]' : 'w-[320px]'")
-                        div(class="flex flex-col h-full overflow-auto pt-0.5")
-                            //- 컬럼 헤더
-                            div(class="flex h-11 items-center px-4 border-b border-neutral-200 bg-neutral-50/50")
-                                input(class="w-full shadow-0 border-none text-sm font-semibold bg-inherit text-neutral-800 focus:outline-none", [(ngModel)]="label.title", (change)="updateLabels([label])", [disabled]="!project.accessLevel(['admin', 'manager'])")
-                                div(class="ml-auto")
-                                div(class="flex gap-1")
-                                    button(class="rounded-md text-xs text-neutral-500 hover:text-neutral-700 hover:bg-neutral-200 size-7 flex items-center justify-center transition-colors", (click)="gridOption(label)")
-                                        i(class="ti ti-arrows-maximize", *ngIf="!labelExtended[label.id]")
-                                        i(class="ti ti-arrows-minimize", *ngIf="labelExtended[label.id]")
-                                    button(class="rounded-md text-xs text-neutral-500 hover:text-neutral-700 hover:bg-neutral-200 size-7 flex items-center justify-center transition-colors", (click)="addIssue(label)")
-                                        i(class="ti ti-plus")
-                                    ng-container(*ngIf="project.accessLevel(['admin', 'manager'])")
-                                        button(class="rounded-md text-xs text-neutral-500 hover:text-neutral-700 hover:bg-neutral-200 size-7 flex items-center justify-center cursor-grab btn-action-move transition-colors", *ngIf="label.mode == 0")
-                                            i(class="ti ti-grip-vertical")
-                                        button(class="rounded-md text-xs text-neutral-500 hover:text-red-500 hover:bg-red-50 size-7 flex items-center justify-center transition-colors", *ngIf="label.mode == 0", (click)="removeLabel(label)")
-                                            i(class="ti ti-x")
-
-                            //- 이슈 카드 리스트
-                            div(class="flex-1 overflow-y-auto px-3 max-sm:px-4")
-                                ng-container(*ngIf="label.issues.length == 0")
-                                    button(class="w-full rounded-md text-xs text-neutral-500 bg-neutral-100 hover:bg-neutral-200 mt-3 py-2 transition-colors", *ngIf="!readOnly", (click)="addIssue(label)")
-                                        i(class="ti ti-plus mr-1")
-                                        | 새 이슈
-
-                                div(class="mt-3", [sortablejs]="label.issues", [sortablejsOptions]="config.issueSorted", [ngClass]="labelExtended[label.id] ? 'grid grid-cols-2 gap-x-3' : ''")
-                                    ng-container(*ngFor="let issue_id of label.issues")
-                                        div(class="rounded-lg mb-3 max-sm:mb-3", (click)="openIssue(issue_id)", [class.is-loaded]="isLoadedIssue(issue_id)", *ngIf="isSearchedUser(cache.issues[issue_id]) && onProcessIssue(cache.issues[issue_id])")
-                                            wiz-portal-works-widget-project-issueboard-issue([issue]="cache.issues[issue_id]", style="display: block; height: 100%;")
-
-                                ng-container(*ngIf="label.issues.length > 0")
-                                    div(class="my-2 py-2 rounded-md text-center text-sm text-neutral-400 cursor-pointer hover:bg-neutral-100 hover:text-neutral-700 transition-colors", *ngIf="!readOnly", (click)="addIssue(label)")
-                                        i(class="ti ti-plus mr-1 text-xs")
-                                        | 새로운 이슈 만들기
-
-                                //- 종료된 작업 토글
-                                div(class="flex items-center rounded-md text-neutral-400 px-2 py-2.5 cursor-pointer text-sm hover:bg-neutral-100 hover:text-neutral-700 transition-colors", *ngIf="label.closeCount > 0", (click)="loadClosed(label, true)")
-                                    span 종료된 작업
-                                    span(class="ml-2 text-xs text-neutral-400") ({{label.closeCount}})
+            //- 칸반 보드
+            ng-container(*ngIf="labels.length > 0")
+                div(class="table w-max h-full overflow-hidden")
+                    div(class="table h-full w-max overflow-hidden", [sortablejs]="labels", [sortablejsOptions]="config.labelSorted")
+                        //- 라벨 컬럼
+                        div(class="table-cell p-0 h-full overflow-hidden border-r border-neutral-200", *ngFor="let label of labels", [ngClass]="labelExtended[label.id] ? 'w-[640px]' : 'w-[320px]'")
+                            div(class="flex flex-col h-full overflow-auto pt-0.5")
+                                //- 컬럼 헤더
+                                div(class="flex h-11 items-center px-4 border-b border-neutral-200 bg-neutral-50/50")
+                                    input(class="w-full shadow-0 border-none text-sm font-semibold bg-inherit text-neutral-800 focus:outline-none", [(ngModel)]="label.title", (change)="updateLabels([label])", [disabled]="!project.accessLevel(['admin', 'manager'])")
                                     div(class="ml-auto")
-                                    i(class="ti ti-chevron-up", *ngIf="hiddenIssues(label.id, 'close').length == 0")
-                                    i(class="ti ti-chevron-down", *ngIf="hiddenIssues(label.id, 'close').length > 0")
+                                    div(class="flex gap-1")
+                                        button(class="rounded-md text-xs text-neutral-500 hover:text-neutral-700 hover:bg-neutral-200 size-7 flex items-center justify-center transition-colors", (click)="gridOption(label)")
+                                            i(class="ti ti-arrows-maximize", *ngIf="!labelExtended[label.id]")
+                                            i(class="ti ti-arrows-minimize", *ngIf="labelExtended[label.id]")
+                                        button(class="rounded-md text-xs text-neutral-500 hover:text-neutral-700 hover:bg-neutral-200 size-7 flex items-center justify-center transition-colors", (click)="addIssue(label)")
+                                            i(class="ti ti-plus")
+                                        ng-container(*ngIf="project.accessLevel(['admin', 'manager'])")
+                                            button(class="rounded-md text-xs text-neutral-500 hover:text-neutral-700 hover:bg-neutral-200 size-7 flex items-center justify-center cursor-grab btn-action-move transition-colors", *ngIf="label.mode == 0")
+                                                i(class="ti ti-grip-vertical")
+                                            button(class="rounded-md text-xs text-neutral-500 hover:text-red-500 hover:bg-red-50 size-7 flex items-center justify-center transition-colors", *ngIf="label.mode == 0", (click)="removeLabel(label)")
+                                                i(class="ti ti-x")
 
-                                div(class="issue-closed-items mt-3", *ngIf="hiddenIssues(label.id, 'close').length > 0", [ngClass]="labelExtended[label.id] ? 'grid grid-cols-2 gap-x-3' : ''")
-                                    ng-container(*ngFor="let issue_id of hiddenIssues(label.id, 'close')")
-                                        div(class="rounded-lg mb-3 max-sm:mb-3", (click)="openIssue(issue_id)", [class.is-loaded]="isLoadedIssue(issue_id)", *ngIf="isSearchedUser(cache.issues[issue_id]) && (!cache.issues[issue_id] || cache.issues[issue_id].status == 'close')")
-                                            wiz-portal-works-widget-project-issueboard-issue([issue]="cache.issues[issue_id]", style="display: block; height: 100%;")
+                                //- 이슈 카드 리스트
+                                div(class="flex-1 overflow-y-auto px-3 max-sm:px-4")
+                                    ng-container(*ngIf="label.issues.length == 0")
+                                        button(class="w-full rounded-md text-xs text-neutral-500 bg-neutral-100 hover:bg-neutral-200 mt-3 py-2 transition-colors", *ngIf="!readOnly", (click)="addIssue(label)")
+                                            i(class="ti ti-plus mr-1")
+                                            | 새 이슈
 
-                                ng-container(*ngIf="!hiddenIssues(label.id, 'close', true).isLastPage && hiddenIssues(label.id, 'close').length > 0")
-                                    div(class="my-2 py-2 rounded-md text-center text-sm text-neutral-400 cursor-pointer hover:bg-neutral-100 hover:text-neutral-700 transition-colors", (click)="loadClosed(label)") 더 불러오기
+                                    div(class="mt-3", [sortablejs]="label.issues", [sortablejsOptions]="config.issueSorted", [ngClass]="labelExtended[label.id] ? 'grid grid-cols-2 gap-x-3' : ''")
+                                        ng-container(*ngFor="let issue_id of label.issues")
+                                            div(class="rounded-lg mb-3 max-sm:mb-3", (click)="openIssue(issue_id)", [class.is-loaded]="isLoadedIssue(issue_id)", *ngIf="isSearchedUser(cache.issues[issue_id]) && onProcessIssue(cache.issues[issue_id])")
+                                                wiz-portal-works-widget-project-issueboard-issue([issue]="cache.issues[issue_id]", style="display: block; height: 100%;")
 
-                                //- 취소된 작업 토글
-                                div(class="flex items-center rounded-md text-neutral-400 px-2 py-2.5 cursor-pointer text-sm hover:bg-neutral-100 hover:text-neutral-700 transition-colors", *ngIf="label.cancelCount > 0", (click)="loadCanceled(label, true)")
-                                    span 취소된 작업
-                                    span(class="ml-2 text-xs text-neutral-400") ({{label.cancelCount}})
+                                    ng-container(*ngIf="label.issues.length > 0")
+                                        div(class="my-2 py-2 rounded-md text-center text-sm text-neutral-400 cursor-pointer hover:bg-neutral-100 hover:text-neutral-700 transition-colors", *ngIf="!readOnly", (click)="addIssue(label)")
+                                            i(class="ti ti-plus mr-1 text-xs")
+                                            | 새로운 이슈 만들기
+
+                                    //- 종료된 작업 토글
+                                    div(class="flex items-center rounded-md text-neutral-400 px-2 py-2.5 cursor-pointer text-sm hover:bg-neutral-100 hover:text-neutral-700 transition-colors", *ngIf="label.closeCount > 0", (click)="loadClosed(label, true)")
+                                        span 종료된 작업
+                                        span(class="ml-2 text-xs text-neutral-400") ({{label.closeCount}})
+                                        div(class="ml-auto")
+                                        i(class="ti ti-chevron-up", *ngIf="hiddenIssues(label.id, 'close').length == 0")
+                                        i(class="ti ti-chevron-down", *ngIf="hiddenIssues(label.id, 'close').length > 0")
+
+                                    div(class="issue-closed-items mt-3", *ngIf="hiddenIssues(label.id, 'close').length > 0", [ngClass]="labelExtended[label.id] ? 'grid grid-cols-2 gap-x-3' : ''")
+                                        ng-container(*ngFor="let issue_id of hiddenIssues(label.id, 'close')")
+                                            div(class="rounded-lg mb-3 max-sm:mb-3", (click)="openIssue(issue_id)", [class.is-loaded]="isLoadedIssue(issue_id)", *ngIf="isSearchedUser(cache.issues[issue_id]) && (!cache.issues[issue_id] || cache.issues[issue_id].status == 'close')")
+                                                wiz-portal-works-widget-project-issueboard-issue([issue]="cache.issues[issue_id]", style="display: block; height: 100%;")
+
+                                    ng-container(*ngIf="!hiddenIssues(label.id, 'close', true).isLastPage && hiddenIssues(label.id, 'close').length > 0")
+                                        div(class="my-2 py-2 rounded-md text-center text-sm text-neutral-400 cursor-pointer hover:bg-neutral-100 hover:text-neutral-700 transition-colors", (click)="loadClosed(label)") 더 불러오기
+
+                                    //- 취소된 작업 토글
+                                    div(class="flex items-center rounded-md text-neutral-400 px-2 py-2.5 cursor-pointer text-sm hover:bg-neutral-100 hover:text-neutral-700 transition-colors", *ngIf="label.cancelCount > 0", (click)="loadCanceled(label, true)")
+                                        span 취소된 작업
+                                        span(class="ml-2 text-xs text-neutral-400") ({{label.cancelCount}})
+                                        div(class="ml-auto")
+                                        i(class="ti ti-chevron-up", *ngIf="hiddenIssues(label.id, 'cancel').length == 0")
+                                        i(class="ti ti-chevron-down", *ngIf="hiddenIssues(label.id, 'cancel').length > 0")
+
+                                    div(class="issue-closed-items mt-3", *ngIf="hiddenIssues(label.id, 'cancel').length > 0", [ngClass]="labelExtended[label.id] ? 'grid grid-cols-2 gap-x-3' : ''")
+                                        ng-container(*ngFor="let issue_id of hiddenIssues(label.id, 'cancel')")
+                                            div(class="rounded-lg mb-3 max-sm:mb-3", (click)="openIssue(issue_id)", [class.is-loaded]="isLoadedIssue(issue_id)", *ngIf="isSearchedUser(cache.issues[issue_id]) && (!cache.issues[issue_id] || cache.issues[issue_id].status == 'cancel')")
+                                                wiz-portal-works-widget-project-issueboard-issue([issue]="cache.issues[issue_id]", style="display: block; height: 100%;")
+
+                                    ng-container(*ngIf="!hiddenIssues(label.id, 'cancel', true).isLastPage && hiddenIssues(label.id, 'cancel').length > 0")
+                                        div(class="my-2 py-2 rounded-md text-center text-sm text-neutral-400 cursor-pointer hover:bg-neutral-100 hover:text-neutral-700 transition-colors", (click)="loadCanceled(label)") 더 불러오기
+
+                                    div(class="mt-6")
+
+                        //- 새 라벨 추가 컬럼
+                        div(class="table-cell w-80 p-0 h-full overflow-hidden border-r border-neutral-200", *ngIf="project.accessLevel(['admin', 'manager']) && !service.trigger.value.isAside")
+                            div(class="flex flex-col h-full overflow-auto pt-0.5")
+                                div(class="flex h-11 items-center px-4 border-b border-neutral-200 bg-neutral-50/50")
+                                    input(class="w-full shadow-0 border-none text-sm bg-inherit text-neutral-800 placeholder-neutral-400 focus:outline-none", placeholder="라벨명을 입력해주세요", [(ngModel)]="cache.label", (keyup.enter)="addLabel(cache.label)")
                                     div(class="ml-auto")
-                                    i(class="ti ti-chevron-up", *ngIf="hiddenIssues(label.id, 'cancel').length == 0")
-                                    i(class="ti ti-chevron-down", *ngIf="hiddenIssues(label.id, 'cancel').length > 0")
+                                        button(class="rounded-md text-xs bg-blue-500 text-white w-12 h-7 hover:bg-blue-600 transition-colors", (click)="addLabel(cache.label)")
+                                            i(class="ti ti-plus")
 
-                                div(class="issue-closed-items mt-3", *ngIf="hiddenIssues(label.id, 'cancel').length > 0", [ngClass]="labelExtended[label.id] ? 'grid grid-cols-2 gap-x-3' : ''")
-                                    ng-container(*ngFor="let issue_id of hiddenIssues(label.id, 'cancel')")
-                                        div(class="rounded-lg mb-3 max-sm:mb-3", (click)="openIssue(issue_id)", [class.is-loaded]="isLoadedIssue(issue_id)", *ngIf="isSearchedUser(cache.issues[issue_id]) && (!cache.issues[issue_id] || cache.issues[issue_id].status == 'cancel')")
-                                            wiz-portal-works-widget-project-issueboard-issue([issue]="cache.issues[issue_id]", style="display: block; height: 100%;")
+        //- 좌우 스크롤 버튼
+        div(class="absolute left-0 p-3 text-2xl cursor-pointer top-[49%] z-[1000] max-sm:hidden text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 rounded-r-md transition-colors", (click)="scroll('left')")
+            i(class="ti ti-chevron-left")
 
-                                ng-container(*ngIf="!hiddenIssues(label.id, 'cancel', true).isLastPage && hiddenIssues(label.id, 'cancel').length > 0")
-                                    div(class="my-2 py-2 rounded-md text-center text-sm text-neutral-400 cursor-pointer hover:bg-neutral-100 hover:text-neutral-700 transition-colors", (click)="loadCanceled(label)") 더 불러오기
+        div(class="absolute right-0 p-3 text-2xl cursor-pointer top-[49%] z-[1000] max-sm:hidden text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 rounded-l-md transition-colors", (click)="scroll('right')")
+            i(class="ti ti-chevron-right")
 
-                                div(class="mt-6")
+    //- ===== 게시판 보기 모드 =====
+    ng-container(*ngIf="viewMode === 'board'")
+        div(class="absolute inset-0 overflow-y-auto z-[999] px-6 py-4")
+            //- 상태 필터 탭 + 검색
+            div(class="flex items-center gap-1 mb-4")
+                button(class="px-3 py-1.5 text-sm font-medium rounded-md transition-colors", [ngClass]="boardData.status === 'active' ? 'bg-neutral-900 text-white' : 'text-neutral-500 hover:bg-neutral-100 hover:text-neutral-700'", (click)="boardChangeStatus('active')") 진행중
+                button(class="px-3 py-1.5 text-sm font-medium rounded-md transition-colors", [ngClass]="boardData.status === 'noti' ? 'bg-neutral-900 text-white' : 'text-neutral-500 hover:bg-neutral-100 hover:text-neutral-700'", (click)="boardChangeStatus('noti')") 공지/알림
+                button(class="px-3 py-1.5 text-sm font-medium rounded-md transition-colors", [ngClass]="boardData.status === 'event' ? 'bg-neutral-900 text-white' : 'text-neutral-500 hover:bg-neutral-100 hover:text-neutral-700'", (click)="boardChangeStatus('event')") 일정
+                button(class="px-3 py-1.5 text-sm font-medium rounded-md transition-colors", [ngClass]="boardData.status === 'closed' ? 'bg-neutral-900 text-white' : 'text-neutral-500 hover:bg-neutral-100 hover:text-neutral-700'", (click)="boardChangeStatus('closed')") 종료
+                button(class="px-3 py-1.5 text-sm font-medium rounded-md transition-colors", [ngClass]="boardData.status === 'canceled' ? 'bg-neutral-900 text-white' : 'text-neutral-500 hover:bg-neutral-100 hover:text-neutral-700'", (click)="boardChangeStatus('canceled')") 취소
+                div(class="ml-auto flex items-center gap-3")
+                    span(class="text-xs text-neutral-400") 총 {{boardData.total}}건
+                    div(class="relative")
+                        div(class="flex items-center border border-neutral-200 rounded-md bg-white overflow-hidden", [class.border-blue-400]="boardData.searchFocused")
+                            i(class="ti ti-search text-neutral-400 pl-2.5 text-sm")
+                            input(class="w-40 h-7 text-xs px-2 border-0 bg-transparent focus:outline-none placeholder-neutral-400", placeholder="제목 검색", [(ngModel)]="boardData.keyword", (keyup.enter)="boardSearch()", (focus)="boardData.searchFocused = true", (blur)="boardData.searchFocused = false")
+                            button(class="px-2 h-7 text-neutral-400 hover:text-neutral-600 transition-colors", *ngIf="boardData.keyword", (click)="boardClearSearch()")
+                                i(class="ti ti-x text-xs")
 
-                //- 새 라벨 추가 컬럼
-                div(class="table-cell w-80 p-0 h-full overflow-hidden border-r border-neutral-200", *ngIf="project.accessLevel(['admin', 'manager']) && !service.trigger.value.isAside")
-                    div(class="flex flex-col h-full overflow-auto pt-0.5")
-                        div(class="flex h-11 items-center px-4 border-b border-neutral-200 bg-neutral-50/50")
-                            input(class="w-full shadow-0 border-none text-sm bg-inherit text-neutral-800 placeholder-neutral-400 focus:outline-none", placeholder="라벨명을 입력해주세요", [(ngModel)]="cache.label", (keyup.enter)="addLabel(cache.label)")
-                            div(class="ml-auto")
-                                button(class="rounded-md text-xs bg-blue-500 text-white w-12 h-7 hover:bg-blue-600 transition-colors", (click)="addLabel(cache.label)")
-                                    i(class="ti ti-plus")
+            //- 테이블
+            div(class="bg-white border border-neutral-200 rounded-lg overflow-hidden")
+                div(class="overflow-x-auto")
+                    table(class="min-w-full")
+                        thead
+                            tr(class="text-xs font-medium text-neutral-500 text-left border-b border-neutral-200")
+                                th(class="py-2.5 px-4 bg-neutral-50") 제목
+                                th(class="py-2.5 px-4 bg-neutral-50 w-1 whitespace-nowrap") 상태
+                                th(class="py-2.5 px-4 bg-neutral-50 w-1 whitespace-nowrap") 우선순위
+                                th(class="py-2.5 px-4 bg-neutral-50 w-1 whitespace-nowrap") 진행률
+                                th(class="py-2.5 px-4 bg-neutral-50 w-1 whitespace-nowrap") 시작일
+                                th(class="py-2.5 px-4 bg-neutral-50 w-1 whitespace-nowrap") 종료일
+                                th(class="py-2.5 px-4 bg-neutral-50 w-1 whitespace-nowrap") 담당자
+                                th(class="py-2.5 px-4 bg-neutral-50 w-1 whitespace-nowrap") 요청자
+                        tbody(class="text-sm divide-y divide-neutral-100")
+                            ng-container(*ngIf="boardData.loading")
+                                tr
+                                    td(class="py-8 text-center text-neutral-400", colspan="8")
+                                        i(class="ti ti-loader-2 animate-spin mr-2")
+                                        | 불러오는 중...
+                            ng-container(*ngIf="!boardData.loading && boardData.rows.length === 0")
+                                tr
+                                    td(class="py-8 text-center text-neutral-400", colspan="8") 이슈가 없습니다
+                            ng-container(*ngIf="!boardData.loading")
+                                ng-container(*ngFor="let row of boardData.rows")
+                                    //- 라벨 서브헤더
+                                    tr(*ngIf="row._type === 'header'")
+                                        td(class="py-2.5 px-4 text-xs font-semibold text-neutral-600 bg-neutral-100", colspan="8") {{row.label_title}}
+                                    //- 데이터 행
+                                    tr(*ngIf="row._type !== 'header'", class="hover:bg-neutral-50 cursor-pointer transition-colors", (click)="openIssue(row.id)")
+                                        //- 제목
+                                        td(class="py-3 px-4 max-w-[360px]")
+                                            div(class="flex items-center gap-2")
+                                                i(class="ti ti-alert-circle text-red-500", *ngIf="row.level == 2")
+                                                i(class="ti ti-speakerphone text-red-500", *ngIf="row.level == 3")
+                                                span(class="font-medium text-neutral-800 truncate", [class.text-red-600]="row.level > 1") {{row.title}}
+                                        //- 상태
+                                        td(class="py-3 px-4 whitespace-nowrap")
+                                            span(class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium", [ngClass]="statusColor(row.status)") {{statusLabel(row.status)}}
+                                        //- 우선순위
+                                        td(class="py-3 px-4 whitespace-nowrap text-xs font-medium", [ngClass]="levelColor(row.level)") {{levelLabel(row.level)}}
+                                        //- 진행률
+                                        td(class="py-3 px-4 whitespace-nowrap")
+                                            div(class="flex items-center gap-2", *ngIf="row.process > 0")
+                                                div(class="w-16 h-1.5 bg-neutral-200 rounded-full overflow-hidden")
+                                                    div(class="h-full rounded-full transition-all", [ngClass]="row.process >= 100 ? 'bg-emerald-500' : 'bg-blue-500'", [style.width]="row.process + '%'")
+                                                span(class="text-xs text-neutral-500") {{row.process}}%
+                                            span(class="text-xs text-neutral-300", *ngIf="!row.process || row.process === 0") —
+                                        //- 시작일
+                                        td(class="py-3 px-4 whitespace-nowrap text-xs text-neutral-500")
+                                            span(*ngIf="row.planstart") {{row.planstart.substring(0, 10)}}
+                                            span(class="text-neutral-300", *ngIf="!row.planstart") —
+                                        //- 종료일
+                                        td(class="py-3 px-4 whitespace-nowrap text-xs text-neutral-500")
+                                            span(*ngIf="row.planend") {{row.planend.substring(0, 10)}}
+                                            span(class="text-neutral-300", *ngIf="!row.planend") —
+                                        //- 담당자
+                                        td(class="py-3 px-4 whitespace-nowrap")
+                                            ng-container(*ngIf="row.worker && row.worker.length > 0")
+                                                span(class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium bg-neutral-50 text-neutral-600 border border-neutral-200", *ngIf="project.member.map[row.worker[0]]") {{project.member.map[row.worker[0]].name}}
+                                                span(class="text-xs text-neutral-400 ml-1", *ngIf="row.worker.length > 1") 외 {{row.worker.length - 1}}명
+                                            span(class="text-xs text-neutral-300", *ngIf="!row.worker || row.worker.length === 0") —
+                                        //- 요청자
+                                        td(class="py-3 px-4 whitespace-nowrap")
+                                            span(class="text-sm text-neutral-600", *ngIf="project.member.map[row.user_id]") {{project.member.map[row.user_id].name}}
+                                            span(class="text-xs text-neutral-300", *ngIf="!project.member.map[row.user_id]") —
 
-    //- 좌우 스크롤 버튼
-    div(class="absolute left-0 p-3 text-2xl cursor-pointer top-[49%] z-[1000] max-sm:hidden text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 rounded-r-md transition-colors", (click)="scroll('left')")
-        i(class="ti ti-chevron-left")
+            //- 페이지네이션
+            div(class="flex items-center justify-center gap-1 mt-4", *ngIf="boardData.lastpage > 1")
+                button(class="px-2.5 py-1.5 text-xs rounded-md text-neutral-500 hover:bg-neutral-100 transition-colors", [disabled]="boardData.page <= 1", (click)="boardChangePage(boardData.page - 1)")
+                    i(class="ti ti-chevron-left")
+                ng-container(*ngFor="let p of boardPageRange()")
+                    button(class="px-3 py-1.5 text-xs rounded-md transition-colors", [ngClass]="p === boardData.page ? 'bg-neutral-900 text-white' : 'text-neutral-500 hover:bg-neutral-100'", (click)="boardChangePage(p)") {{p}}
+                button(class="px-2.5 py-1.5 text-xs rounded-md text-neutral-500 hover:bg-neutral-100 transition-colors", [disabled]="boardData.page >= boardData.lastpage", (click)="boardChangePage(boardData.page + 1)")
+                    i(class="ti ti-chevron-right")
 
-    div(class="absolute right-0 p-3 text-2xl cursor-pointer top-[49%] z-[1000] max-sm:hidden text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 rounded-l-md transition-colors", (click)="scroll('right')")
-        i(class="ti ti-chevron-right")
-
-    //- 멤버 조회 팝업
+    //- ===== 플로팅 버튼 영역 (공통: 보기모드 토글 + 멤버 조회) =====
     div(class="absolute right-[24px] bottom-[24px] z-[1000]")
+        //- 멤버 조회 팝업
         div(class="bg-neutral-900 rounded-lg text-white mb-3 z-[1000] py-1 px-0 m-0 min-w-44 shadow-xl", *ngIf="memberSearch")
             ng-container(*ngFor="let member of project.member.list()")
                 div(class="cursor-pointer min-w-44 px-3 py-2 text-sm hover:bg-neutral-800 rounded-md transition-colors", *ngIf="searchMember(member, memberSearchText)", (click)="searchByMember(member)")
                     span {{member.meta.name}}
             div(class="min-w-44 px-3 py-2")
                 input(class="flex items-center w-full h-7 text-xs bg-neutral-800 rounded-md px-2 text-white placeholder-neutral-400 border-0 focus:outline-none focus:ring-1 focus:ring-neutral-600", placeholder="사용자 검색", [(ngModel)]="memberSearchText")
-            div(class="size-3 ml-3 -mb-[6px] rotate-45 bg-neutral-900")
+            div(class="flex justify-end pr-5")
+                div(class="size-3 -mb-[6px] rotate-45 bg-neutral-900")
 
-        div(class="cursor-pointer bg-neutral-900 rounded-md text-center py-2 text-white border border-neutral-700 px-4 transition-all min-w-[176px] hover:bg-neutral-800 text-sm", (click)="selectMember()")
-            span {{memberSearch ? '조회 취소' : '멤버 조회'}}
+        //- 버튼 그룹
+        div(class="flex items-center gap-2")
+            //- 보기 모드 토글
+            div(class="view-toggle-btn flex items-center bg-neutral-900 rounded-lg border border-neutral-700 overflow-hidden shadow-lg h-9")
+                button(class="flex items-center gap-1.5 px-3.5 h-full text-sm font-medium transition-all", [ngClass]="viewMode === 'kanban' ? 'text-white' : 'text-neutral-500 hover:text-neutral-300'", (click)="viewMode !== 'kanban' && toggleViewMode()")
+                    i(class="ti ti-layout-kanban text-base")
+                    span(class="max-sm:hidden") 칸반
+                button(class="flex items-center gap-1.5 px-3.5 h-full text-sm font-medium transition-all", [ngClass]="viewMode === 'board' ? 'text-white' : 'text-neutral-500 hover:text-neutral-300'", (click)="viewMode !== 'board' && toggleViewMode()")
+                    i(class="ti ti-list text-base")
+                    span(class="max-sm:hidden") 게시판
+
+            //- 멤버 조회
+            div(class="cursor-pointer bg-neutral-900 rounded-lg text-center text-white border border-neutral-700 px-3.5 transition-all hover:bg-neutral-800 text-sm shadow-lg h-9 flex items-center justify-center", (click)="selectMember()")
+                span {{memberSearch ? '조회 취소' : '멤버 조회'}}
 
 ng-container(*ngIf="issue.modal > 0")
     wiz-portal-works-project-issueboard-issue([issue]="issue", class="overflow-hidden")

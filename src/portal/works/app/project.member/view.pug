@@ -1,9 +1,45 @@
-div(class="flex flex-col border border-neutral-200 rounded-lg bg-white overflow-hidden")
+div(class="flex flex-col border border-neutral-200 rounded-lg bg-white overflow-hidden max-w-3xl")
     //- 멤버 추가 영역
-    div(class="flex flex-wrap items-end gap-3 p-5 border-b border-neutral-100", *ngIf="!readOnly")
-        div(class="flex-1 min-w-[280px]")
-            label(class="block mb-1.5 text-xs font-medium text-neutral-500 uppercase tracking-wider") 사용자 이메일
-            input(type="email", class="w-full px-3 py-2 text-sm border border-neutral-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 placeholder-neutral-400 transition-colors", [(ngModel)]="newuser.email", placeholder="user@season.co.kr", (keyup.enter)="create()")
+    div(class="flex flex-wrap items-start gap-3 p-5 border-b border-neutral-100", *ngIf="!readOnly")
+        div(class="flex-1 min-w-[280px] relative", #autocompleteContainer="")
+            label(class="block mb-1.5 text-xs font-medium text-neutral-500 uppercase tracking-wider") 사용자 검색
+            input(type="text", class="w-full px-3 py-2 text-sm border border-neutral-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 placeholder-neutral-400 transition-colors", [(ngModel)]="searchKeyword", placeholder="이름 또는 이메일로 검색", (input)="onSearchInput()", (keydown)="onSearchKeydown($event)", (focus)="onSearchFocus()", autocomplete="off")
+            //- 선택된 사용자 표시
+            div(class="flex items-center gap-2 mt-1.5", *ngIf="selectedUser")
+                div(class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium ring-1 ring-inset ring-blue-200")
+                    span {{selectedUser.name}}
+                    span(class="text-blue-400") {{selectedUser.email}}
+                    button(class="ml-0.5 hover:text-blue-900 transition-colors", (click)="clearSelection()")
+                        i(class="ti ti-x text-xs")
+            //- 자동완성 드롭다운
+            div(class="autocomplete-dropdown absolute left-0 right-0 top-full mt-1 bg-white border border-neutral-200 rounded-lg shadow-lg z-50 max-h-[320px] overflow-y-auto", *ngIf="showDropdown && (searchResults.internal.length > 0 || searchResults.external.length > 0)")
+                //- 내부 사용자 그룹
+                ng-container(*ngIf="searchResults.internal.length > 0")
+                    div(class="px-3 py-2 text-[11px] font-semibold text-neutral-400 uppercase tracking-wider bg-neutral-50 border-b border-neutral-100 sticky top-0") 내부 사용자
+                    div(*ngFor="let user of searchResults.internal; let i = index", class="flex items-center gap-3 px-3 py-2.5 cursor-pointer hover:bg-blue-50 transition-colors border-b border-neutral-50 last:border-b-0", [class.bg-blue-50]="highlightIndex === getGlobalIndex('internal', i)", (click)="selectUser(user)", (mouseenter)="highlightIndex = getGlobalIndex('internal', i)")
+                        div(class="w-7 h-7 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-xs font-semibold flex-shrink-0") {{user.name?.charAt(0) || '?'}}
+                        div(class="flex-1 min-w-0")
+                            div(class="text-sm font-medium text-neutral-800 truncate") {{user.name}}
+                            div(class="text-xs text-neutral-400 truncate") {{user.email}}
+                        div(class="flex-shrink-0")
+                            span(class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium", [ngClass]="user.membership === 'admin' ? 'bg-violet-50 text-violet-600 ring-1 ring-inset ring-violet-200' : 'bg-sky-50 text-sky-600 ring-1 ring-inset ring-sky-200'") {{user.membership === 'admin' ? '관리자' : '직원'}}
+                //- 외부 사용자 그룹
+                ng-container(*ngIf="searchResults.external.length > 0")
+                    div(class="px-3 py-2 text-[11px] font-semibold text-neutral-400 uppercase tracking-wider bg-neutral-50 border-b border-neutral-100 sticky top-0", [class.border-t]="searchResults.internal.length > 0") 외부 사용자
+                    div(*ngFor="let user of searchResults.external; let i = index", class="flex items-center gap-3 px-3 py-2.5 cursor-pointer hover:bg-blue-50 transition-colors border-b border-neutral-50 last:border-b-0", [class.bg-blue-50]="highlightIndex === getGlobalIndex('external', i)", (click)="selectUser(user)", (mouseenter)="highlightIndex = getGlobalIndex('external', i)")
+                        div(class="w-7 h-7 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-xs font-semibold flex-shrink-0") {{user.name?.charAt(0) || '?'}}
+                        div(class="flex-1 min-w-0")
+                            div(class="text-sm font-medium text-neutral-800 truncate") {{user.name}}
+                            div(class="text-xs text-neutral-400 truncate") {{user.email}}
+                        div(class="flex-shrink-0")
+                            span(class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-amber-50 text-amber-600 ring-1 ring-inset ring-amber-200") {{user.membership === 'guest' ? '게스트' : '일반'}}
+                //- 검색 중
+                div(class="px-3 py-4 text-center text-xs text-neutral-400", *ngIf="searching")
+                    i(class="ti ti-loader-2 animate-spin mr-1")
+                    | 검색 중...
+            //- 검색 결과 없음
+            div(class="autocomplete-dropdown absolute left-0 right-0 top-full mt-1 bg-white border border-neutral-200 rounded-lg shadow-lg z-50 px-3 py-4 text-center text-xs text-neutral-400", *ngIf="showDropdown && !searching && searchResults.internal.length === 0 && searchResults.external.length === 0")
+                | 검색 결과가 없습니다
         div(class="w-28")
             label(class="block mb-1.5 text-xs font-medium text-neutral-500 uppercase tracking-wider") 권한
             select(class="w-full px-3 py-2 text-sm border border-neutral-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-colors", [(ngModel)]="newuser.role")
@@ -11,8 +47,9 @@ div(class="flex flex-col border border-neutral-200 rounded-lg bg-white overflow-
                 option(value="manager", *ngIf="project.accessLevel(['admin'])") 매니저
                 option(value="user") 구성원
                 option(value="guest") 손님
-        div
-            button(class="px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-md hover:bg-blue-600 transition-colors", (click)="create()") 추가
+        div(class="flex flex-col")
+            label(class="block mb-1.5 text-xs font-medium text-transparent") &nbsp;
+            button(class="px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-md hover:bg-blue-600 transition-colors", [disabled]="!selectedUser", [class.opacity-50]="!selectedUser", [class.cursor-not-allowed]="!selectedUser", (click)="create()") 추가
 
     //- 멤버 테이블
     div(class="overflow-x-auto")

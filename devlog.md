@@ -28,3 +28,14 @@
 | 2026-02-28 | 024 | 전체 빌드 및 디자인 통합 검증 | [상세](devlog/2026-02-28/024-final-build-verification.md) |
 | 2026-02-28 | 025 | 관리자 기능 설계 및 Config DB화 방법론 | [상세](devlog/2026-02-28/025-admin-feature-design.md) |
 | 2026-02-28 | 026 | 드라이브 tree API driveItem 미정의 오류 수정 | [상세](devlog/2026-02-28/026-drive-tree-driveitem-fix.md) |
+| 2026-02-28 | 027 | 프로젝트 멤버 추가 자동완성 드롭다운 구현 | [상세](devlog/2026-02-28/027-member-autocomplete-dropdown.md) |
+| 2026-02-28 | 028 | 이슈보드 칸반/게시판 보기 모드 전환 구현 | [상세](devlog/2026-02-28/028-issueboard-view-mode.md) |
+| 2026-02-28 | 029 | 멤버 자동완성 드롭다운 리뷰 반영 | [상세](devlog/2026-02-28/029-member-autocomplete-review.md) |
+| 2026-02-28 | 030 | 이슈보드 보기모드 토글 리뷰 반영 | [상세](devlog/2026-02-28/030-issueboard-toggle-review.md) |
+| 2026-02-28 | 031 | 멤버 검색 시 기존 멤버 제외 | [상세](devlog/2026-02-28/031-member-search-exclude.md) |
+| 2026-02-28 | 032 | 이슈보드 멤버조회/구성원 UI 수정 | [상세](devlog/2026-02-28/032-issueboard-member-ui-fix.md) |
+| 2026-02-28 | 033 | UI 구조 일부 수정 (드라이브/이슈보드 게시판 모드) | [상세](devlog/2026-02-28/033-ui-structure-update.md) |
+| 2026-02-28 | 034 | 멤버 검색 기존 멤버 제외 버그 수정 | [상세](devlog/2026-02-28/034-member-exclude-bugfix.md) |
+| 2026-02-28 | 035 | 대시보드 화면 전체 스크롤 버그 수정 | [상세](devlog/2026-02-28/035-dashboard-scroll-fix.md) |
+| 2026-02-28 | 036 | 멤버 검색 제외 범위를 프로젝트 실제 멤버로 한정 | [상세](devlog/2026-02-28/036-member-exclude-scope-fix.md) |
+| 2026-02-28 | 037 | 이슈보드 게시판 보기 공지/일정 탭 및 검색 기능 추가 | [상세](devlog/2026-02-28/037-issueboard-board-tags-search.md) |

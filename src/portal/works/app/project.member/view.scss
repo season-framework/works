@@ -4,3 +4,18 @@ th {
         min-width: 24px;
     }
 }
+
+.autocomplete-dropdown {
+    &::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: rgba(0, 0, 0, 0.15);
+        border-radius: 2px;
+    }
+}

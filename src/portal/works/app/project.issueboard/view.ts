@@ -356,4 +356,108 @@ export class Component implements OnInit, OnDestroy {
         return false;
     }
 
+    // ===== 보기 모드 (kanban / board) =====
+    public viewMode: string = 'kanban';
+    public boardData: any = {
+        rows: [],
+        page: 1,
+        lastpage: 1,
+        total: 0,
+        status: 'active',
+        loading: false,
+        keyword: '',
+        searchFocused: false
+    };
+
+    public async toggleViewMode() {
+        this.viewMode = this.viewMode === 'kanban' ? 'board' : 'kanban';
+        if (this.viewMode === 'board') {
+            this.boardData.page = 1;
+            await this.loadBoardData();
+        }
+        await this.service.render();
+    }
+
+    public async loadBoardData() {
+        this.boardData.loading = true;
+        await this.service.render();
+
+        const { code, data } = await wiz.call("loadAllIssues", {
+            project_id: this.project.id(),
+            page: this.boardData.page,
+            status: this.boardData.status,
+            keyword: this.boardData.keyword || ''
+        });
+
+        if (code === 200) {
+            // 라벨별 서브헤더 삽입
+            let processedRows = [];
+            let lastLabelId = null;
+            for (let row of (data.rows || [])) {
+                if (row.label_id !== lastLabelId) {
+                    processedRows.push({ _type: 'header', label_title: row.label_title, label_id: row.label_id });
+                    lastLabelId = row.label_id;
+                }
+                row._type = 'data';
+                processedRows.push(row);
+            }
+            this.boardData.rows = processedRows;
+            this.boardData.lastpage = data.lastpage || 1;
+            this.boardData.total = data.total || 0;
+        }
+        this.boardData.loading = false;
+        await this.service.render();
+    }
+
+    public async boardChangePage(page: number) {
+        if (page < 1 || page > this.boardData.lastpage) return;
+        this.boardData.page = page;
+        await this.loadBoardData();
+    }
+
+    public async boardChangeStatus(status: string) {
+        this.boardData.status = status;
+        this.boardData.page = 1;
+        await this.loadBoardData();
+    }
+
+    public statusLabel(status: string): string {
+        const map = { open: '시작 전', work: '진행중', finish: '완료', close: '종료', cancel: '취소', noti: '공지', event: '일정' };
+        return map[status] || status;
+    }
+
+    public statusColor(status: string): string {
+        const map = { open: 'bg-neutral-100 text-neutral-600', work: 'bg-blue-50 text-blue-600', finish: 'bg-emerald-50 text-emerald-600', close: 'bg-neutral-200 text-neutral-500', cancel: 'bg-red-50 text-red-500', noti: 'bg-amber-50 text-amber-600', event: 'bg-purple-50 text-purple-600' };
+        return map[status] || 'bg-neutral-100 text-neutral-600';
+    }
+
+    public levelLabel(level: number): string {
+        const map = { 0: '낮음', 1: '보통', 2: '중요', 3: '긴급' };
+        return map[level] || '보통';
+    }
+
+    public levelColor(level: number): string {
+        const map = { 0: 'text-neutral-400', 1: 'text-neutral-600', 2: 'text-amber-600', 3: 'text-red-600' };
+        return map[level] || 'text-neutral-600';
+    }
+
+    public boardPageRange(): number[] {
+        const pages = [];
+        const start = Math.max(1, this.boardData.page - 2);
+        const end = Math.min(this.boardData.lastpage, this.boardData.page + 2);
+        for (let i = start; i <= end; i++) pages.push(i);
+        return pages;
+    }
+
+    public async boardSearch() {
+        this.boardData.page = 1;
+        await this.loadBoardData();
+    }
+
+    public async boardClearSearch() {
+        this.boardData.keyword = '';
+        this.boardData.page = 1;
+        await this.loadBoardData();
+    }
+
 }

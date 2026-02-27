@@ -1,0 +1,14 @@
+.view-toggle-btn {
+    button {
+        position: relative;
+        z-index: 1;
+
+        &:first-child {
+            border-radius: 0.5rem 0 0 0.5rem;
+        }
+
+        &:last-child {
+            border-radius: 0 0.5rem 0.5rem 0;
+        }
+    }
+}
