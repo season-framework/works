@@ -1,0 +1,12 @@
+{
+    "id": "page.dashboard",
+    "mode": "page",
+    "title": "/dashboard",
+    "namespace": "dashboard",
+    "category": "",
+    "viewuri": "/dashboard",
+    "preview": "",
+    "controller": "user",
+    "layout": "layout.aside",
+    "template": "wiz-page-dashboard()"
+}

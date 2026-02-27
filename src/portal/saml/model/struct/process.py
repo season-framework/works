@@ -87,7 +87,7 @@ class Process:
             sessiondata = userinfo
 
         wiz.session.set(**sessiondata)
-        wiz.response.redirect("/explore/project")
+        wiz.response.redirect("/dashboard")
 
     def logout(self, returnTo="/authenticate"):
         wiz.session.clear()

@@ -1,4 +1,4 @@
-const INDEX_PAGE = "explore/project";
+const INDEX_PAGE = "dashboard";
 
 import { URLPattern } from "urlpattern-polyfill";
 import { NgModule } from '@angular/core';
@@ -70,10 +70,9 @@ for (let i = 0; i < app_routes.length; i++) {
         router.children.push({
             matcher: (url: any) => {
                 let matcher = patternMatcher(child.path, url);
-                if (matcher) return matcher;
-                return null;
+                return matcher;
             },
-            component: child.component
+            component: child.component,
         });
     }
     routes.push(router);

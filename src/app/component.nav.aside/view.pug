@@ -26,17 +26,21 @@ div(class="flex flex-col max-sm:flex-row max-sm:flex-wrap h-screen max-sm:h-auto
             li
                 ul.text-gray-400(role="list", class="")
                     li
-                        a(*ngIf="service.auth.show(true)", routerLink="/issues", class="flex gap-x-3 p-2 mt-1 hover:bg-blue-50 text-sm/6 font-semibold", routerLinkActive="text-blue-600 ff-b bg-blue-50 border-l-[5px] border-blue-500")
-                            i.ti.ti-brand-wechat.place-content-center
-                            | 이슈모음
+                        a(*ngIf="service.auth.show(true)", routerLink="/dashboard", class="flex gap-x-3 p-2 mt-1 hover:bg-blue-50 text-sm/6 font-semibold", routerLinkActive="text-blue-600 ff-b bg-blue-50 border-l-[5px] border-blue-500")
+                            i.ti.ti-dashboard.place-content-center
+                            | 대시보드
                     li
                         a(routerLink="/explore/project", class="flex gap-x-3 p-2 hover:bg-blue-50 text-sm/6 font-semibold", routerLinkActive="text-blue-600 ff-b bg-blue-50 border-l-4 border-blue-500")
                             i.ti.ti-brand-asana.place-content-center
-                            | 프로젝트 탐색
+                            | 프로젝트
+                    li
+                        a(*ngIf="service.auth.show(true)", routerLink="/issues", class="flex gap-x-3 p-2 hover:bg-blue-50 text-sm/6 font-semibold", routerLinkActive="text-blue-600 ff-b bg-blue-50 border-l-[5px] border-blue-500")
+                            i.ti.ti-brand-wechat.place-content-center
+                            | 이슈모음
                     li
                         a(routerLink="/explore/wiki", class="flex gap-x-3 p-2 hover:bg-blue-50 text-sm/6 font-semibold", routerLinkActive="text-blue-600 ff-b bg-blue-50 border-l-4 border-blue-500")
                             i.ti.ti-book-2.place-content-center
-                            | 위키 탐색
+                            | 위키탐색
                     li.border-l-4.border-blue-500(*ngIf="project.status() && project.isLoaded")
                         .text-blue-600.ff-b(class="flex gap-x-3 p-2 text-sm/6 font-semibold")
                             span.cursor-pointer.transition-all(class="hover:scale-125", (click)="project.untrack(!project.data().userconfig_untrack)")
