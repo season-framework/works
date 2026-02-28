@@ -17,14 +17,24 @@ export class Component implements OnInit, OnDestroy {
         this.PROJECT_ID = WizRoute.segment.id;
     }
 
+    private isMenuAvailable(menu: string): boolean {
+        if (menu === 'info' || menu === 'member') return true;
+        const menuConfig = this.project.data()?.extra?.menu;
+        if (!menuConfig) return false;
+        return !!menuConfig[menu];
+    }
+
+    private getDefaultMenu(): string {
+        return this.project.data()?.extra?.main || 'info';
+    }
+
     public async ngOnInit() {
         await this.service.init();
         await this.service.auth.allow();
         await this.project.init(this.PROJECT_ID);
 
         if (!WizRoute.segment.menu) {
-            let main: string = this.project.data().extra.main;
-            if (!main) main = 'info';
+            let main: string = this.getDefaultMenu();
             this.service.href(`/project/${this.PROJECT_ID}/${main}`);
             this.MENU = main;
         } else {
@@ -41,7 +51,42 @@ export class Component implements OnInit, OnDestroy {
         this.routerSub = this.router.events.subscribe(async (event) => {
             if (event instanceof NavigationEnd) {
                 if (!this.loaded) return;
+                const newId = WizRoute.segment.id;
                 const newMenu = WizRoute.segment.menu;
+
+                if (!newId) {
+                    this.service.href("/explore/project");
+                    return;
+                }
+
+                // 프로젝트 변경 감지: 프로젝트 re-init
+                if (newId !== this.PROJECT_ID) {
+                    this.PROJECT_ID = newId;
+                    this.loaded = false;
+                    await this.project.init(this.PROJECT_ID);
+
+                    if (!this.project.status()) {
+                        this.service.href("/explore/project");
+                        return;
+                    }
+
+                    // 메뉴 결정: 요청된 메뉴가 사용 가능하면 유지, 아니면 메인 메뉴로
+                    let targetMenu = newMenu;
+                    if (!targetMenu || !this.isMenuAvailable(targetMenu)) {
+                        targetMenu = this.getDefaultMenu();
+                        this.MENU = targetMenu;
+                        this.loaded = true;
+                        this.service.href(`/project/${this.PROJECT_ID}/${targetMenu}`);
+                        return;
+                    }
+
+                    this.MENU = targetMenu;
+                    this.loaded = true;
+                    await this.service.render();
+                    return;
+                }
+
+                // 같은 프로젝트, 메뉴 변경
                 if (!newMenu) {
                     this.service.href("/explore/project");
                     return;

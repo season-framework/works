@@ -41,3 +41,6 @@
 | 2026-02-28 | 037 | 이슈보드 게시판 보기 공지/일정 탭 및 검색 기능 추가 | [상세](devlog/2026-02-28/037-issueboard-board-tags-search.md) |
 | 2026-02-28 | 038 | 사이드 메뉴 프로젝트 스위칭 드롭다운 추가 | [상세](devlog/2026-02-28/038-sidebar-project-switcher.md) |
 | 2026-02-28 | 039 | 이슈보드 진행 상태별 모아보기 필터 추가 | [상세](devlog/2026-02-28/039-issueboard-status-filter.md) |
+| 2026-02-28 | 040 | 사이드 메뉴 프로젝트 스위칭 라우팅 개선 | [상세](devlog/2026-02-28/040-project-switcher-routing-fix.md) |
+| 2026-02-28 | 041 | 프로젝트 스위칭 드롭다운 UX 개선 | [상세](devlog/2026-02-28/041-project-switcher-ux.md) |
+| 2026-02-28 | 042 | 프로젝트 스위칭 드롭다운 오버플로우 클리핑 수정 | [상세](devlog/2026-02-28/042-project-switcher-overflow.md) |

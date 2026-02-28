@@ -56,20 +56,21 @@ div(class="flex flex-col max-sm:flex-row max-sm:flex-wrap h-screen max-sm:h-auto
         //- 프로젝트 스위칭 드롭다운
         div(class="mt-auto px-2 pb-3 pt-2 border-t border-neutral-200 project-switcher-container", *ngIf="service.auth.show(true)")
             div(class="relative")
-                //- 드롭다운 패널 (위로 열림)
-                div(class="absolute bottom-full left-0 right-0 mb-1 bg-white border border-neutral-200 rounded-lg shadow-lg overflow-hidden z-50", *ngIf="projectSwitcher.open")
+                //- 드롭다운 패널 (fixed로 overflow 클리핑 회피)
+                div(class="fixed bg-white border border-neutral-200 rounded-lg shadow-lg overflow-hidden z-[9999] w-[320px]", *ngIf="projectSwitcher.open", [ngStyle]="projectSwitcher.panelStyle")
                     div(class="px-2.5 pt-2.5 pb-2")
                         div(class="flex items-center border border-neutral-200 rounded-md bg-neutral-50 overflow-hidden", [class.border-blue-400]="projectSwitcher.searchFocused")
                             i(class="ti ti-search text-neutral-400 pl-2 text-sm")
-                            input(class="w-full h-7 text-xs px-2 border-0 bg-transparent focus:outline-none placeholder-neutral-400", placeholder="프로젝트 검색", [(ngModel)]="projectSwitcher.keyword", (click)="$event.stopPropagation()", (focus)="projectSwitcher.searchFocused = true", (blur)="projectSwitcher.searchFocused = false")
-                    div(class="max-h-52 overflow-y-auto")
+                            input(class="w-full h-8 text-sm px-2 border-0 bg-transparent focus:outline-none placeholder-neutral-400", placeholder="프로젝트 검색", [(ngModel)]="projectSwitcher.keyword", (click)="$event.stopPropagation()", (focus)="projectSwitcher.searchFocused = true", (blur)="projectSwitcher.searchFocused = false", (keydown)="onSwitcherKeydown($event)", (input)="onSwitcherInput()")
+                    div(class="max-h-80 overflow-y-auto project-switcher-list")
                         ng-container(*ngIf="filteredProjects().length === 0")
                             div(class="px-3 py-4 text-center text-xs text-neutral-400") 프로젝트가 없습니다
-                        ng-container(*ngFor="let p of filteredProjects()")
-                            div(class="flex items-center gap-2.5 px-3 py-2 cursor-pointer text-sm hover:bg-neutral-100 transition-colors", [class.bg-neutral-100]="project.status() && project.data().namespace === p.namespace", (click)="switchProject(p)")
-                                i(class="ti ti-folder text-neutral-400 text-base")
+                        ng-container(*ngFor="let p of filteredProjects(); let i = index")
+                            div(class="flex items-center gap-2.5 px-3 py-2.5 cursor-pointer hover:bg-neutral-100 transition-colors", [class.bg-neutral-100]="project.status() && project.data().namespace === p.namespace", [class.bg-blue-50]="i === projectSwitcher.highlightIndex", [class.project-switcher-highlight]="i === projectSwitcher.highlightIndex", (click)="switchProject(p)", (mouseenter)="projectSwitcher.highlightIndex = i")
+                                i(class="ti ti-folder text-neutral-400 text-lg")
                                 div(class="flex-1 min-w-0")
-                                    div(class="truncate text-neutral-700", [class.font-medium]="project.status() && project.data().namespace === p.namespace") {{p.title}}
+                                    div(class="truncate text-sm text-neutral-800", [class.font-medium]="project.status() && project.data().namespace === p.namespace") {{p.short || p.title}}
+                                    div(class="truncate text-xs text-neutral-400 mt-0.5", *ngIf="p.short && p.short !== p.title") {{p.title}}
                 //- 트리거 버튼
                 button(class="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-sm text-neutral-600 hover:bg-neutral-200/60 transition-colors", (click)="toggleProjectSwitcher($event)")
                     i(class="ti ti-arrows-exchange text-base text-neutral-400")

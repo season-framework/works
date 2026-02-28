@@ -13,7 +13,9 @@ export class Component implements OnInit {
     public projectSwitcher: any = {
         open: false,
         projects: [],
-        keyword: ''
+        keyword: '',
+        highlightIndex: -1,
+        panelStyle: {}
     };
 
     public async ngOnInit() {
@@ -45,8 +47,47 @@ export class Component implements OnInit {
         this.projectSwitcher.open = !this.projectSwitcher.open;
         if (this.projectSwitcher.open) {
             this.projectSwitcher.keyword = '';
+            this.projectSwitcher.highlightIndex = -1;
+            // 트리거 버튼 위치 기반으로 fixed 드롭다운 좌표 계산
+            const trigger = event.currentTarget as HTMLElement;
+            const rect = trigger.getBoundingClientRect();
+            this.projectSwitcher.panelStyle = {
+                'bottom': (window.innerHeight - rect.top + 4) + 'px',
+                'left': rect.left + 'px'
+            };
         }
         this.service.render();
+    }
+
+    public onSwitcherKeydown(event: KeyboardEvent) {
+        const items = this.filteredProjects();
+        if (event.key === 'ArrowDown') {
+            event.preventDefault();
+            this.projectSwitcher.highlightIndex = Math.min(this.projectSwitcher.highlightIndex + 1, items.length - 1);
+            this.scrollToHighlighted();
+        } else if (event.key === 'ArrowUp') {
+            event.preventDefault();
+            this.projectSwitcher.highlightIndex = Math.max(this.projectSwitcher.highlightIndex - 1, 0);
+            this.scrollToHighlighted();
+        } else if (event.key === 'Enter') {
+            event.preventDefault();
+            if (this.projectSwitcher.highlightIndex >= 0 && this.projectSwitcher.highlightIndex < items.length) {
+                this.switchProject(items[this.projectSwitcher.highlightIndex]);
+            }
+        } else if (event.key === 'Escape') {
+            this.projectSwitcher.open = false;
+        }
+        this.service.render();
+    }
+
+    private scrollToHighlighted() {
+        setTimeout(() => {
+            const container = document.querySelector('.project-switcher-list');
+            const active = container?.querySelector('.project-switcher-highlight');
+            if (active && container) {
+                active.scrollIntoView({ block: 'nearest' });
+            }
+        }, 0);
     }
 
     public filteredProjects(): any[] {
@@ -54,13 +95,24 @@ export class Component implements OnInit {
         if (!kw) return this.projectSwitcher.projects;
         return this.projectSwitcher.projects.filter((p: any) =>
             (p.title || '').toLowerCase().includes(kw) ||
+            (p.short || '').toLowerCase().includes(kw) ||
             (p.namespace || '').toLowerCase().includes(kw)
         );
     }
 
+    public onSwitcherInput() {
+        this.projectSwitcher.highlightIndex = this.filteredProjects().length > 0 ? 0 : -1;
+    }
+
     public switchProject(p: any) {
         this.projectSwitcher.open = false;
-        this.service.href(`/project/${p.namespace}/info`);
+        // 현재 보고 있는 메뉴를 유지하여 이동, 프로젝트 페이지가 아니면 기본 경로로
+        const currentMenu = WizRoute.segment?.menu;
+        if (currentMenu) {
+            this.service.href(`/project/${p.namespace}/${currentMenu}`);
+        } else {
+            this.service.href(`/project/${p.namespace}`);
+        }
     }
 
     public async logout() {
