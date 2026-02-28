@@ -43,3 +43,4 @@ class Config(BaseConfig):
 
 config = wiz.config("works")
 Model = Config(config)
+

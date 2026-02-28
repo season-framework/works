@@ -1,0 +1,133 @@
+div(class="space-y-6")
+    //- 위키 목록 뷰
+    ng-container(*ngIf="!selectedBook")
+        //- 검색 및 필터 영역
+        div(class="flex items-center gap-3 flex-wrap")
+            div(class="flex-1 min-w-[200px]")
+                div(class="flex items-center border border-neutral-200 rounded-md bg-white overflow-hidden", [class.border-blue-400]="searchFocused")
+                    i(class="ti ti-search text-neutral-400 pl-3 text-sm")
+                    input(class="w-full h-9 text-sm px-2 border-0 bg-transparent focus:outline-none placeholder-neutral-400",
+                        placeholder="위키 제목, namespace로 검색",
+                        [(ngModel)]="keyword",
+                        (focus)="searchFocused = true",
+                        (blur)="searchFocused = false",
+                        (keydown.enter)="search()")
+            select(class="h-9 text-sm border border-neutral-200 rounded-md px-3 bg-white text-neutral-700 focus:outline-none focus:border-blue-400",
+                [(ngModel)]="filterVisibility",
+                (change)="search()")
+                option(value="") 전체 공개범위
+                option(value="public") 공개
+                option(value="internal") 내부
+                option(value="private") 비공개
+            button(class="h-9 px-4 text-sm bg-neutral-800 text-white rounded-md hover:bg-neutral-700 transition-colors",
+                (click)="search()")
+                i.ti.ti-search.mr-1
+                | 검색
+
+        //- 결과 요약
+        div(class="text-xs text-neutral-400") 총 {{total}}개 위키
+
+        //- 위키 테이블
+        div(class="border border-neutral-200 rounded-lg overflow-hidden")
+            table(class="w-full text-sm")
+                thead
+                    tr(class="bg-neutral-50 border-b border-neutral-200")
+                        th(class="text-left px-4 py-2.5 font-medium text-neutral-600") 위키 제목
+                        th(class="text-left px-4 py-2.5 font-medium text-neutral-600 w-32") Namespace
+                        th(class="text-center px-4 py-2.5 font-medium text-neutral-600 w-24") 공개범위
+                        th(class="text-center px-4 py-2.5 font-medium text-neutral-600 w-20") 접근 권한
+                        th(class="text-center px-4 py-2.5 font-medium text-neutral-600 w-20") 페이지
+                        th(class="text-center px-4 py-2.5 font-medium text-neutral-600 w-36") 최근 수정
+                        th(class="text-center px-4 py-2.5 font-medium text-neutral-600 w-28") 작업
+                tbody
+                    tr(*ngFor="let book of books",
+                        class="border-b border-neutral-100 hover:bg-neutral-50 transition-colors")
+                        td(class="px-4 py-2.5 text-neutral-800")
+                            span(class="text-sm font-medium") {{book.title || '(제목 없음)'}}
+                        td(class="px-4 py-2.5 text-neutral-500 text-xs font-mono") {{book.namespace}}
+                        td(class="text-center px-4 py-2.5")
+                            span(class="inline-block px-2 py-0.5 text-xs rounded-full",
+                                [class.bg-green-100]="book.visibility === 'public'",
+                                [class.text-green-700]="book.visibility === 'public'",
+                                [class.bg-blue-100]="book.visibility === 'internal'",
+                                [class.text-blue-700]="book.visibility === 'internal'",
+                                [class.bg-neutral-100]="book.visibility === 'private'",
+                                [class.text-neutral-600]="book.visibility === 'private'") {{visibilityLabel(book.visibility)}}
+                        td(class="text-center px-4 py-2.5 text-neutral-600 text-xs") {{book.access_count}}명
+                        td(class="text-center px-4 py-2.5 text-neutral-600 text-xs") {{book.page_count}}
+                        td(class="text-center px-4 py-2.5 text-neutral-400 text-xs") {{book.updated | date:'yyyy-MM-dd HH:mm'}}
+                        td(class="text-center px-4 py-2.5")
+                            div(class="flex items-center justify-center gap-1")
+                                button(class="p-1 text-neutral-400 hover:text-blue-500 transition-colors",
+                                    title="접근 권한 조회",
+                                    (click)="viewAccess(book)")
+                                    i.ti.ti-lock
+                                button(class="p-1 text-neutral-400 hover:text-red-500 transition-colors",
+                                    title="삭제",
+                                    (click)="deleteBook(book)")
+                                    i.ti.ti-trash
+                    tr(*ngIf="books.length === 0")
+                        td(class="px-4 py-8 text-center text-neutral-400", colspan="7") 위키가 없습니다
+
+        //- 페이지네이션
+        div(class="flex justify-center", *ngIf="lastPage > 1")
+            div(class="flex items-center gap-1")
+                button(class="px-3 py-1.5 text-sm border border-neutral-200 rounded-md hover:bg-neutral-100 transition-colors",
+                    [class.opacity-50]="page <= 1",
+                    [disabled]="page <= 1",
+                    (click)="goPage(page - 1)")
+                    i.ti.ti-chevron-left
+                ng-container(*ngFor="let p of pageList()")
+                    button(class="px-3 py-1.5 text-sm border rounded-md transition-colors",
+                        [class.border-neutral-800]="p === page",
+                        [class.bg-neutral-800]="p === page",
+                        [class.text-white]="p === page",
+                        [class.border-neutral-200]="p !== page",
+                        [class.hover:bg-neutral-100]="p !== page",
+                        (click)="goPage(p)") {{p}}
+                button(class="px-3 py-1.5 text-sm border border-neutral-200 rounded-md hover:bg-neutral-100 transition-colors",
+                    [class.opacity-50]="page >= lastPage",
+                    [disabled]="page >= lastPage",
+                    (click)="goPage(page + 1)")
+                    i.ti.ti-chevron-right
+
+    //- 접근 권한 상세 뷰
+    ng-container(*ngIf="selectedBook")
+        div(class="space-y-4")
+            div(class="flex items-center gap-3")
+                button(class="p-1.5 rounded-md hover:bg-neutral-200 transition-colors",
+                    (click)="closeAccess()")
+                    i.ti.ti-arrow-left.text-lg.text-neutral-600
+                h3(class="text-sm font-semibold text-neutral-800") {{selectedBook.title}} - 접근 권한
+
+            div(class="border border-neutral-200 rounded-lg overflow-hidden")
+                table(class="w-full text-sm")
+                    thead
+                        tr(class="bg-neutral-50 border-b border-neutral-200")
+                            th(class="text-left px-4 py-2.5 font-medium text-neutral-600") 유형
+                            th(class="text-left px-4 py-2.5 font-medium text-neutral-600") 사용자/그룹
+                            th(class="text-center px-4 py-2.5 font-medium text-neutral-600 w-24") 역할
+                            th(class="text-center px-4 py-2.5 font-medium text-neutral-600 w-36") 부여일
+                    tbody
+                        tr(*ngFor="let acc of accessList",
+                            class="border-b border-neutral-100")
+                            td(class="px-4 py-2.5")
+                                span(class="inline-block px-2 py-0.5 text-xs rounded-full bg-neutral-100 text-neutral-600") {{acc.type}}
+                            td(class="px-4 py-2.5 text-neutral-800")
+                                span(*ngIf="acc.user_name") {{acc.user_name}} ({{acc.user_email}})
+                                span(*ngIf="!acc.user_name") {{acc.key}}
+                            td(class="text-center px-4 py-2.5")
+                                span(class="inline-block px-2 py-0.5 text-xs rounded-full",
+                                    [class.bg-red-100]="acc.role === 'admin'",
+                                    [class.text-red-700]="acc.role === 'admin'",
+                                    [class.bg-blue-100]="acc.role === 'editor'",
+                                    [class.text-blue-700]="acc.role === 'editor'",
+                                    [class.bg-neutral-100]="acc.role !== 'admin' && acc.role !== 'editor'",
+                                    [class.text-neutral-600]="acc.role !== 'admin' && acc.role !== 'editor'") {{roleLabel(acc.role)}}
+                            td(class="text-center px-4 py-2.5 text-neutral-400 text-xs") {{acc.created | date:'yyyy-MM-dd HH:mm'}}
+                        tr(*ngIf="accessList.length === 0")
+                            td(class="px-4 py-8 text-center text-neutral-400", colspan="4") 접근 권한이 없습니다
+
+            div(class="flex gap-2")
+                button(class="px-4 py-2 text-sm border border-red-200 text-red-600 rounded-md hover:bg-red-50 transition-colors",
+                    (click)="deleteBook(selectedBook)") 위키 삭제

@@ -44,3 +44,13 @@
 | 2026-02-28 | 040 | 사이드 메뉴 프로젝트 스위칭 라우팅 개선 | [상세](devlog/2026-02-28/040-project-switcher-routing-fix.md) |
 | 2026-02-28 | 041 | 프로젝트 스위칭 드롭다운 UX 개선 | [상세](devlog/2026-02-28/041-project-switcher-ux.md) |
 | 2026-02-28 | 042 | 프로젝트 스위칭 드롭다운 오버플로우 클리핑 수정 | [상세](devlog/2026-02-28/042-project-switcher-overflow.md) |
+| 2026-03-01 | 001 | page.admin 탭/섹션 기반 네비게이션 리팩토링 | [상세](devlog/2026-03-01/001-admin-tab-navigation.md) |
+| 2026-03-01 | 002 | 사용자 관리 API 구현 (page.admin/api.py) | [상세](devlog/2026-03-01/002-admin-user-api.md) |
+| 2026-03-01 | 003 | 사용자 관리 UI 컴포넌트 구현 (admin.user) | [상세](devlog/2026-03-01/003-admin-user-ui.md) |
+| 2026-03-01 | 004 | system_config DB 모델 및 SystemConfig Resolver 구현 | [상세](devlog/2026-03-01/004-system-config-db-resolver.md) |
+| 2026-03-01 | 005 | 시스템 설정 API 구현 (page.admin/api.py) | [상세](devlog/2026-03-01/005-admin-config-api.md) |
+| 2026-03-01 | 006 | 시스템 설정 UI 컴포넌트 구현 (admin.config) | [상세](devlog/2026-03-01/006-admin-config-ui.md) |
+| 2026-03-01 | 007 | 프로젝트 전체 관리 API 구현 (page.admin/api.py) | [상세](devlog/2026-03-01/007-admin-project-api.md) |
+| 2026-03-01 | 008 | 프로젝트 전체 관리 UI 컴포넌트 구현 (admin.project) | [상세](devlog/2026-03-01/008-admin-project-ui.md) |
+| 2026-03-01 | 009 | 위키 전체 관리 API 및 UI 구현 (admin.wiki) | [상세](devlog/2026-03-01/009-admin-wiki-api-ui.md) |
+| 2026-03-01 | 010 | Config DB 통합 및 기존 설정 파일 Fallback 연결 | [상세](devlog/2026-03-01/010-config-db-fallback.md) |

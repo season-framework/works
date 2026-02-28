@@ -1,0 +1,11 @@
+{
+    "id": "admin.wiki",
+    "mode": "portal",
+    "title": "Admin Wiki Management",
+    "namespace": "admin.wiki",
+    "category": "editor",
+    "viewuri": "",
+    "controller": "",
+    "template": "wiz-portal-wiki-admin-wiki()",
+    "type": "app"
+}

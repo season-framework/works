@@ -1,0 +1,180 @@
+//- 로딩 상태
+div(*ngIf="loading", class="flex items-center justify-center py-12")
+    div(class="text-neutral-400 text-sm") 설정을 불러오는 중...
+
+//- 메인 콘텐츠
+div(*ngIf="!loading", class="space-y-6")
+    //- 탭 네비게이션
+    div(class="border-b border-neutral-200")
+        nav(class="flex gap-0 -mb-px")
+            button(*ngFor="let tab of tabs",
+                class="px-4 py-2.5 text-sm border-b-2 transition-colors whitespace-nowrap",
+                [class.border-neutral-800]="activeTab === tab.id",
+                [class.text-neutral-800]="activeTab === tab.id",
+                [class.font-medium]="activeTab === tab.id",
+                [class.border-transparent]="activeTab !== tab.id",
+                [class.text-neutral-500]="activeTab !== tab.id",
+                [class.hover:text-neutral-700]="activeTab !== tab.id",
+                (click)="switchTab(tab.id)")
+                i(class="mr-1.5", [ngClass]="tab.icon")
+                | {{tab.label}}
+
+    //- ══════════════════════════
+    //- 사이트 설정 탭
+    //- ══════════════════════════
+    div(*ngIf="activeTab === 'site'", class="space-y-6")
+        div(class="border border-neutral-200 rounded-lg p-6 space-y-5")
+            h4(class="text-sm font-semibold text-neutral-700") 사이트 기본 설정
+            div(class="space-y-4")
+                div
+                    label(class="block text-xs text-neutral-500 mb-1") PWA 제목
+                    input(class="w-full h-9 text-sm px-3 border border-neutral-200 rounded-md bg-white focus:outline-none focus:border-blue-400",
+                        [(ngModel)]="site.pwa_title",
+                        placeholder="사이트 이름을 입력하세요")
+                div
+                    label(class="block text-xs text-neutral-500 mb-1") PWA 디스플레이 모드
+                    select(class="w-full h-9 text-sm px-3 border border-neutral-200 rounded-md bg-white focus:outline-none focus:border-blue-400",
+                        [(ngModel)]="site.pwa_display")
+                        option(value="standalone") standalone
+                        option(value="fullscreen") fullscreen
+                        option(value="minimal-ui") minimal-ui
+                        option(value="browser") browser
+                div
+                    label(class="block text-xs text-neutral-500 mb-1") 사이트 URL
+                    input(class="w-full h-9 text-sm px-3 border border-neutral-200 rounded-md bg-white focus:outline-none focus:border-blue-400",
+                        [(ngModel)]="site.site_url",
+                        placeholder="https://example.com")
+            div(class="pt-2")
+                button(class="px-4 py-2 text-sm bg-neutral-800 text-white rounded-md hover:bg-neutral-700 transition-colors",
+                    (click)="saveSiteConfig()") 저장
+
+    //- ══════════════════════════
+    //- SMTP 설정 탭
+    //- ══════════════════════════
+    div(*ngIf="activeTab === 'smtp'", class="space-y-6")
+        div(class="border border-neutral-200 rounded-lg p-6 space-y-5")
+            h4(class="text-sm font-semibold text-neutral-700") SMTP 서버 설정
+            div(class="grid grid-cols-2 gap-4")
+                div
+                    label(class="block text-xs text-neutral-500 mb-1") SMTP 호스트
+                    input(class="w-full h-9 text-sm px-3 border border-neutral-200 rounded-md bg-white focus:outline-none focus:border-blue-400",
+                        [(ngModel)]="smtp.smtp_host",
+                        placeholder="smtp.example.com")
+                div
+                    label(class="block text-xs text-neutral-500 mb-1") SMTP 포트
+                    input(class="w-full h-9 text-sm px-3 border border-neutral-200 rounded-md bg-white focus:outline-none focus:border-blue-400",
+                        type="number",
+                        [(ngModel)]="smtp.smtp_port",
+                        placeholder="587")
+                div
+                    label(class="block text-xs text-neutral-500 mb-1") 발신자 이메일
+                    input(class="w-full h-9 text-sm px-3 border border-neutral-200 rounded-md bg-white focus:outline-none focus:border-blue-400",
+                        [(ngModel)]="smtp.smtp_sender",
+                        placeholder="noreply@example.com")
+                div
+                    label(class="block text-xs text-neutral-500 mb-1") SMTP 비밀번호
+                    input(class="w-full h-9 text-sm px-3 border border-neutral-200 rounded-md bg-white focus:outline-none focus:border-blue-400",
+                        type="password",
+                        [(ngModel)]="smtp.smtp_password",
+                        placeholder="비밀번호")
+            div(class="pt-2")
+                button(class="px-4 py-2 text-sm bg-neutral-800 text-white rounded-md hover:bg-neutral-700 transition-colors",
+                    (click)="saveSmtpConfig()") 저장
+
+        //- SMTP 테스트
+        div(class="border border-neutral-200 rounded-lg p-6 space-y-4")
+            h4(class="text-sm font-semibold text-neutral-700") SMTP 테스트
+            p(class="text-xs text-neutral-400") 저장된 SMTP 설정으로 테스트 이메일을 발송합니다.
+            div(class="flex items-center gap-3")
+                input(class="flex-1 h-9 text-sm px-3 border border-neutral-200 rounded-md bg-white focus:outline-none focus:border-blue-400",
+                    [(ngModel)]="testEmail",
+                    placeholder="수신 이메일 주소",
+                    (keydown.enter)="sendTestEmail()")
+                button(class="h-9 px-4 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-500 transition-colors whitespace-nowrap",
+                    [disabled]="testLoading",
+                    (click)="sendTestEmail()")
+                    ng-container(*ngIf="!testLoading")
+                        i.ti.ti-send.mr-1
+                        | 테스트 발송
+                    ng-container(*ngIf="testLoading")
+                        | 발송 중...
+
+    //- ══════════════════════════
+    //- 이메일 템플릿 탭
+    //- ══════════════════════════
+    div(*ngIf="activeTab === 'template'", class="space-y-6")
+        //- 템플릿 목록
+        div(*ngIf="!selectedTemplate", class="border border-neutral-200 rounded-lg overflow-hidden")
+            div(class="px-6 py-4 border-b border-neutral-200 bg-neutral-50")
+                h4(class="text-sm font-semibold text-neutral-700") 이메일 템플릿
+            div(class="divide-y divide-neutral-100")
+                div(*ngFor="let tpl of templates",
+                    class="flex items-center justify-between px-6 py-3 hover:bg-neutral-50 cursor-pointer transition-colors",
+                    (click)="selectTemplate(tpl)")
+                    div(class="flex items-center gap-3")
+                        i.ti.ti-file-text.text-neutral-400
+                        span(class="text-sm text-neutral-800") {{tpl.name}}
+                        span(class="text-xs text-neutral-400") ({{tpl.filename}})
+                    i.ti.ti-chevron-right.text-neutral-300
+                div(*ngIf="templates.length === 0", class="px-6 py-8 text-center text-sm text-neutral-400")
+                    | 등록된 템플릿이 없습니다.
+
+        //- 템플릿 편집
+        div(*ngIf="selectedTemplate", class="space-y-4")
+            div(class="flex items-center gap-3")
+                button(class="p-1.5 rounded-md hover:bg-neutral-200 transition-colors",
+                    (click)="closeTemplate()")
+                    i.ti.ti-arrow-left.text-lg.text-neutral-600
+                h4(class="text-sm font-semibold text-neutral-700") {{selectedTemplate.name}}
+            div(class="border border-neutral-200 rounded-lg overflow-hidden")
+                textarea(class="w-full h-96 text-sm px-4 py-3 font-mono bg-white border-0 focus:outline-none resize-none",
+                    [(ngModel)]="templateContent",
+                    placeholder="HTML 콘텐츠를 입력하세요")
+            div(class="flex gap-2")
+                button(class="px-4 py-2 text-sm bg-neutral-800 text-white rounded-md hover:bg-neutral-700 transition-colors",
+                    (click)="saveTemplate()") 저장
+                button(class="px-4 py-2 text-sm border border-neutral-200 text-neutral-600 rounded-md hover:bg-neutral-100 transition-colors",
+                    (click)="closeTemplate()") 취소
+
+    //- ══════════════════════════
+    //- 인증 설정 탭
+    //- ══════════════════════════
+    div(*ngIf="activeTab === 'auth'", class="space-y-6")
+        div(class="border border-neutral-200 rounded-lg p-6 space-y-5")
+            h4(class="text-sm font-semibold text-neutral-700") 인증 설정
+            div(class="space-y-4")
+                div(class="flex items-center justify-between py-2")
+                    div
+                        div(class="text-sm text-neutral-800") SAML 인증 사용
+                        div(class="text-xs text-neutral-400 mt-0.5") SAML SSO(Single Sign-On) 인증을 활성화합니다.
+                    label(class="relative inline-flex items-center cursor-pointer")
+                        input(type="checkbox",
+                            class="sr-only peer",
+                            [checked]="auth.auth_saml_use",
+                            (change)="auth.auth_saml_use = !auth.auth_saml_use")
+                        div(class="w-11 h-6 bg-neutral-200 rounded-full peer peer-checked:bg-neutral-800 transition-colors after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full")
+            div(class="pt-2")
+                button(class="px-4 py-2 text-sm bg-neutral-800 text-white rounded-md hover:bg-neutral-700 transition-colors",
+                    (click)="saveAuthConfig()") 저장
+
+    //- ══════════════════════════
+    //- 스토리지 설정 탭
+    //- ══════════════════════════
+    div(*ngIf="activeTab === 'storage'", class="space-y-6")
+        div(class="border border-neutral-200 rounded-lg p-6 space-y-5")
+            h4(class="text-sm font-semibold text-neutral-700") 파일 저장 경로
+            p(class="text-xs text-neutral-400") 파일 업로드 시 저장되는 서버 경로입니다. 변경 시 기존 파일 이동이 필요할 수 있습니다.
+            div(class="space-y-4")
+                div
+                    label(class="block text-xs text-neutral-500 mb-1") Works 저장 경로
+                    input(class="w-full h-9 text-sm px-3 border border-neutral-200 rounded-md bg-white focus:outline-none focus:border-blue-400 font-mono",
+                        [(ngModel)]="storage.works_path",
+                        placeholder="/mnt/data/works")
+                div
+                    label(class="block text-xs text-neutral-500 mb-1") Wiki 저장 경로
+                    input(class="w-full h-9 text-sm px-3 border border-neutral-200 rounded-md bg-white focus:outline-none focus:border-blue-400 font-mono",
+                        [(ngModel)]="storage.wiki_path",
+                        placeholder="/mnt/data/wiki")
+            div(class="pt-2")
+                button(class="px-4 py-2 text-sm bg-neutral-800 text-white rounded-md hover:bg-neutral-700 transition-colors",
+                    (click)="saveStorageConfig()") 저장

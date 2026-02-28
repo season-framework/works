@@ -1,0 +1,11 @@
+{
+    "id": "admin.user",
+    "mode": "portal",
+    "title": "Admin User Management",
+    "namespace": "admin.user",
+    "category": "editor",
+    "viewuri": "",
+    "controller": "",
+    "template": "wiz-portal-season-admin-user()",
+    "type": "app"
+}

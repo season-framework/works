@@ -1,0 +1,104 @@
+div(class="space-y-6")
+    //- 검색 및 필터 영역
+    div(class="flex items-center gap-3 flex-wrap")
+        div(class="flex-1 min-w-[200px]")
+            div(class="flex items-center border border-neutral-200 rounded-md bg-white overflow-hidden", [class.border-blue-400]="searchFocused")
+                i(class="ti ti-search text-neutral-400 pl-3 text-sm")
+                input(class="w-full h-9 text-sm px-2 border-0 bg-transparent focus:outline-none placeholder-neutral-400",
+                    placeholder="프로젝트명, namespace로 검색",
+                    [(ngModel)]="keyword",
+                    (focus)="searchFocused = true",
+                    (blur)="searchFocused = false",
+                    (keydown.enter)="search()")
+        select(class="h-9 text-sm border border-neutral-200 rounded-md px-3 bg-white text-neutral-700 focus:outline-none focus:border-blue-400",
+            [(ngModel)]="filterStatus",
+            (change)="search()")
+            option(value="") 전체 상태
+            option(value="draft") 초안
+            option(value="open") 운영
+            option(value="close") 종료
+        select(class="h-9 text-sm border border-neutral-200 rounded-md px-3 bg-white text-neutral-700 focus:outline-none focus:border-blue-400",
+            [(ngModel)]="filterVisibility",
+            (change)="search()")
+            option(value="") 전체 공개범위
+            option(value="public") 공개
+            option(value="internal") 내부
+            option(value="private") 비공개
+        button(class="h-9 px-4 text-sm bg-neutral-800 text-white rounded-md hover:bg-neutral-700 transition-colors",
+            (click)="search()")
+            i.ti.ti-search.mr-1
+            | 검색
+
+    //- 결과 요약
+    div(class="text-xs text-neutral-400") 총 {{total}}개 프로젝트
+
+    //- 프로젝트 테이블
+    div(class="border border-neutral-200 rounded-lg overflow-hidden")
+        table(class="w-full text-sm")
+            thead
+                tr(class="bg-neutral-50 border-b border-neutral-200")
+                    th(class="text-left px-4 py-2.5 font-medium text-neutral-600") 프로젝트명
+                    th(class="text-left px-4 py-2.5 font-medium text-neutral-600 w-32") Namespace
+                    th(class="text-center px-4 py-2.5 font-medium text-neutral-600 w-24") 상태
+                    th(class="text-center px-4 py-2.5 font-medium text-neutral-600 w-24") 공개범위
+                    th(class="text-center px-4 py-2.5 font-medium text-neutral-600 w-20") 멤버
+                    th(class="text-center px-4 py-2.5 font-medium text-neutral-600 w-36") 최근 수정
+                    th(class="text-center px-4 py-2.5 font-medium text-neutral-600 w-36") 작업
+            tbody
+                tr(*ngFor="let proj of projects",
+                    class="border-b border-neutral-100 hover:bg-neutral-50 transition-colors")
+                    td(class="px-4 py-2.5 text-neutral-800")
+                        div(class="flex items-center gap-2")
+                            span(class="text-sm font-medium") {{proj.title || '(제목 없음)'}}
+                    td(class="px-4 py-2.5 text-neutral-500 text-xs font-mono") {{proj.namespace}}
+                    td(class="text-center px-4 py-2.5")
+                        select(class="text-xs border border-neutral-200 rounded px-2 py-1 bg-white focus:outline-none",
+                            [ngModel]="proj.status",
+                            (change)="changeStatus(proj, $event.target.value)")
+                            option(value="draft") 초안
+                            option(value="open") 운영
+                            option(value="close") 종료
+                    td(class="text-center px-4 py-2.5")
+                        span(class="inline-block px-2 py-0.5 text-xs rounded-full",
+                            [class.bg-green-100]="proj.visibility === 'public'",
+                            [class.text-green-700]="proj.visibility === 'public'",
+                            [class.bg-blue-100]="proj.visibility === 'internal'",
+                            [class.text-blue-700]="proj.visibility === 'internal'",
+                            [class.bg-neutral-100]="proj.visibility === 'private'",
+                            [class.text-neutral-600]="proj.visibility === 'private'") {{visibilityLabel(proj.visibility)}}
+                    td(class="text-center px-4 py-2.5 text-neutral-600 text-xs") {{proj.member_count}}명
+                    td(class="text-center px-4 py-2.5 text-neutral-400 text-xs") {{proj.updated | date:'yyyy-MM-dd HH:mm'}}
+                    td(class="text-center px-4 py-2.5")
+                        div(class="flex items-center justify-center gap-1")
+                            button(class="p-1 text-neutral-400 hover:text-blue-500 transition-colors",
+                                title="스토리지 확인",
+                                (click)="viewStorage(proj)")
+                                i.ti.ti-database
+                            button(class="p-1 text-neutral-400 hover:text-red-500 transition-colors",
+                                title="삭제",
+                                (click)="deleteProject(proj)")
+                                i.ti.ti-trash
+                tr(*ngIf="projects.length === 0")
+                    td(class="px-4 py-8 text-center text-neutral-400", colspan="7") 프로젝트가 없습니다
+
+    //- 페이지네이션
+    div(class="flex justify-center", *ngIf="lastPage > 1")
+        div(class="flex items-center gap-1")
+            button(class="px-3 py-1.5 text-sm border border-neutral-200 rounded-md hover:bg-neutral-100 transition-colors",
+                [class.opacity-50]="page <= 1",
+                [disabled]="page <= 1",
+                (click)="goPage(page - 1)")
+                i.ti.ti-chevron-left
+            ng-container(*ngFor="let p of pageList()")
+                button(class="px-3 py-1.5 text-sm border rounded-md transition-colors",
+                    [class.border-neutral-800]="p === page",
+                    [class.bg-neutral-800]="p === page",
+                    [class.text-white]="p === page",
+                    [class.border-neutral-200]="p !== page",
+                    [class.hover:bg-neutral-100]="p !== page",
+                    (click)="goPage(p)") {{p}}
+            button(class="px-3 py-1.5 text-sm border border-neutral-200 rounded-md hover:bg-neutral-100 transition-colors",
+                [class.opacity-50]="page >= lastPage",
+                [disabled]="page >= lastPage",
+                (click)="goPage(page + 1)")
+                i.ti.ti-chevron-right

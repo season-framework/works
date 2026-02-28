@@ -3,7 +3,7 @@
     "id": "page.admin",
     "title": "/admin",
     "namespace": "admin",
-    "viewuri": "/admin/**",
+    "viewuri": "/admin/:section?/:subsection?",
     "category": "",
     "controller": "admin",
     "layout": "layout.aside",

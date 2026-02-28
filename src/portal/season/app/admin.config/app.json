@@ -1,0 +1,11 @@
+{
+    "id": "admin.config",
+    "mode": "portal",
+    "title": "Admin System Config",
+    "namespace": "admin.config",
+    "category": "editor",
+    "viewuri": "",
+    "controller": "",
+    "template": "wiz-portal-season-admin-config()",
+    "type": "app"
+}

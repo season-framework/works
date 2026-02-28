@@ -1,0 +1,11 @@
+{
+    "id": "admin.project",
+    "mode": "portal",
+    "title": "Admin Project Management",
+    "namespace": "admin.project",
+    "category": "editor",
+    "viewuri": "",
+    "controller": "",
+    "template": "wiz-portal-works-admin-project()",
+    "type": "app"
+}

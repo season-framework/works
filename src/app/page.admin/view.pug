@@ -1,4 +1,36 @@
-div(class="h-full overflow-y-auto")
-    div(class="max-w-5xl mx-auto px-8 py-8 space-y-8")
-        wiz-portal-saml-mgmt-idp
-        wiz-portal-saml-sp-config
+div(class="h-full flex")
+    //- 좌측 관리 네비게이션
+    div(class="w-56 shrink-0 border-r border-neutral-200 bg-neutral-50 flex flex-col")
+        div(class="px-4 py-5")
+            h2(class="text-base font-semibold text-neutral-800") 관리자
+        nav(class="flex-1 px-3", style="display:flex;flex-direction:column;row-gap:2px;")
+            a(*ngFor="let menu of menus",
+                class="flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors cursor-pointer",
+                [ngClass]="isActive(menu.id) ? 'font-medium text-neutral-900 bg-neutral-200' : 'text-neutral-600 hover:bg-neutral-100'",
+                (click)="navigate(menu.id)")
+                i(class="text-lg", [ngClass]="menu.icon")
+                span {{menu.label}}
+
+    //- 우측 콘텐츠 영역
+    div(class="flex-1 overflow-y-auto")
+        div(class="max-w-5xl mx-auto px-8 py-8 space-y-8")
+            //- 사용자 관리
+            ng-container(*ngIf="currentSection === 'user'")
+                wiz-portal-season-admin-user
+
+            //- 프로젝트 관리
+            ng-container(*ngIf="currentSection === 'project'")
+                wiz-portal-works-admin-project
+
+            //- 위키 관리
+            ng-container(*ngIf="currentSection === 'wiki'")
+                wiz-portal-wiki-admin-wiki
+
+            //- SAML 설정 (기존 컴포넌트)
+            ng-container(*ngIf="currentSection === 'saml'")
+                wiz-portal-saml-mgmt-idp
+                wiz-portal-saml-sp-config
+
+            //- 시스템 설정
+            ng-container(*ngIf="currentSection === 'config'")
+                wiz-portal-season-admin-config
