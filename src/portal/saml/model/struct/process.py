@@ -80,7 +80,8 @@ class Process:
             else:
                 userinfo[key] = value
 
-        saml_acs = wiz.config("season").get("saml_acs")
+        season_config = wiz.model("portal/season/config")
+        saml_acs = season_config.get("auth_saml_acs")
         if saml_acs is not None:
             sessiondata = saml_acs(wiz, userinfo)
         else:

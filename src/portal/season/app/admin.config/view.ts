@@ -11,6 +11,13 @@ export class Component implements OnInit {
         pwa_title: '',
         pwa_display: 'standalone',
         site_url: '',
+        pwa_start_url: '/',
+        pwa_background_color: '#6C8DF6',
+        pwa_theme_color: '#6C8DF6',
+        pwa_orientation: 'any',
+        pwa_icon: '',
+        pwa_icon_192: '',
+        pwa_icon_512: '',
     };
 
     // SMTP 설정
@@ -24,6 +31,13 @@ export class Component implements OnInit {
     // 인증 설정
     public auth: any = {
         auth_saml_use: false,
+        saml_mode: 'config',
+        auth_baseuri: '/auth',
+        auth_login_uri: '',
+        auth_logout_uri: '',
+        auth_saml_entity: 'season',
+        auth_saml_base_path: 'config/auth/saml',
+        auth_saml_error_uri: '/',
     };
 
     // 스토리지 설정
@@ -40,6 +54,9 @@ export class Component implements OnInit {
     public templates: any[] = [];
     public selectedTemplate: any = null;
     public templateContent: string = '';
+
+    // PWA 상세 설정 펼침
+    public showPwaDetail: boolean = false;
 
     public tabs: any[] = [
         { id: 'site', label: '사이트 설정', icon: 'ti ti-world' },
@@ -119,6 +136,13 @@ export class Component implements OnInit {
             { category: 'site', key: 'pwa_title', value: this.site.pwa_title, type: 'string', description: 'PWA 제목' },
             { category: 'site', key: 'pwa_display', value: this.site.pwa_display, type: 'string', description: 'PWA 디스플레이 모드' },
             { category: 'site', key: 'site_url', value: this.site.site_url, type: 'string', description: '사이트 URL' },
+            { category: 'site', key: 'pwa_start_url', value: this.site.pwa_start_url, type: 'string', description: 'PWA 시작 URL' },
+            { category: 'site', key: 'pwa_background_color', value: this.site.pwa_background_color, type: 'string', description: 'PWA 배경색' },
+            { category: 'site', key: 'pwa_theme_color', value: this.site.pwa_theme_color, type: 'string', description: 'PWA 테마 색상' },
+            { category: 'site', key: 'pwa_orientation', value: this.site.pwa_orientation, type: 'string', description: 'PWA 화면 방향' },
+            { category: 'site', key: 'pwa_icon', value: this.site.pwa_icon, type: 'string', description: 'PWA 아이콘 (ICO)' },
+            { category: 'site', key: 'pwa_icon_192', value: this.site.pwa_icon_192, type: 'string', description: 'PWA 아이콘 192x192' },
+            { category: 'site', key: 'pwa_icon_512', value: this.site.pwa_icon_512, type: 'string', description: 'PWA 아이콘 512x512' },
         ];
         await this.saveConfig(items);
     }
@@ -136,6 +160,13 @@ export class Component implements OnInit {
     public async saveAuthConfig() {
         const items = [
             { category: 'auth', key: 'auth_saml_use', value: String(this.auth.auth_saml_use), type: 'bool', description: 'SAML 인증 사용 여부' },
+            { category: 'auth', key: 'saml_mode', value: this.auth.saml_mode, type: 'string', description: 'SAML 설정 모드 (config/db)' },
+            { category: 'auth', key: 'auth_baseuri', value: this.auth.auth_baseuri, type: 'string', description: '인증 기본 URI' },
+            { category: 'auth', key: 'auth_login_uri', value: this.auth.auth_login_uri, type: 'string', description: '로그인 URI' },
+            { category: 'auth', key: 'auth_logout_uri', value: this.auth.auth_logout_uri, type: 'string', description: '로그아웃 URI' },
+            { category: 'auth', key: 'auth_saml_entity', value: this.auth.auth_saml_entity, type: 'string', description: 'SAML Entity ID' },
+            { category: 'auth', key: 'auth_saml_base_path', value: this.auth.auth_saml_base_path, type: 'string', description: 'SAML 설정 파일 경로' },
+            { category: 'auth', key: 'auth_saml_error_uri', value: this.auth.auth_saml_error_uri, type: 'string', description: 'SAML 오류 시 리다이렉트 URI' },
         ];
         await this.saveConfig(items);
     }

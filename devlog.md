@@ -57,3 +57,4 @@
 | 2026-03-01 | 011 | Admin 포탈 컴포넌트 API 라우팅 수정 (wiz.call 404 해결) | [상세](devlog/2026-03-01/011-admin-api-routing-fix.md) |
 | 2026-03-01 | 012 | Modal Alert 취소 버튼 텍스트 수정 (true 표시 문제) | [상세](devlog/2026-03-01/012-alert-cancel-text-fix.md) |
 | 2026-03-01 | 013 | 관리자 사용자 관리 등급 표기 4단계 확장 | [상세](devlog/2026-03-01/013-admin-user-membership-label.md) |
+| 2026-03-02 | 001 | season.py → DB(system_config) 설정 통합 마이그레이션 | [상세](devlog/2026-03-02/001-config-db-migration.md) |

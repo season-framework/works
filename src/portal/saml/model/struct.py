@@ -66,10 +66,10 @@ class Struct:
 
     def config(self, key=None):
         xmlsec_path = get_xmlsec_binary(["/usr/bin/xmlsec1"])
-        season_config = wiz.config("season")
+        season_config = wiz.model("portal/season/config")
         saml_mode = season_config.get("saml_mode", "config") # config / db
         if saml_mode == "config":
-            saml_config = season_config.get("saml")
+            saml_config = wiz.config("season").get("saml")
         else: # db
             saml_config = self.config_from_db()
         saml_config = stdClass(saml_config)

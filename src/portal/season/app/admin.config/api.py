@@ -54,13 +54,13 @@ def config_update():
 def smtp_test():
     to = wiz.request.query("to", True)
 
-    sys_config = wiz.model("portal/season/system_config")
-    config = wiz.config("season")
+    # config.py가 DB → season.py fallback을 자동 처리
+    config = wiz.model("portal/season/config")
 
-    smtp_host = sys_config.get("smtp", "smtp_host", getattr(config, 'smtp_host', None))
-    smtp_port = sys_config.get("smtp", "smtp_port", getattr(config, 'smtp_port', 587))
-    smtp_sender = sys_config.get("smtp", "smtp_sender", getattr(config, 'smtp_sender', None))
-    smtp_password = sys_config.get("smtp", "smtp_password", getattr(config, 'smtp_password', None))
+    smtp_host = config.smtp_host
+    smtp_port = config.smtp_port
+    smtp_sender = config.smtp_sender
+    smtp_password = config.smtp_password
 
     if not smtp_host or not smtp_sender:
         wiz.response.status(400, "SMTP 설정이 완료되지 않았습니다")

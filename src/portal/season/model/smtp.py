@@ -6,11 +6,6 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-config = wiz.model("portal/season/config")
-SMTP_SENDER = config.smtp_sender
-SMTP_HOST = config.smtp_host
-SMTP_PORT = config.smtp_port
-SMTP_PASSWORD = config.smtp_password
 fs = wiz.project.fs(os.path.join("config", "smtp"))
 
 class Model:
@@ -25,7 +20,14 @@ class Model:
         return result
 
     def send(self, to, template=None, title="TITLE", **kwargs):
-        sender = SMTP_SENDER
+        # 호출 시점에 config를 읽어 DB → season.py fallback 적용
+        config = wiz.model("portal/season/config")
+        smtp_sender = config.smtp_sender
+        smtp_host = config.smtp_host
+        smtp_port = config.smtp_port
+        smtp_password = config.smtp_password
+
+        sender = smtp_sender
         if template is None:
             html = """<div style="width: 100%; min-height: 100%; background: #f5f7fb; padding-top: 48px; padding-bottom: 48px;">
     <div style="width: 80%; max-width: 600px; margin: 0 auto; background: #fff; border-radius: 8px;">
@@ -56,14 +58,14 @@ class Model:
 
         msg = MIMEText(html, 'html', _charset='utf8')
         msg['Subject'] = title
-        msg['From'] = SMTP_SENDER
+        msg['From'] = smtp_sender
         msg['To'] = to
 
-        mailserver = smtplib.SMTP(SMTP_HOST, SMTP_PORT)
+        mailserver = smtplib.SMTP(smtp_host, smtp_port)
         mailserver.ehlo()
         mailserver.starttls()
-        mailserver.login(SMTP_SENDER, SMTP_PASSWORD)
-        mailserver.sendmail(SMTP_SENDER, to, msg.as_string())
+        mailserver.login(smtp_sender, smtp_password)
+        mailserver.sendmail(smtp_sender, to, msg.as_string())
         mailserver.quit()
     
     @classmethod

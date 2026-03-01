@@ -1,8 +1,8 @@
 import json
 import markdown
 
-season_config = wiz.config("season")
-site_url = getattr(season_config, 'site_url', '')
+season_config = wiz.model("portal/season/config")
+site_url = season_config.site_url
 
 segment = wiz.request.match("/api/wiki/book/<book_id>/<path:path>")
 action = segment.path
