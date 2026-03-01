@@ -5,7 +5,7 @@
     "namespace": "admin.config",
     "category": "editor",
     "viewuri": "",
-    "controller": "",
+    "controller": "admin",
     "template": "wiz-portal-season-admin-config()",
     "type": "app"
 }

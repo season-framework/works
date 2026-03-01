@@ -11,7 +11,7 @@ export default class Alert {
         message: "Do you really want to remove app? What you've done cannot be undone.",
         action: "Delete",
         actionBtn: "error",
-        cancel: true,
+        cancel: '취소',
         status: 'error'
     };
     public opts: any = {};

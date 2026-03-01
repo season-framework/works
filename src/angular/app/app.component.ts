@@ -29,7 +29,7 @@ export class AppComponent implements OnInit {
             return await this.service.alert.show({
                 title,
                 message,
-                action: "close",
+                action: "닫기",
                 cancel: false,
             });
         }
@@ -38,7 +38,7 @@ export class AppComponent implements OnInit {
                 title,
                 status: "success",
                 message,
-                action: "close",
+                action: "닫기",
                 actionBtn: "success",
                 cancel: false,
             });

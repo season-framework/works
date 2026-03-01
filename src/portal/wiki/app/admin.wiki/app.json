@@ -5,7 +5,7 @@
     "namespace": "admin.wiki",
     "category": "editor",
     "viewuri": "",
-    "controller": "",
+    "controller": "admin",
     "template": "wiz-portal-wiki-admin-wiki()",
     "type": "app"
 }

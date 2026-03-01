@@ -68,6 +68,11 @@ export class Component implements OnInit {
         return labels[status] || status;
     }
 
+    public membershipLabel(membership: string): string {
+        const labels: any = { admin: '관리자', staff: '내부사용자', user: '외부사용자', guest: '손님' };
+        return labels[membership] || membership;
+    }
+
     public async selectUser(user: any) {
         const { code, data } = await wiz.call("user_get", { id: user.id });
         if (code === 200) {
@@ -87,7 +92,7 @@ export class Component implements OnInit {
             mobile: this.selectedUser.mobile || '',
         });
         if (code === 200) {
-            await this.service.alert.show({ title: '저장 완료', status: 'success', message: '사용자 정보가 저장되었습니다.', action: '확인' });
+            await this.service.alert.show({ title: '저장 완료', status: 'success', message: '사용자 정보가 저장되었습니다.', action: '확인', cancel: false });
             await this.loadUsers();
         }
     }
@@ -110,6 +115,7 @@ export class Component implements OnInit {
                 status: 'success',
                 message: `임시 비밀번호: ${data.password}`,
                 action: '확인',
+                cancel: false,
             });
         }
     }

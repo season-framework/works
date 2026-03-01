@@ -54,3 +54,6 @@
 | 2026-03-01 | 008 | 프로젝트 전체 관리 UI 컴포넌트 구현 (admin.project) | [상세](devlog/2026-03-01/008-admin-project-ui.md) |
 | 2026-03-01 | 009 | 위키 전체 관리 API 및 UI 구현 (admin.wiki) | [상세](devlog/2026-03-01/009-admin-wiki-api-ui.md) |
 | 2026-03-01 | 010 | Config DB 통합 및 기존 설정 파일 Fallback 연결 | [상세](devlog/2026-03-01/010-config-db-fallback.md) |
+| 2026-03-01 | 011 | Admin 포탈 컴포넌트 API 라우팅 수정 (wiz.call 404 해결) | [상세](devlog/2026-03-01/011-admin-api-routing-fix.md) |
+| 2026-03-01 | 012 | Modal Alert 취소 버튼 텍스트 수정 (true 표시 문제) | [상세](devlog/2026-03-01/012-alert-cancel-text-fix.md) |
+| 2026-03-01 | 013 | 관리자 사용자 관리 등급 표기 4단계 확장 | [상세](devlog/2026-03-01/013-admin-user-membership-label.md) |

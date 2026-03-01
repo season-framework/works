@@ -156,6 +156,7 @@ export class Component implements OnInit {
                 status: 'success',
                 message: '설정이 저장되었습니다.',
                 action: '확인',
+                cancel: false,
             });
             await this.loadConfig();
         } else {
@@ -164,6 +165,7 @@ export class Component implements OnInit {
                 status: 'error',
                 message: '설정 저장 중 오류가 발생했습니다.',
                 action: '확인',
+                cancel: false,
             });
         }
     }
@@ -177,6 +179,7 @@ export class Component implements OnInit {
                 status: 'error',
                 message: '수신 이메일 주소를 입력해주세요.',
                 action: '확인',
+                cancel: false,
             });
             return;
         }
@@ -193,6 +196,7 @@ export class Component implements OnInit {
                 status: 'success',
                 message: data,
                 action: '확인',
+                cancel: false,
             });
         } else {
             await this.service.alert.show({
@@ -200,6 +204,7 @@ export class Component implements OnInit {
                 status: 'error',
                 message: data || 'SMTP 테스트 실패',
                 action: '확인',
+                cancel: false,
             });
         }
     }
@@ -235,6 +240,7 @@ export class Component implements OnInit {
                 status: 'success',
                 message: '템플릿이 저장되었습니다.',
                 action: '확인',
+                cancel: false,
             });
         }
     }

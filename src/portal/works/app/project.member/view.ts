@@ -195,7 +195,7 @@ export class Component implements OnInit, OnDestroy {
             message: `"${user.meta.name}" 사용자를 이 프로젝트에서 제외하시겠습니까?`,
             action: "제외하기",
             actionBtn: "error",
-            cancel: "cancel",
+            cancel: "취소",
         });
         if (!res) return;
         await this.project.member.remove(user.user);

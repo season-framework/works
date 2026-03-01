@@ -105,6 +105,7 @@ export class Component implements OnInit {
                 status: 'info',
                 message: `${project.title || project.namespace}: ${data.size_mb} MB`,
                 action: '확인',
+                cancel: false,
             });
         }
     }

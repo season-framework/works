@@ -117,12 +117,12 @@ export class Component implements OnInit {
 
     public async logout() {
         const res = await this.service.alert.show({
-            title: "Logout",
+            title: "로그아웃",
             status: "error",
             message: "정말 로그아웃하시겠습니까?",
-            action: "logout",
+            action: "로그아웃",
             actionBtn: "error",
-            cancel: "cancel",
+            cancel: "취소",
         });
         if (!res) return;
         location.href = "/auth/logout?returnTo=/authenticate";

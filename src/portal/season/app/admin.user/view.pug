@@ -10,13 +10,15 @@ div(class="space-y-6", *ngIf="!selectedUser")
                     (focus)="searchFocused = true",
                     (blur)="searchFocused = false",
                     (keydown.enter)="search()")
-        select(class="h-9 text-sm border border-neutral-200 rounded-md px-3 bg-white text-neutral-700 focus:outline-none focus:border-blue-400",
+        select(class="h-9 text-sm border border-neutral-200 rounded-md px-8 bg-white text-neutral-700 focus:outline-none focus:border-blue-400",
             [(ngModel)]="filterMembership",
             (change)="search()")
             option(value="") 전체 등급
             option(value="admin") 관리자
-            option(value="user") 일반
-        select(class="h-9 text-sm border border-neutral-200 rounded-md px-3 bg-white text-neutral-700 focus:outline-none focus:border-blue-400",
+            option(value="staff") 내부사용자
+            option(value="user") 외부사용자
+            option(value="guest") 손님
+        select(class="h-9 text-sm border border-neutral-200 rounded-md px-8 bg-white text-neutral-700 focus:outline-none focus:border-blue-400",
             [(ngModel)]="filterStatus",
             (change)="search()")
             option(value="") 전체 상태
@@ -50,11 +52,13 @@ div(class="space-y-6", *ngIf="!selectedUser")
                     td(class="px-4 py-2.5 text-neutral-800") {{user.email}}
                     td(class="px-4 py-2.5 text-neutral-700") {{user.name}}
                     td(class="text-center px-4 py-2.5")
-                        span(class="inline-block px-2 py-0.5 text-xs rounded-full",
+                        span(class="inline-block px-2 py-0.5 text-xs rounded-full text-nowrap",
                             [class.bg-red-100]="user.membership === 'admin'",
                             [class.text-red-700]="user.membership === 'admin'",
-                            [class.bg-neutral-100]="user.membership !== 'admin'",
-                            [class.text-neutral-600]="user.membership !== 'admin'") {{user.membership === 'admin' ? '관리자' : '일반'}}
+                            [class.bg-blue-100]="user.membership === 'staff'",
+                            [class.text-blue-700]="user.membership === 'staff'",
+                            [class.bg-neutral-100]="user.membership === 'user' || user.membership === 'guest'",
+                            [class.text-neutral-600]="user.membership === 'user' || user.membership === 'guest'") {{membershipLabel(user.membership)}}
                     td(class="text-center px-4 py-2.5")
                         span(class="inline-block px-2 py-0.5 text-xs rounded-full",
                             [class.bg-green-100]="user.status === 'active'",
@@ -123,7 +127,9 @@ div(*ngIf="selectedUser", class="space-y-6")
                 select(class="w-full h-9 text-sm px-3 border border-neutral-200 rounded-md bg-white focus:outline-none focus:border-blue-400",
                     [(ngModel)]="selectedUser.membership")
                     option(value="admin") 관리자
-                    option(value="user") 일반
+                    option(value="staff") 내부사용자
+                    option(value="user") 외부사용자
+                    option(value="guest") 손님
             div
                 label(class="block text-xs text-neutral-500 mb-1") 상태
                 select(class="w-full h-9 text-sm px-3 border border-neutral-200 rounded-md bg-white focus:outline-none focus:border-blue-400",
