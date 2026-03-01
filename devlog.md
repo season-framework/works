@@ -58,3 +58,11 @@
 | 2026-03-01 | 012 | Modal Alert 취소 버튼 텍스트 수정 (true 표시 문제) | [상세](devlog/2026-03-01/012-alert-cancel-text-fix.md) |
 | 2026-03-01 | 013 | 관리자 사용자 관리 등급 표기 4단계 확장 | [상세](devlog/2026-03-01/013-admin-user-membership-label.md) |
 | 2026-03-02 | 001 | season.py → DB(system_config) 설정 통합 마이그레이션 | [상세](devlog/2026-03-02/001-config-db-migration.md) |
+| 2026-03-02 | 002 | 프로젝트 캘린더 기능 구현 (DB/Struct/App/메뉴 통합) | [상세](devlog/2026-03-02/002-calendar-feature.md) |
+| 2026-03-02 | 003 | 캘린더 기능 고도화 (카테고리/참가자/드래그앤드롭/공통 캘린더) | [상세](devlog/2026-03-02/003-calendar-enhancement.md) |
+| 2026-03-02 | 004 | 캘린더 기능 버그 3건 수정 (API 500/hover 시프트/참가자 UX) | [상세](devlog/2026-03-02/004-calendar-bugfix.md) |
+| 2026-03-02 | 005 | 메인 캘린더 사이드바 개편 및 필터 기능 추가 | [상세](devlog/2026-03-02/005-calendar-sidebar-refactor.md) |
+| 2026-03-02 | 006 | 메인 캘린더 로딩 해제 안됨 버그 수정 | [상세](devlog/2026-03-02/006-calendar-loading-fix.md) |
+| 2026-03-02 | 007 | 프로젝트 캘린더 카테고리 편집 즉시 반영 수정 + 인스트럭션 9.11 등록 | [상세](devlog/2026-03-02/007-calendar-category-render-fix.md) |
+| 2026-03-02 | 008 | 프로젝트 캘린더 카테고리/모달 UI 개선 | [상세](devlog/2026-03-02/008-calendar-category-modal-ui.md) |
+| 2026-03-02 | 009 | 프로젝트 캘린더 카테고리 드래그앤드롭 순서 변경 기능 | [상세](devlog/2026-03-02/009-calendar-category-reorder.md) |

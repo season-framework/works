@@ -1,0 +1,11 @@
+{
+    "mode": "page",
+    "id": "page.calendar",
+    "title": "/calendar",
+    "namespace": "calendar",
+    "viewuri": "/calendar",
+    "category": "",
+    "controller": "user",
+    "layout": "layout.aside",
+    "template": "wiz-page-calendar()"
+}

@@ -5,6 +5,9 @@ ng-container(*ngIf="loaded")
     ng-container(*ngIf="project.accessLevel(['admin', 'manager', 'user', 'guest'])")
         div(class="min-h-full px-6 py-4", *ngIf="MENU == 'member'")
             wiz-portal-works-project-member
+        ng-container(*ngIf="MENU == 'calendar'")
+            div(class="h-full")
+                wiz-portal-works-project-calendar
         ng-container(*ngIf="MENU == 'issueboard'")
             wiz-portal-works-project-issueboard
         ng-container(*ngIf="MENU == 'meeting'")

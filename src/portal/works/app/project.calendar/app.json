@@ -1,0 +1,11 @@
+{
+    "id": "project.calendar",
+    "mode": "portal",
+    "title": "project/calendar",
+    "namespace": "project.calendar",
+    "category": "project",
+    "viewuri": "",
+    "controller": "base",
+    "type": "app",
+    "template": "wiz-portal-works-project-calendar()"
+}

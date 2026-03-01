@@ -6,6 +6,7 @@ Member = wiz.model("portal/works/struct/member")
 Plan = wiz.model("portal/works/struct/plan")
 Issueboard = wiz.model("portal/works/struct/issueboard")
 Meeting = wiz.model("portal/works/struct/meeting")
+Calendar = wiz.model("portal/works/struct/calendar")
 
 orm = wiz.model("portal/season/orm")
 projectdb = orm.use("project", module="works")
@@ -21,6 +22,7 @@ class Project:
         self.plan = Plan(self)
         self.issueboard = Issueboard(self)
         self.meeting = Meeting(self)
+        self.calendar = Calendar(self)
         
         self.data['role'] = self.member.auth()
         

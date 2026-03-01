@@ -47,13 +47,14 @@ export class Project {
         if (!this.cache.extra.doc) this.cache.extra.doc = "";
         if (!this.cache.extra.main) this.cache.extra.main = "info";
         if (!this.cache.extra.menu) this.cache.extra.menu = {
-            plan: true, meeting: true, issueboard: true, wiki: true, drive: true
+            plan: true, meeting: true, issueboard: true, wiki: true, drive: true, calendar: true
         };
         if (this.cache.extra.menu.plan == null) this.cache.extra.menu.plan = true;
         if (this.cache.extra.menu.meeting == null) this.cache.extra.menu.meeting = true;
         if (this.cache.extra.menu.issueboard == null) this.cache.extra.menu.issueboard = true;
         if (this.cache.extra.menu.wiki == null) this.cache.extra.menu.wiki = true;
         if (this.cache.extra.menu.drive == null) this.cache.extra.menu.drive = true;
+        if (this.cache.extra.menu.calendar == null) this.cache.extra.menu.calendar = true;
         if (this.cache.start) this.cache.start = (this.cache.start + '').substring(0, 10);
         if (this.cache.end) this.cache.end = (this.cache.end + '').substring(0, 10);
         await this.member.load();

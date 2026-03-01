@@ -1,0 +1,289 @@
+div(class="w-full h-full flex overflow-hidden bg-white")
+    //- 좌측: 캘린더 영역
+    div(class="flex-1 min-w-0 flex flex-col overflow-hidden")
+        //- 헤더: 월 네비게이션 + 일정 추가
+        div(class="flex items-center justify-between px-6 py-4 border-b border-neutral-200")
+            div(class="flex items-center gap-3")
+                button(class="p-1 rounded-md hover:bg-neutral-100 transition-colors", (click)="prevMonth()")
+                    i(class="ti ti-chevron-left text-lg text-neutral-600")
+                h2(class="text-lg font-semibold text-neutral-900 min-w-[120px] text-center") {{monthLabel}}
+                button(class="p-1 rounded-md hover:bg-neutral-100 transition-colors", (click)="nextMonth()")
+                    i(class="ti ti-chevron-right text-lg text-neutral-600")
+                button(class="ml-2 px-3 py-1 text-xs font-medium text-neutral-600 bg-neutral-100 rounded-md hover:bg-neutral-200 transition-colors",
+                    (click)="goToday()") 오늘
+            div
+                button(*ngIf="!readOnly",
+                    class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-white bg-blue-500 rounded-md hover:bg-blue-600 transition-colors",
+                    (click)="openCreateModal()")
+                    i(class="ti ti-plus text-base")
+                    span 일정 추가
+
+        //- 캘린더 그리드
+        div(class="flex-1 min-h-0 overflow-auto")
+            div(class="min-h-full")
+                //- 요일 헤더
+                div(class="grid grid-cols-7 border-b border-neutral-200 bg-neutral-50 sticky top-0 z-10")
+                    ng-container(*ngFor="let name of dayNames; let i = index")
+                        div(class="py-2 text-center text-xs font-medium uppercase tracking-wider",
+                            [ngClass]="i === 0 ? 'text-red-400' : (i === 6 ? 'text-blue-400' : 'text-neutral-500')") {{name}}
+
+                //- 주별 행
+                ng-container(*ngFor="let week of weeks")
+                    div(class="grid grid-cols-7 border-b border-neutral-100")
+                        ng-container(*ngFor="let cell of week; let i = index")
+                            div(class="min-h-[100px] border-r border-neutral-100 last:border-r-0 p-1 cursor-pointer hover:bg-neutral-50/50 transition-colors",
+                                [ngClass]="{'bg-blue-50/30': cell.date === today, 'opacity-40': !cell.currentMonth}",
+                                (click)="openCreateModal(cell.date)",
+                                (dragover)="onDragOver($event)",
+                                (drop)="onDrop($event, cell)")
+                                //- 날짜 숫자
+                                div(class="flex items-center justify-between px-1")
+                                    span(class="text-xs font-medium",
+                                        [ngClass]="{'text-red-500': i === 0, 'text-blue-500': i === 6, 'text-neutral-700': i > 0 && i < 6, 'bg-blue-500 text-white rounded-full w-5 h-5 flex items-center justify-center': cell.date === today}") {{cell.day}}
+                                //- 이벤트 목록
+                                div(class="mt-1 space-y-0.5")
+                                    ng-container(*ngFor="let ev of cell.events; let ei = index")
+                                        div(*ngIf="ei < 3",
+                                            class="text-xs px-1.5 py-0.5 rounded truncate text-white cursor-pointer hover:opacity-80 transition-opacity",
+                                            [style.background-color]="getEventColor(ev)",
+                                            [attr.draggable]="!readOnly ? 'true' : null",
+                                            (dragstart)="onDragStart($event, ev)",
+                                            (click)="openEvent(ev); $event.stopPropagation()")
+                                            | {{ev.title}}
+                                        div(*ngIf="ei === 3",
+                                            class="text-xs px-1.5 text-neutral-400")
+                                            | +{{cell.events.length - 3}}건
+
+    //- 우측: 사이드바
+    div(class="w-[240px] flex-shrink-0 border-l border-neutral-200 flex flex-col bg-neutral-50 overflow-hidden")
+        //- 내 일정만 보기 토글
+        div(class="px-4 py-3 border-b border-neutral-200")
+            label(class="flex items-center cursor-pointer gap-2")
+                input(class="sr-only peer", type="checkbox", [checked]="showMyOnly", (change)="toggleMyOnly()")
+                div(class="relative w-9 h-5 bg-neutral-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full after:absolute after:top-[1px] after:start-[1px] after:bg-white after:border-neutral-300 after:border after:rounded-full after:size-4 after:transition-all peer-checked:bg-blue-600")
+                span(class="text-[13px] font-medium text-neutral-700") 내 일정만 보기
+
+        //- 카테고리 필터
+        div(class="flex-1 min-h-0 overflow-y-auto px-4 py-3")
+            div(class="flex items-center justify-between mb-2")
+                span(class="text-xs font-semibold text-neutral-500 uppercase tracking-wider") 카테고리
+                button(*ngIf="!readOnly",
+                    class="p-0.5 rounded hover:bg-neutral-200 transition-colors",
+                    (click)="showCategoryAdd = !showCategoryAdd")
+                    i(class="ti ti-plus text-sm text-neutral-400")
+
+            //- 카테고리 추가 폼
+            div(*ngIf="showCategoryAdd",
+                class="mb-3 p-2 bg-white rounded-md border border-neutral-200")
+                input(class="w-full px-2 py-1 text-xs border border-neutral-200 rounded focus:outline-none focus:border-blue-400 mb-2",
+                    placeholder="카테고리명",
+                    [(ngModel)]="newCategoryName",
+                    (keyup.enter)="addCategory()")
+                div(class="flex flex-wrap gap-1 mb-2")
+                    ng-container(*ngFor="let c of colors")
+                        button(class="w-5 h-5 rounded-full border-2 transition-all",
+                            [style.background-color]="c",
+                            [ngClass]="newCategoryColor === c ? 'border-neutral-800 scale-110' : 'border-transparent hover:scale-105'",
+                            (click)="newCategoryColor = c")
+                div(class="flex gap-1 justify-end")
+                    button(class="px-2 py-0.5 text-xs text-blue-500 hover:text-blue-600 font-medium",
+                        (click)="addCategory()") 추가
+                    button(class="px-2 py-0.5 text-xs text-neutral-400 hover:text-neutral-600",
+                        (click)="showCategoryAdd = false; newCategoryName = ''") 취소
+
+            //- 미분류 체크박스
+            div(class="flex items-center gap-2 py-1")
+                input(type="checkbox",
+                    class="w-3.5 h-3.5 rounded border-neutral-300 text-neutral-500 cursor-pointer",
+                    [checked]="categoryFilters['__none__'] !== false",
+                    (change)="toggleCategoryFilter('__none__')")
+                span(class="text-[13px] text-neutral-600") 미분류
+
+            //- 카테고리 목록 (드래그앤드롭 지원)
+            ng-container(*ngFor="let cat of categories; let ci = index")
+                div(class="flex items-center gap-2 py-1 group transition-colors",
+                    [ngClass]="dragOverCategoryId === cat.id ? 'bg-blue-50 border-t-2 border-blue-300' : 'border-t-2 border-transparent'",
+                    [attr.draggable]="!readOnly && editingCategoryId !== cat.id ? 'true' : null",
+                    (dragstart)="onCategoryDragStart($event, cat)",
+                    (dragover)="onCategoryDragOver($event, cat)",
+                    (drop)="onCategoryDrop($event, cat)",
+                    (dragend)="onCategoryDragEnd()")
+                    //- 드래그 핸들
+                    i(*ngIf="!readOnly && editingCategoryId !== cat.id",
+                        class="ti ti-grip-vertical text-xs text-neutral-300 cursor-grab group-hover:text-neutral-400 flex-shrink-0")
+                    input(type="checkbox",
+                        class="w-3.5 h-3.5 rounded cursor-pointer",
+                        [style.accent-color]="cat.color",
+                        [checked]="categoryFilters[cat.id] !== false",
+                        (change)="toggleCategoryFilter(cat.id)")
+                    ng-container(*ngIf="editingCategoryId !== cat.id")
+                        div(class="w-2.5 h-2.5 rounded-full flex-shrink-0",
+                            [style.background-color]="cat.color")
+                        span(class="flex-1 text-[13px] text-neutral-700 truncate") {{cat.name}}
+                        div(*ngIf="!readOnly",
+                            class="flex items-center flex-shrink-0 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity gap-0.5")
+                            button(class="p-0.5 rounded hover:bg-neutral-200",
+                                (click)="startEditCategory(cat); $event.stopPropagation()")
+                                i(class="ti ti-pencil text-xs text-neutral-400")
+                            button(class="p-0.5 rounded hover:bg-red-100",
+                                (click)="removeCategory(cat); $event.stopPropagation()")
+                                i(class="ti ti-trash text-xs text-red-400")
+                    //- 카테고리 편집 모드
+                    ng-container(*ngIf="editingCategoryId === cat.id")
+                        div(class="flex-1 min-w-0")
+                            input(class="w-full px-1 py-0.5 text-xs border border-blue-300 rounded focus:outline-none mb-1",
+                                [(ngModel)]="editingCategoryName",
+                                (keyup.enter)="saveEditCategory(cat)",
+                                (keyup.escape)="cancelEditCategory()")
+                            div(class="flex flex-wrap gap-1")
+                                ng-container(*ngFor="let c of colors")
+                                    button(class="w-4 h-4 rounded-full border-2 transition-all",
+                                        [style.background-color]="c",
+                                        [ngClass]="editingCategoryColor === c ? 'border-neutral-800 scale-110' : 'border-transparent hover:scale-105'",
+                                        (click)="editingCategoryColor = c")
+                        div(class="flex flex-col gap-0.5 flex-shrink-0")
+                            button(class="p-0.5 text-blue-500",
+                                (click)="saveEditCategory(cat)")
+                                i(class="ti ti-check text-xs")
+                            button(class="p-0.5 text-neutral-400",
+                                (click)="cancelEditCategory()")
+                                i(class="ti ti-x text-xs")
+
+    //- 모달 오버레이
+    div(*ngIf="showModal", class="fixed inset-0 z-[9999] flex items-center justify-center")
+        //- 배경 딤
+        div(class="absolute inset-0 bg-black/30", (click)="closeModal()")
+        //- 모달 콘텐츠
+        div(class="relative bg-white rounded-lg shadow-xl w-full max-w-lg mx-4 flex flex-col max-h-[85vh]")
+            //- 모달 헤더
+            div(class="flex items-center justify-between px-5 py-4 border-b border-neutral-200 flex-shrink-0")
+                h3(class="text-sm font-semibold text-neutral-900")
+                    ng-container(*ngIf="!selectedEvent") 새 일정
+                    ng-container(*ngIf="selectedEvent && !isEditing") 일정 상세
+                    ng-container(*ngIf="selectedEvent && isEditing") 일정 수정
+                button(class="p-1 rounded-md hover:bg-neutral-100 transition-colors", (click)="closeModal()")
+                    i(class="ti ti-x text-lg text-neutral-400")
+
+            //- 모달 본문
+            div(class="px-5 py-4 space-y-4 flex-1 min-h-0 overflow-y-auto")
+                //- 읽기 모드
+                ng-container(*ngIf="selectedEvent && !isEditing")
+                    div
+                        label(class="block text-xs font-medium text-neutral-500 mb-1") 제목
+                        p(class="text-sm text-neutral-900") {{selectedEvent.title}}
+                    div(*ngIf="selectedEvent.description")
+                        label(class="block text-xs font-medium text-neutral-500 mb-1") 설명
+                        p(class="text-sm text-neutral-700 whitespace-pre-wrap") {{selectedEvent.description}}
+                    div(class="flex gap-4")
+                        div
+                            label(class="block text-xs font-medium text-neutral-500 mb-1") 시작
+                            p(class="text-sm text-neutral-900") {{selectedEvent.start.substring(0, selectedEvent.all_day ? 10 : 16)}}
+                        div
+                            label(class="block text-xs font-medium text-neutral-500 mb-1") 종료
+                            p(class="text-sm text-neutral-900") {{selectedEvent.end.substring(0, selectedEvent.all_day ? 10 : 16)}}
+                    div(*ngIf="selectedEvent.all_day")
+                        span(class="inline-flex items-center px-2 py-0.5 text-xs font-medium bg-neutral-100 text-neutral-600 rounded-full") 종일 일정
+                    div(*ngIf="getCategoryName(selectedEvent.category_id)")
+                        label(class="block text-xs font-medium text-neutral-500 mb-1") 카테고리
+                        div(class="flex items-center gap-2")
+                            div(class="w-2.5 h-2.5 rounded-full",
+                                [style.background-color]="selectedEvent.category?.color || '#3b82f6'")
+                            p(class="text-sm text-neutral-900") {{getCategoryName(selectedEvent.category_id)}}
+                    div(*ngIf="selectedEvent.attendees?.length")
+                        label(class="block text-xs font-medium text-neutral-500 mb-1") 참가자
+                        div(class="flex flex-wrap gap-1")
+                            ng-container(*ngFor="let att of selectedEvent.attendees")
+                                span(class="inline-flex items-center px-2 py-0.5 text-xs bg-neutral-100 text-neutral-700 rounded-full")
+                                    | {{att.user_name || att.user_id}}
+                    div(*ngIf="selectedEvent.user?.name")
+                        label(class="block text-xs font-medium text-neutral-500 mb-1") 작성자
+                        p(class="text-sm text-neutral-900") {{selectedEvent.user.name}}
+
+                //- 편집 모드
+                ng-container(*ngIf="isEditing")
+                    div
+                        label(class="block text-xs font-medium text-neutral-500 mb-1") 제목
+                        input(class="w-full px-3 py-2 text-sm border border-neutral-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-colors",
+                            placeholder="일정 제목", [(ngModel)]="eventForm.title")
+                    div
+                        label(class="block text-xs font-medium text-neutral-500 mb-1") 설명
+                        textarea(class="w-full px-3 py-2 text-sm border border-neutral-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-colors resize-none",
+                            rows="3", placeholder="일정 설명 (선택사항)", [(ngModel)]="eventForm.description")
+                    div
+                        label(class="inline-flex items-center cursor-pointer")
+                            input(class="sr-only peer", type="checkbox", [(ngModel)]="eventForm.all_day")
+                            div(class="relative w-9 h-5 bg-neutral-200 peer-focus:outline-none rounded-full peer border border-neutral-300 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-blue-600 after:absolute after:top-[1px] after:start-[1px] after:bg-white after:border-neutral-300 after:border after:rounded-full after:size-4 after:transition-all peer-checked:bg-blue-600")
+                            span(class="ml-2 text-sm text-neutral-700") 종일 일정
+                    div(class="flex gap-3")
+                        div(class="flex-1")
+                            label(class="block text-xs font-medium text-neutral-500 mb-1") 시작일
+                            input(type="date", class="w-full px-3 py-2 text-sm border border-neutral-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-colors",
+                                [(ngModel)]="eventForm.start_date")
+                        div(class="flex-1", *ngIf="!eventForm.all_day")
+                            label(class="block text-xs font-medium text-neutral-500 mb-1") 시작시간
+                            input(type="time", class="w-full px-3 py-2 text-sm border border-neutral-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-colors",
+                                [(ngModel)]="eventForm.start_time")
+                    div(class="flex gap-3")
+                        div(class="flex-1")
+                            label(class="block text-xs font-medium text-neutral-500 mb-1") 종료일
+                            input(type="date", class="w-full px-3 py-2 text-sm border border-neutral-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-colors",
+                                [(ngModel)]="eventForm.end_date")
+                        div(class="flex-1", *ngIf="!eventForm.all_day")
+                            label(class="block text-xs font-medium text-neutral-500 mb-1") 종료시간
+                            input(type="time", class="w-full px-3 py-2 text-sm border border-neutral-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-colors",
+                                [(ngModel)]="eventForm.end_time")
+
+                    //- 카테고리 선택
+                    div(*ngIf="categories.length > 0")
+                        label(class="block text-xs font-medium text-neutral-500 mb-1") 카테고리
+                        select(class="w-full px-3 py-2 text-sm border border-neutral-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-colors",
+                            [(ngModel)]="eventForm.category_id")
+                            option(value="") 미분류
+                            ng-container(*ngFor="let cat of categories")
+                                option([value]="cat.id") {{cat.name}}
+
+                    //- 참가자 관리
+                    div
+                        label(class="block text-xs font-medium text-neutral-500 mb-1") 참가자
+                        //- 추가된 참가자 칩
+                        div(*ngIf="eventForm.attendees?.length",
+                            class="flex flex-wrap gap-1 mb-2")
+                            ng-container(*ngFor="let uid of eventForm.attendees")
+                                span(class="inline-flex items-center gap-1 px-2 py-0.5 text-xs bg-blue-50 text-blue-700 rounded-full")
+                                    | {{getMemberName(uid)}}
+                                    button(class="ml-0.5 hover:text-red-500 transition-colors",
+                                        (click)="removeAttendeeFromForm(uid)")
+                                        i(class="ti ti-x text-xs")
+                        //- 멤버 검색
+                        div(class="relative")
+                            input(class="w-full px-3 py-2 text-sm border border-neutral-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-colors",
+                                placeholder="이름 또는 이메일로 검색",
+                                [(ngModel)]="attendeeSearch",
+                                (focus)="showAttendeeDropdown = true",
+                                (blur)="delayHideDropdown()")
+                            //- 드롭다운 (위로 표시)
+                            div(*ngIf="showAttendeeDropdown && filteredMembers.length > 0",
+                                class="absolute left-0 right-0 bottom-full mb-1 bg-white border border-neutral-200 rounded-md shadow-lg z-20 max-h-[150px] overflow-y-auto")
+                                ng-container(*ngFor="let m of filteredMembers")
+                                    div(class="px-3 py-2 text-sm hover:bg-neutral-50 cursor-pointer flex items-center gap-2",
+                                        (mousedown)="addAttendeeToForm(m); $event.preventDefault()")
+                                        i(class="ti ti-user text-neutral-400")
+                                        div
+                                            div(class="text-neutral-800") {{m.name || m.email}}
+                                            div(*ngIf="m.name && m.email",
+                                                class="text-xs text-neutral-400") {{m.email}}
+
+            //- 모달 푸터
+            div(class="flex items-center justify-between px-5 py-3 border-t border-neutral-200 bg-neutral-50 flex-shrink-0")
+                div
+                    button(*ngIf="selectedEvent && !readOnly",
+                        class="text-sm text-red-500 hover:text-red-600 transition-colors", (click)="deleteEvent()") 삭제
+                div(class="flex gap-2")
+                    button(class="px-4 py-1.5 text-sm font-medium text-neutral-600 bg-white border border-neutral-200 rounded-md hover:bg-neutral-50 transition-colors",
+                        (click)="closeModal()") 취소
+                    button(*ngIf="selectedEvent && !isEditing && !readOnly",
+                        class="px-4 py-1.5 text-sm font-medium text-white bg-blue-500 rounded-md hover:bg-blue-600 transition-colors",
+                        (click)="startEdit()") 수정
+                    button(*ngIf="isEditing",
+                        class="px-4 py-1.5 text-sm font-medium text-white bg-blue-500 rounded-md hover:bg-blue-600 transition-colors",
+                        (click)="saveEvent()") 저장
