@@ -11,6 +11,7 @@ import Toast from './toast';
 import Navbar from './navbar';
 import Lang from './lang';
 import Trigger from './trigger';
+import Theme from './theme';
 
 @Injectable({ providedIn: 'root' })
 export class Service {
@@ -23,6 +24,7 @@ export class Service {
     public navbar: Navbar;
     public lang: Lang;
     public trigger: Trigger;
+    public theme: Theme;
     public app: ChangeDetectorRef;
 
     constructor() { }
@@ -39,6 +41,7 @@ export class Service {
             this.request = new Request();
             this.toast = new Toast();
             this.trigger = new Trigger();
+            this.theme = new Theme(this);
 
             if (this.app.translate) {
                 this.lang = new Lang(this);
@@ -49,6 +52,10 @@ export class Service {
             
             await this.loading.show();
             await this.auth.init();
+        }
+
+        if (!this.theme) {
+            this.theme = new Theme(this);
         }
 
         await this.auth.check();

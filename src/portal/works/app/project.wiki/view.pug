@@ -1,9 +1,9 @@
-div(class="py-6 px-4 flex flex-wrap overflow-auto")
+div(class="py-4 px-4 flex flex-wrap overflow-auto")
     div(class="flex w-full", class="max-sm:flex-col-reverse")
-        div(class="w-3/4 p-4", class="max-sm:w-full")
-            div(class="flex flex-col gap-y-4")
+        div(class="w-3/4 px-2", class="max-sm:w-full")
+            div(class="flex flex-col gap-y-3")
                 //- 로딩 스켈레톤
-                div(class="flex flex-col bg-white rounded-lg border border-neutral-200 p-6 w-full gap-y-3 items-end", *ngIf="!loaded")
+                div(class="flex flex-col bg-white rounded-lg border border-neutral-200 px-4 py-3 w-full gap-y-3 items-end", *ngIf="!loaded")
                     div(class="bg-neutral-200 rounded-full h-4 w-9/12 animate-pulse")
                     div(class="bg-neutral-200 rounded-full h-3 w-10/12 animate-pulse")
                     div(class="bg-neutral-200 rounded-full h-3 w-11/12 animate-pulse")
@@ -21,11 +21,11 @@ div(class="py-6 px-4 flex flex-wrap overflow-auto")
 
                     //- 위키 목록
                     ng-container(*ngFor="let item of list; let i = index")
-                        div(class="flex flex-wrap bg-white rounded-lg border border-neutral-200 p-5 w-full cursor-pointer hover:bg-neutral-50 hover:border-neutral-300 transition-all", (click)="open(item)")
-                            img(class="size-14 bg-neutral-50 border border-neutral-200 rounded-lg bg-contain bg-center bg-cover bg-no-repeat", style="background-image: url({{item.icon}})")
-                            div(class="flex-1 ml-5")
+                        div(class="flex flex-wrap bg-white rounded-lg border border-neutral-200 px-4 py-3 w-full cursor-pointer hover:bg-neutral-50 hover:border-neutral-300 transition-all", (click)="open(item)")
+                            img(class="size-12 bg-neutral-50 border border-neutral-200 rounded-lg bg-contain bg-center bg-cover bg-no-repeat", style="background-image: url({{item.icon}})")
+                            div(class="flex-1 ml-4")
                                 h3(class="font-medium text-neutral-800") {{item.title}}
-                                div(class="flex text-neutral-400 text-xs mt-2", class="max-sm:flex-col")
+                                div(class="flex text-neutral-400 text-xs mt-1.5", class="max-sm:flex-col")
                                     span(class="max-sm:before:!content-[''] max-sm:before:!mx-0")
                                         i(class="ti ti-rotate-clockwise-2 mr-1")
                                         span {{displayDate(item.updated)}}
@@ -64,14 +64,14 @@ div(class="relative z-[99999]", *ngIf="isConnectWiki")
                     h3(class="text-base font-semibold text-neutral-900") 위키 연결
                 div(class="relative flex-1 flex flex-col gap-y-3 px-4 py-3 overflow-auto bg-neutral-50")
                     ng-container(*ngFor="let item of wiki.list")
-                        div(class="flex flex-wrap bg-white rounded-lg border border-neutral-200 p-5 w-full cursor-pointer hover:bg-neutral-50 hover:border-neutral-300 transition-all",
+                        div(class="flex flex-wrap bg-white rounded-lg border border-neutral-200 px-4 py-3 w-full cursor-pointer hover:bg-neutral-50 hover:border-neutral-300 transition-all",
                             [ngClass]="wiki.selected && item.id == wiki.selected.id ? '!border-blue-500 !bg-blue-50 ring-1 ring-blue-200' : ''",
                             (click)="selectConnectWiki(item)",
                         )
-                            img(class="size-14 bg-neutral-50 border border-neutral-200 rounded-lg bg-contain bg-center bg-cover bg-no-repeat", style="background-image: url({{item.icon}})")
-                            div(class="flex-1 ml-5")
+                            img(class="size-12 bg-neutral-50 border border-neutral-200 rounded-lg bg-contain bg-center bg-cover bg-no-repeat", style="background-image: url({{item.icon}})")
+                            div(class="flex-1 ml-4")
                                 h3(class="font-medium text-neutral-800") {{item.title}}
-                                div(class="flex text-neutral-400 text-xs mt-2", class="max-sm:flex-col")
+                                div(class="flex text-neutral-400 text-xs mt-1.5", class="max-sm:flex-col")
                                     span(class="max-sm:before:!content-[''] max-sm:before:!mx-0")
                                         i(class="ti ti-rotate-clockwise-2 mr-1")
                                         span {{displayDate(item.updated)}}

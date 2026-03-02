@@ -3,9 +3,14 @@ div(class="flex flex-col max-sm:flex-row max-sm:flex-wrap h-screen max-sm:h-auto
         i.ti.ti-menu-2.text-2xl.text-neutral-600
 
     a(routerLink="/", class="flex shrink-0 items-center cursor-pointer px-4 py-1")
-        img(class="w-40 mx-auto", src="/assets/portal/season/brand/logo-black.svg", alt="Season WORKS")
+        img(class="w-40 mx-auto", src="/assets/portal/season/brand/logo-black.svg", alt="Season WORKS",
+            *ngIf="!service.theme?.isDark")
+        img(class="w-40 mx-auto", src="/assets/portal/season/brand/logo-white.svg", alt="Season WORKS",
+            *ngIf="service.theme?.isDark")
 
-    nav(class="flex flex-col text-sm mt-4 border-t border-neutral-200 transition-all duration-300 max-sm:h-0 max-sm:!basis-full max-sm:mt-0 max-sm:border-t-0", *ngIf="service.auth.show(true)", [ngbCollapse]="service.navbar.isMenuCollapsed")
+    nav(class="flex flex-col text-sm mt-4 border-t border-neutral-200 max-sm:!basis-full max-sm:mt-0 max-sm:border-t-0",
+        *ngIf="service.auth.show(true)",
+        [ngClass]="{'mobile-nav-collapsed': service.navbar.isMenuCollapsed}")
         div(class="px-4 py-3")
             p(class="text-sm text-neutral-700 font-medium") {{service.auth.session.name}}
             p(class="text-xs text-neutral-400 mt-0.5") {{service.auth.session.email}}
@@ -19,7 +24,8 @@ div(class="flex flex-col max-sm:flex-row max-sm:flex-wrap h-screen max-sm:h-auto
             button(*ngIf="service.auth.session.membership === 'admin'", class="w-9 text-neutral-500 hover:bg-neutral-200/60 transition-colors border-l border-neutral-200", routerLink="/admin", routerLinkActive="!bg-neutral-200/60")
                 i.ti.ti-settings.text-lg
 
-    nav([ngbCollapse]="service.navbar.isMenuCollapsed", class="flex grow flex-col mt-1 max-sm:mt-0 max-sm:h-0 transition-all duration-300 max-sm:!basis-full px-2")
+    nav(class="flex grow flex-col mt-1 max-sm:mt-0 max-sm:!basis-full px-2",
+        [ngClass]="{'mobile-nav-collapsed': service.navbar.isMenuCollapsed}")
         ul(role="list", class="flex flex-1 flex-col py-2 space-y-0.5")
             li
                 a(*ngIf="service.auth.show(true)", routerLink="/dashboard", class="flex items-center gap-3 px-3 py-2 rounded-md text-sm text-neutral-600 hover:bg-neutral-200/60 transition-colors", routerLinkActive="font-medium text-neutral-900 bg-neutral-200/60")
@@ -58,26 +64,39 @@ div(class="flex flex-col max-sm:flex-row max-sm:flex-wrap h-screen max-sm:h-auto
                     a(class="flex items-center gap-3 px-3 py-1.5 rounded-md text-sm text-neutral-500 hover:bg-neutral-200/60 transition-colors", [routerLink]="project.menuLink('wiki')", routerLinkActive="font-medium text-neutral-900 bg-neutral-200/60", *ngIf="project.data().extra.menu.wiki") 위키
                     a(class="flex items-center gap-3 px-3 py-1.5 rounded-md text-sm text-neutral-500 hover:bg-neutral-200/60 transition-colors", [routerLink]="project.menuLink('drive')", routerLinkActive="font-medium text-neutral-900 bg-neutral-200/60", *ngIf="project.data().extra.menu.drive") 드라이브
 
-        //- 프로젝트 스위칭 드롭다운
-        div(class="mt-auto px-2 pb-3 pt-2 border-t border-neutral-200 project-switcher-container", *ngIf="service.auth.show(true)")
-            div(class="relative")
-                //- 드롭다운 패널 (fixed로 overflow 클리핑 회피)
-                div(class="fixed bg-white border border-neutral-200 rounded-lg shadow-lg overflow-hidden z-[9999] w-[320px]", *ngIf="projectSwitcher.open", [ngStyle]="projectSwitcher.panelStyle")
-                    div(class="px-2.5 pt-2.5 pb-2")
-                        div(class="flex items-center border border-neutral-200 rounded-md bg-neutral-50 overflow-hidden", [class.border-blue-400]="projectSwitcher.searchFocused")
-                            i(class="ti ti-search text-neutral-400 pl-2 text-sm")
-                            input(class="w-full h-8 text-sm px-2 border-0 bg-transparent focus:outline-none placeholder-neutral-400", placeholder="프로젝트 검색", [(ngModel)]="projectSwitcher.keyword", (click)="$event.stopPropagation()", (focus)="projectSwitcher.searchFocused = true", (blur)="projectSwitcher.searchFocused = false", (keydown)="onSwitcherKeydown($event)", (input)="onSwitcherInput()")
-                    div(class="max-h-80 overflow-y-auto project-switcher-list")
-                        ng-container(*ngIf="filteredProjects().length === 0")
-                            div(class="px-3 py-4 text-center text-xs text-neutral-400") 프로젝트가 없습니다
-                        ng-container(*ngFor="let p of filteredProjects(); let i = index")
-                            div(class="flex items-center gap-2.5 px-3 py-2.5 cursor-pointer hover:bg-neutral-100 transition-colors", [class.bg-neutral-100]="project.status() && project.data().namespace === p.namespace", [class.bg-blue-50]="i === projectSwitcher.highlightIndex", [class.project-switcher-highlight]="i === projectSwitcher.highlightIndex", (click)="switchProject(p)", (mouseenter)="projectSwitcher.highlightIndex = i")
-                                i(class="ti ti-folder text-neutral-400 text-lg")
-                                div(class="flex-1 min-w-0")
-                                    div(class="truncate text-sm text-neutral-800", [class.font-medium]="project.status() && project.data().namespace === p.namespace") {{p.short || p.title}}
-                                    div(class="truncate text-xs text-neutral-400 mt-0.5", *ngIf="p.short && p.short !== p.title") {{p.title}}
-                //- 트리거 버튼
-                button(class="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-sm text-neutral-600 hover:bg-neutral-200/60 transition-colors", (click)="toggleProjectSwitcher($event)")
-                    i(class="ti ti-arrows-exchange text-base text-neutral-400")
-                    span(class="truncate flex-1 text-left") 프로젝트 이동
-                    i(class="ti text-xs text-neutral-400", [ngClass]="projectSwitcher.open ? 'ti-chevron-down' : 'ti-chevron-up'")
+        //- 하단 유틸리티 영역
+        div(class="mt-auto border-t border-neutral-200")
+            //- 테마 전환 토글 (세그먼트 컨트롤)
+            div(class="px-3 py-2.5")
+                .theme-toggle-track((click)="service.theme.toggle(); service.render(); $event.stopPropagation()")
+                    .theme-toggle-thumb([ngClass]="{'is-dark': service.theme?.isDark}")
+                    .theme-toggle-option([ngClass]="{'is-active': !service.theme?.isDark}")
+                        i.ti.ti-sun(class="text-[13px]")
+                        span 라이트
+                    .theme-toggle-option([ngClass]="{'is-active': service.theme?.isDark}")
+                        i.ti.ti-moon(class="text-[13px]")
+                        span 다크
+
+            //- 프로젝트 스위칭 드롭다운
+            div(class="px-2 pb-3 project-switcher-container", *ngIf="service.auth.show(true)")
+                div(class="relative")
+                    //- 드롭다운 패널 (fixed로 overflow 클리핑 회피)
+                    div(class="fixed bg-white border border-neutral-200 rounded-lg shadow-lg overflow-hidden z-[9999] w-[320px]", *ngIf="projectSwitcher.open", [ngStyle]="projectSwitcher.panelStyle")
+                        div(class="px-2.5 pt-2.5 pb-2")
+                            div(class="flex items-center border border-neutral-200 rounded-md bg-neutral-50 overflow-hidden", [class.border-blue-400]="projectSwitcher.searchFocused")
+                                i(class="ti ti-search text-neutral-400 pl-2 text-sm")
+                                input(class="w-full h-8 text-sm px-2 border-0 bg-transparent focus:outline-none placeholder-neutral-400", placeholder="프로젝트 검색", [(ngModel)]="projectSwitcher.keyword", (click)="$event.stopPropagation()", (focus)="projectSwitcher.searchFocused = true", (blur)="projectSwitcher.searchFocused = false", (keydown)="onSwitcherKeydown($event)", (input)="onSwitcherInput()")
+                        div(class="max-h-80 overflow-y-auto project-switcher-list")
+                            ng-container(*ngIf="filteredProjects().length === 0")
+                                div(class="px-3 py-4 text-center text-xs text-neutral-400") 프로젝트가 없습니다
+                            ng-container(*ngFor="let p of filteredProjects(); let i = index")
+                                div(class="flex items-center gap-2.5 px-3 py-2.5 cursor-pointer hover:bg-neutral-100 transition-colors", [class.bg-neutral-100]="project.status() && project.data().namespace === p.namespace", [class.bg-blue-50]="i === projectSwitcher.highlightIndex", [class.project-switcher-highlight]="i === projectSwitcher.highlightIndex", (click)="switchProject(p)", (mouseenter)="projectSwitcher.highlightIndex = i")
+                                    i(class="ti ti-folder text-neutral-400 text-lg")
+                                    div(class="flex-1 min-w-0")
+                                        div(class="truncate text-sm text-neutral-800", [class.font-medium]="project.status() && project.data().namespace === p.namespace") {{p.short || p.title}}
+                                        div(class="truncate text-xs text-neutral-400 mt-0.5", *ngIf="p.short && p.short !== p.title") {{p.title}}
+                    //- 트리거 버튼
+                    button(class="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-sm text-neutral-600 hover:bg-neutral-200/60 transition-colors", (click)="toggleProjectSwitcher($event)")
+                        i(class="ti ti-arrows-exchange text-base text-neutral-400")
+                        span(class="truncate flex-1 text-left") 프로젝트 이동
+                        i(class="ti text-xs text-neutral-400", [ngClass]="projectSwitcher.open ? 'ti-chevron-down' : 'ti-chevron-up'")

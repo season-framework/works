@@ -78,3 +78,7 @@
 | 2026-03-02 | 019 | SSO 로그인 시 활성 기기 미등록 수정 (세션 토큰 발급 추가) | [상세](devlog/2026-03-02/019-sso-session-token-fix.md) |
 | 2026-03-02 | 020 | 로그인 페이지 디자인 리뉴얼 (Split 레이아웃) | [상세](devlog/2026-03-02/020-login-page-redesign.md) |
 | 2026-03-02 | 021 | 로그인 페이지 인풋/버튼 UX 고도화 (Toss/Apple 스타일) | [상세](devlog/2026-03-02/021-login-ux-enhancement.md) |
+| 2026-03-02 | 022 | 모바일 사이드 메뉴 동작 안함 수정 | [상세](devlog/2026-03-02/022-mobile-sidebar-fix.md) |
+| 2026-03-02 | 023 | 다크모드/라이트모드 토글 기능 구현 | [상세](devlog/2026-03-02/023-dark-mode-toggle.md) |
+| 2026-03-02 | 024 | 다크모드 동작 안함 수정 및 토글 UI 개선 | [상세](devlog/2026-03-02/024-darkmode-fix-toggle.md) |
+| 2026-03-02 | 025 | 카드/버블 여백 콤팩트화 (프로젝트/위키 목록, 메시지 버블) | [상세](devlog/2026-03-02/025-card-bubble-padding-compact.md) |

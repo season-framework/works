@@ -27,7 +27,7 @@ div(*ngIf="cache.loaded", class="w-full h-full overflow-hidden", [ngClass]="cont
                 div(class="flex-1 flex m-0 p-0 overflow-hidden")
                     //- 좌측 패널: 작업 정보
                     div(class="m-0 p-0 overflow-hidden max-sm:hidden h-full border-r border-neutral-200 flex flex-col bg-white", [ngClass]="(issue.id == 'new' ? 'w-full flex-1' : 'w-7/12 max-sm:w-full') + (cache.tab == 'info' ? ' max-sm:!flex' : '')")
-                        div(class="p-5 h-full overflow-y-auto overflow-x-hidden text-sm pb-[360px] lg:pb-5")
+                        div(class="px-4 py-3 h-full overflow-y-auto overflow-x-hidden text-sm pb-[360px] lg:pb-4")
                             div(class="space-y-4")
                                 //- 이슈 제목
                                 div(class="flex items-center")
@@ -207,7 +207,7 @@ div(*ngIf="cache.loaded", class="w-full h-full overflow-hidden", [ngClass]="cont
 
                         //- 메시지 목록
                         div(class="flex-1 flex flex-col overflow-hidden")
-                            div(class="p-4 flex-1 relative text-sm overflow-auto bg-neutral-50/50")
+                            div(class="px-3 py-3 flex-1 relative text-sm overflow-auto bg-neutral-50/50")
                                 ng-container(*ngIf="cache.newMessage")
                                     div(class="w-4/5 p-2.5 text-center text-sm rounded-lg bg-blue-50 text-blue-600 border border-blue-200 absolute left-[10%] bottom-3 z-[9999] cursor-pointer", (click)="unreadMessage(true)") 새로운 메시지가 있습니다
 

@@ -1,4 +1,4 @@
-.flex.flex-col.p-5([ngClass]="msg.parent_id && 'py-2 pl-9'")
+.flex.flex-col([ngClass]="msg.parent_id ? 'py-1.5 pl-9 px-4' : 'px-4 py-2.5'")
     .flex.items-center
         .font-semibold.text-sm.text-neutral-900(*ngIf="project.member.map[msg.user_id]")
             i.mr-2.ti.ti-arrow-back-up.text-neutral-400(*ngIf="msg.parent_id")
@@ -15,7 +15,7 @@
                 i.ti.ti-star.text-neutral-300((click)="event.favoriteMessage(msg)", *ngIf="msg.favorite == 0", class="hover:text-yellow-500")
                 i.ti.ti-star-filled.text-yellow-500((click)="event.favoriteMessage(msg)", *ngIf="msg.favorite == 1")
 
-    div(*ngIf="msg.attachment && msg.attachment.length > 0", class="mb-[6px]")
+    div(*ngIf="msg.attachment && msg.attachment.length > 0", class="mb-[4px]")
         ng-container(*ngFor="let file of msg.attachment")
             a.inline-flex.items-center.gap-1.rounded-md.text-xs.bg-neutral-100.text-neutral-600.mr-1.mt-1.transition(class="hover:bg-neutral-200 px-2 py-0.5 overflow-hidden max-w-[180px] text-ellipsis text-nowrap", [attr.href]="project.downloadUrl(file.id, file.filename)", target="_blank", [title]="file.filename")
                 i.ti.ti-download

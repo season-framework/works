@@ -1,3 +1,76 @@
 :host {
     display: block;
 }
+
+// 모바일에서만 메뉴 접기/펼치기 (데스크탑에서는 항상 표시)
+@media (max-width: 639px) {
+    .mobile-nav-collapsed {
+        display: none !important;
+    }
+}
+
+// ─── 테마 토글: 세그먼트 컨트롤 (칸반/게시판 스타일) ───
+.theme-toggle-track {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: #e4e4e7; // neutral-200
+    border-radius: 8px;
+    padding: 3px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.2s ease;
+}
+
+.theme-toggle-thumb {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: calc(50% - 3px);
+    height: calc(100% - 6px);
+    background: #ffffff;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 0;
+
+    &.is-dark {
+        transform: translateX(100%);
+    }
+}
+
+.theme-toggle-option {
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 5px 0;
+    font-size: 12px;
+    font-weight: 500;
+    color: #a1a1aa; // neutral-400
+    transition: color 0.2s ease;
+
+    &.is-active {
+        color: #18181b; // neutral-900
+    }
+}
+
+// 다크모드 오버라이드
+[data-theme="dark"] {
+    .theme-toggle-track {
+        background: #27272a; // zinc-800
+    }
+    .theme-toggle-thumb {
+        background: #3f3f46; // zinc-700
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    }
+    .theme-toggle-option {
+        color: #52525b; // zinc-600
+        &.is-active {
+            color: #fafafa;
+        }
+    }
+}
