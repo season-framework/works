@@ -9,6 +9,22 @@ class Controller:
         wiz.session = wiz.model("portal/season/session").use()
         sessiondata = wiz.session.get()
         wiz.response.data.set(session=sessiondata)
+
+        # 강제 로그아웃된 세션 차단
+        forced_logout = False
+        session_token = wiz.session.get("session_token")
+        if session_token:
+            try:
+                orm = wiz.model("portal/season/orm")
+                session_db = orm.use("user_session", id_size=64)
+                sess = session_db.get(id=session_token)
+                if sess and not sess['is_active']:
+                    forced_logout = True
+            except: pass
+
+        if forced_logout:
+            wiz.session.clear()
+            wiz.response.status(401)
         
         def query(key=None, default=None):
             method = wiz.request.method().upper()

@@ -4,6 +4,7 @@ import datetime
 smtp = wiz.model('portal/season/smtp').use()
 orm = wiz.model("portal/season/orm")
 db = orm.use("user")
+config = wiz.config("season")
 
 class Tool:
     def checkId(self, id):
@@ -53,7 +54,16 @@ def login():
         wiz.response.status(201, True)
 
     if user['password'](password) == False:
+        # 비밀번호 로그인 실패 이력 기록
+        try:
+            config.record_login_history(wiz, user['id'], user['email'], login_method="password", status="failed")
+        except: pass
         wiz.response.status(401, "이메일 또는 비밀번호를 확인해주세요")
+
+    # 비밀번호 로그인 성공 이력 기록
+    try:
+        config.record_login_history(wiz, user['id'], user['email'], login_method="password", status="success")
+    except: pass
 
     wiz.session.create(user['id'])
     wiz.response.status(200, True)

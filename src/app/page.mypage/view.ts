@@ -5,6 +5,9 @@ export class Component implements OnInit {
     constructor(public service: Service) { }
 
     public data: any = {};
+    public loginHistory: any = { rows: [], total: 0, page: 1 };
+    public activeSessions: any[] = [];
+    public passwordOpen: boolean = false;
 
     public async ngOnInit() {
         await this.service.init();
@@ -35,6 +38,8 @@ export class Component implements OnInit {
         this.data.user = user;
         this.data.password = {};
 
+        await this.loadLoginHistory();
+        await this.loadActiveSessions();
         await this.service.render();
     }
 
@@ -47,7 +52,6 @@ export class Component implements OnInit {
             await this.service.auth.init();
             return;
         }
-
         await this.alert("오류가 발생했습니다");
     }
 
@@ -59,7 +63,7 @@ export class Component implements OnInit {
             return;
         }
 
-        let pd = {};
+        let pd: any = {};
         pd.current = this.service.auth.hash(pdata.current);
         pd.data = this.service.auth.hash(pdata.data);
 
@@ -93,5 +97,65 @@ export class Component implements OnInit {
     public async deleteIcon() {
         this.data.user.profile_image = '';
         await this.service.render();
+    }
+
+    public async loadLoginHistory(page: number = 1) {
+        const { code, data } = await wiz.call("login_history", { page, dump: 10 });
+        if (code == 200) {
+            this.loginHistory = { rows: data.rows, total: data.total, page: data.page };
+        }
+        await this.service.render();
+    }
+
+    public async loadActiveSessions() {
+        const { code, data } = await wiz.call("active_sessions");
+        if (code == 200) {
+            this.activeSessions = data.sessions || [];
+        }
+        await this.service.render();
+    }
+
+    public async forceLogout(sessionId: string) {
+        let res = await this.service.alert.show({
+            title: '',
+            message: '이 기기를 강제 로그아웃하시겠습니까?',
+            cancel: '취소',
+            actionBtn: 'error',
+            action: '로그아웃',
+            status: 'error'
+        });
+
+        if (!res) return;
+
+        const { code, data } = await wiz.call("force_logout", { session_id: sessionId });
+        if (code == 200) {
+            await this.alert("강제 로그아웃 되었습니다", 'success');
+            await this.loadActiveSessions();
+        } else {
+            await this.alert(data.message || "오류가 발생했습니다");
+        }
+    }
+
+    public togglePassword() {
+        this.passwordOpen = !this.passwordOpen;
+        this.service.render();
+    }
+
+    public get historyTotalPages(): number {
+        return Math.ceil(this.loginHistory.total / 10) || 1;
+    }
+
+    public async goHistoryPage(page: number) {
+        if (page < 1 || page > this.historyTotalPages) return;
+        await this.loadLoginHistory(page);
+    }
+
+    public methodLabel(method: string): string {
+        const map: any = { password: '비밀번호', saml: 'SSO', otp: 'OTP' };
+        return map[method] || method;
+    }
+
+    public statusLabel(status: string): string {
+        return status === 'success' ? '성공' : '실패';
     }
 }

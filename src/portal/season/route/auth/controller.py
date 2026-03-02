@@ -15,6 +15,11 @@ if wiz.request.match(f"{BASEURI}/logout") is not None:
     if LOGOUT_URI is not None and LOGOUT_URI != f"{BASEURI}/logout":
         wiz.response.redirect(LOGOUT_URI)
 
+    # 로그아웃 시 세션 비활성화
+    try:
+        config.deactivate_session(wiz)
+    except: pass
+
     wiz.session.clear()
     wiz.response.redirect(returnTo)
 

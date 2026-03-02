@@ -1,64 +1,172 @@
 div(class="h-full overflow-y-auto")
-    div(class="max-w-3xl mx-auto px-8 py-8", *ngIf="data.user && service.auth.show(true)")
-        //- 기본정보 카드
-        div(class="bg-white border border-neutral-200 rounded-lg overflow-hidden")
-            div(class="flex items-center px-5 py-4 border-b border-neutral-200")
-                wiz-component-dot
-                h2(class="ml-3 text-lg font-semibold text-neutral-900") 기본정보
+    div(class="max-w-2xl mx-auto px-6 py-10", *ngIf="data.user && service.auth.show(true)")
 
-            div(class="divide-y divide-neutral-100")
-                //- 이메일
-                div(class="flex items-center min-h-[48px] max-sm:flex-col max-sm:items-start")
-                    div(class="w-1/6 max-sm:w-full px-4 py-2 text-sm font-medium text-neutral-500 bg-neutral-50 flex items-center h-full self-stretch") 이메일
-                    div(class="flex-1 p-2")
-                        input(type="text", class="w-full px-3 py-2 text-sm bg-neutral-50 border border-neutral-200 rounded-md text-neutral-400 cursor-not-allowed", [(ngModel)]="data.user.email", disabled)
+        //- ── 프로필 히어로 ──
+        div(class="flex items-center gap-5 mb-10")
+            div(class="relative group")
+                div(class="w-20 h-20 rounded-full bg-neutral-100 border border-neutral-200 bg-cover bg-center flex items-center justify-center overflow-hidden cursor-pointer",
+                    [ngStyle]="{'background-image': data.user.profile_image ? 'url(' + data.user.profile_image + ')' : 'none'}",
+                    (click)="updateIcon()")
+                    span(*ngIf="!data.user.profile_image",
+                        class="text-2xl font-bold text-neutral-400") {{ data.user.name?.[0] || '?' }}
+                div(class="absolute inset-0 rounded-full bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity cursor-pointer",
+                    (click)="updateIcon()")
+                    svg(class="w-5 h-5 text-white", fill="none", viewBox="0 0 24 24", stroke="currentColor")
+                        path(stroke-linecap="round", stroke-linejoin="round", stroke-width="2", d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z")
+                        path(stroke-linecap="round", stroke-linejoin="round", stroke-width="2", d="M15 13a3 3 0 11-6 0 3 3 0 016 0z")
+            div(class="flex-1 min-w-0")
+                h1(class="text-xl font-semibold text-neutral-900 truncate") {{ data.user.name || '이름 없음' }}
+                p(class="text-sm text-neutral-500 mt-0.5") {{ data.user.email }}
+                div(class="flex items-center gap-2 mt-2", *ngIf="data.user.profile_image")
+                    button(class="text-xs text-red-500 hover:text-red-600 hover:underline",
+                        (click)="deleteIcon()") 아이콘 삭제
 
-                //- 이름 / 연락처
-                div(class="flex items-center min-h-[48px] max-sm:flex-col max-sm:items-start")
-                    div(class="w-1/6 max-sm:w-full px-4 py-2 text-sm font-medium text-neutral-500 bg-neutral-50 flex items-center h-full self-stretch") 이름
-                    div(class="flex-1 p-2")
-                        input(type="text", class="w-full px-3 py-2 text-sm border border-neutral-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-colors", [(ngModel)]="data.user.name")
-                    div(class="w-1/6 max-sm:w-full px-4 py-2 text-sm font-medium text-neutral-500 bg-neutral-50 flex items-center h-full self-stretch") 연락처
-                    div(class="flex-1 p-2")
-                        input(type="tel", class="w-full px-3 py-2 text-sm border border-neutral-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-colors", [(ngModel)]="data.user.mobile")
+        //- ── 기본 정보 섹션 ──
+        div(class="mb-8")
+            h2(class="text-[13px] font-semibold text-neutral-400 uppercase tracking-wider mb-4") 기본 정보
 
-                //- 아이콘
-                div(class="flex items-center min-h-[48px] max-sm:flex-col max-sm:items-start")
-                    div(class="w-1/6 max-sm:w-full px-4 py-2 text-sm font-medium text-neutral-500 bg-neutral-50 flex items-center h-full self-stretch") 아이콘
-                    div(class="flex-1 flex items-center gap-2 p-2")
-                        button(class="shrink-0 w-9 h-9 border border-neutral-200 rounded-lg bg-contain bg-center bg-cover bg-no-repeat hover:ring-2 hover:ring-blue-500/20 transition-all", [ngStyle]="{'background-image': 'url(' + data.user.profile_image + ')'}", (click)="updateIcon()", aria-label="프로필 아이콘 변경")
-                        button(class="px-3 py-1.5 text-sm font-medium text-white bg-neutral-600 rounded-md hover:bg-neutral-500 transition-colors", (click)="updateIcon()") 아이콘 등록
-                        button(class="px-3 py-1.5 text-sm font-medium text-blue-600 hover:underline", *ngIf="data.user.profile_image", (click)="deleteIcon()") 아이콘 삭제
+            div(class="space-y-1")
+                //- 이메일 (읽기 전용)
+                div(class="flex items-center py-2 px-3 rounded-md group")
+                    span(class="w-24 shrink-0 text-[13px] text-neutral-500") 이메일
+                    span(class="flex-1 text-[13px] text-neutral-400") {{ data.user.email }}
 
-            div(class="flex justify-end px-5 py-3 border-t border-neutral-100 bg-neutral-50")
-                button(class="px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-md hover:bg-blue-600 transition-colors", (click)="update()") 저장하기
+                //- 이름
+                div(class="flex items-center py-1 px-3 rounded-md hover:bg-neutral-50 transition-colors group")
+                    span(class="w-24 shrink-0 text-[13px] text-neutral-500") 이름
+                    input(type="text",
+                        class="flex-1 text-[13px] text-neutral-900 bg-transparent border-0 outline-none focus:outline-none p-1 -m-1 rounded hover:bg-neutral-100 focus:bg-white focus:ring-1 focus:ring-blue-500/30 transition-all",
+                        [(ngModel)]="data.user.name")
 
-        //- 비밀번호 변경 카드
-        div(class="bg-white border border-neutral-200 rounded-lg overflow-hidden mt-8")
-            div(class="flex items-center px-5 py-4 border-b border-neutral-200")
-                wiz-component-dot
-                h2(class="ml-3 text-lg font-semibold text-neutral-900") 비밀번호 변경
+                //- 연락처
+                div(class="flex items-center py-1 px-3 rounded-md hover:bg-neutral-50 transition-colors group")
+                    span(class="w-24 shrink-0 text-[13px] text-neutral-500") 연락처
+                    input(type="tel",
+                        class="flex-1 text-[13px] text-neutral-900 bg-transparent border-0 outline-none focus:outline-none p-1 -m-1 rounded hover:bg-neutral-100 focus:bg-white focus:ring-1 focus:ring-blue-500/30 transition-all",
+                        [(ngModel)]="data.user.mobile")
 
-            div(class="divide-y divide-neutral-100")
+            div(class="flex justify-end mt-4")
+                button(class="px-4 py-1.5 text-[13px] font-medium text-white bg-blue-500 rounded-md hover:bg-blue-600 transition-colors",
+                    (click)="update()") 저장
+
+        div(class="border-t border-neutral-100 my-6")
+
+        //- ── 비밀번호 변경 섹션 ──
+        div(class="mb-8")
+            div(class="flex items-center justify-between cursor-pointer py-1",
+                (click)="togglePassword()")
+                h2(class="text-[13px] font-semibold text-neutral-400 uppercase tracking-wider") 비밀번호 변경
+                svg(class="w-4 h-4 text-neutral-400 transition-transform",
+                    [class.rotate-180]="passwordOpen",
+                    fill="none", viewBox="0 0 24 24", stroke="currentColor")
+                    path(stroke-linecap="round", stroke-linejoin="round", stroke-width="2", d="M19 9l-7 7-7-7")
+
+            div(*ngIf="passwordOpen", class="mt-4 space-y-1")
                 //- 현재 비밀번호
-                div(class="flex items-center min-h-[48px] max-sm:flex-col max-sm:items-start", *ngIf="data.user.hasPassword")
-                    div(class="w-1/6 max-sm:w-full px-4 py-2 text-sm font-medium text-neutral-500 bg-neutral-50 flex items-center h-full self-stretch") 현재 비밀번호
-                    div(class="flex-1 p-2")
-                        input(type="password", class="w-full px-3 py-2 text-sm border border-neutral-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-colors", [(ngModel)]="data.password.current")
+                div(class="flex items-center py-1 px-3 rounded-md hover:bg-neutral-50 transition-colors",
+                    *ngIf="data.user.hasPassword")
+                    span(class="w-24 shrink-0 text-[13px] text-neutral-500") 현재
+                    input(type="password",
+                        class="flex-1 text-[13px] text-neutral-900 bg-transparent border-0 outline-none focus:outline-none p-1 -m-1 rounded hover:bg-neutral-100 focus:bg-white focus:ring-1 focus:ring-blue-500/30 transition-all",
+                        [(ngModel)]="data.password.current",
+                        placeholder="현재 비밀번호")
 
                 //- 새 비밀번호
-                div(class="flex items-center min-h-[48px] max-sm:flex-col max-sm:items-start")
-                    div(class="w-1/6 max-sm:w-full px-4 py-2 text-sm font-medium text-neutral-500 bg-neutral-50 flex items-center h-full self-stretch")
-                        span(*ngIf="data.user.hasPassword") 비밀번호 변경
-                        span(*ngIf="!data.user.hasPassword") 비밀번호 설정
-                    div(class="flex-1 p-2")
-                        input(type="password", class="w-full px-3 py-2 text-sm border border-neutral-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-colors", [(ngModel)]="data.password.data")
+                div(class="flex items-center py-1 px-3 rounded-md hover:bg-neutral-50 transition-colors")
+                    span(class="w-24 shrink-0 text-[13px] text-neutral-500")
+                        span(*ngIf="data.user.hasPassword") 새 비밀번호
+                        span(*ngIf="!data.user.hasPassword") 설정
+                    input(type="password",
+                        class="flex-1 text-[13px] text-neutral-900 bg-transparent border-0 outline-none focus:outline-none p-1 -m-1 rounded hover:bg-neutral-100 focus:bg-white focus:ring-1 focus:ring-blue-500/30 transition-all",
+                        [(ngModel)]="data.password.data",
+                        placeholder="새 비밀번호")
 
                 //- 비밀번호 확인
-                div(class="flex items-center min-h-[48px] max-sm:flex-col max-sm:items-start")
-                    div(class="w-1/6 max-sm:w-full px-4 py-2 text-sm font-medium text-neutral-500 bg-neutral-50 flex items-center h-full self-stretch") 비밀번호 확인
-                    div(class="flex-1 p-2")
-                        input(type="password", class="w-full px-3 py-2 text-sm border border-neutral-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-colors", [(ngModel)]="data.password.repeat")
+                div(class="flex items-center py-1 px-3 rounded-md hover:bg-neutral-50 transition-colors")
+                    span(class="w-24 shrink-0 text-[13px] text-neutral-500") 확인
+                    input(type="password",
+                        class="flex-1 text-[13px] text-neutral-900 bg-transparent border-0 outline-none focus:outline-none p-1 -m-1 rounded hover:bg-neutral-100 focus:bg-white focus:ring-1 focus:ring-blue-500/30 transition-all",
+                        [(ngModel)]="data.password.repeat",
+                        placeholder="비밀번호 확인")
 
-            div(class="flex justify-end px-5 py-3 border-t border-neutral-100 bg-neutral-50")
-                button(class="px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-md hover:bg-blue-600 transition-colors", (click)="changePassword()") 변경하기
+                div(class="flex justify-end mt-4")
+                    button(class="px-4 py-1.5 text-[13px] font-medium text-white bg-blue-500 rounded-md hover:bg-blue-600 transition-colors",
+                        (click)="changePassword()") 변경하기
+
+        div(class="border-t border-neutral-100 my-6")
+
+        //- ── 활성 기기 섹션 ──
+        div(class="mb-8")
+            h2(class="text-[13px] font-semibold text-neutral-400 uppercase tracking-wider mb-4") 활성 기기
+
+            div(*ngIf="activeSessions.length === 0",
+                class="text-[13px] text-neutral-400 py-4") 활성 세션이 없습니다.
+
+            div(class="space-y-2", *ngIf="activeSessions.length > 0")
+                div(*ngFor="let sess of activeSessions",
+                    class="flex items-center gap-3 py-3 px-3 rounded-lg hover:bg-neutral-50 transition-colors")
+                    //- 기기 아이콘
+                    div(class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0",
+                        [class]="sess.is_current ? 'bg-blue-50 text-blue-500' : 'bg-neutral-100 text-neutral-400'")
+                        svg(class="w-5 h-5", fill="none", viewBox="0 0 24 24", stroke="currentColor")
+                            path(stroke-linecap="round", stroke-linejoin="round", stroke-width="1.5",
+                                d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z")
+                    div(class="flex-1 min-w-0")
+                        div(class="flex items-center gap-2")
+                            span(class="text-[13px] font-medium text-neutral-900 truncate") {{ sess.device_name }}
+                            span(*ngIf="sess.is_current",
+                                class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-blue-50 text-blue-600") 현재 기기
+                        div(class="flex items-center gap-3 mt-0.5")
+                            span(class="text-xs text-neutral-400") {{ sess.ip }}
+                            span(class="text-xs text-neutral-300") ·
+                            span(class="text-xs text-neutral-400") {{ sess.last_active }}
+                    button(*ngIf="!sess.is_current",
+                        class="shrink-0 px-3 py-1 text-xs font-medium text-red-500 hover:text-white hover:bg-red-500 border border-red-200 hover:border-red-500 rounded-md transition-all",
+                        (click)="forceLogout(sess.id)") 로그아웃
+
+        div(class="border-t border-neutral-100 my-6")
+
+        //- ── 로그인 이력 섹션 ──
+        div(class="mb-8")
+            h2(class="text-[13px] font-semibold text-neutral-400 uppercase tracking-wider mb-4") 로그인 이력
+
+            div(*ngIf="loginHistory.rows.length === 0",
+                class="text-[13px] text-neutral-400 py-4") 로그인 이력이 없습니다.
+
+            div(*ngIf="loginHistory.rows.length > 0")
+                //- 테이블 헤더
+                div(class="grid gap-2 px-3 py-2 text-xs text-neutral-400 font-medium border-b border-neutral-100",
+                    style="grid-template-columns: 1fr 1fr 120px 80px 60px;")
+                    span 날짜
+                    span 디바이스
+                    span IP
+                    span 방식
+                    span 상태
+
+                //- 테이블 행
+                div(*ngFor="let row of loginHistory.rows",
+                    class="grid gap-2 px-3 py-2.5 text-[13px] border-b border-neutral-50 hover:bg-neutral-50 transition-colors",
+                    style="grid-template-columns: 1fr 1fr 120px 80px 60px;")
+                    span(class="text-neutral-600 truncate") {{ row.created }}
+                    span(class="text-neutral-900 truncate") {{ row.device_name }}
+                    span(class="text-neutral-500 font-mono text-xs truncate") {{ row.ip }}
+                    span
+                        span(class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium",
+                            [class]="row.login_method === 'saml' ? 'bg-purple-50 text-purple-600' : 'bg-neutral-100 text-neutral-600'") {{ methodLabel(row.login_method) }}
+                    span
+                        span(class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium",
+                            [class]="row.status === 'success' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'") {{ statusLabel(row.status) }}
+
+                //- 페이지네이션
+                div(class="flex items-center justify-center gap-2 mt-4", *ngIf="historyTotalPages > 1")
+                    button(class="px-2 py-1 text-xs text-neutral-400 hover:text-neutral-700 disabled:opacity-30",
+                        [disabled]="loginHistory.page <= 1",
+                        (click)="goHistoryPage(loginHistory.page - 1)")
+                        svg(class="w-4 h-4", fill="none", viewBox="0 0 24 24", stroke="currentColor")
+                            path(stroke-linecap="round", stroke-linejoin="round", stroke-width="2", d="M15 19l-7-7 7-7")
+                    span(class="text-xs text-neutral-500") {{ loginHistory.page }} / {{ historyTotalPages }}
+                    button(class="px-2 py-1 text-xs text-neutral-400 hover:text-neutral-700 disabled:opacity-30",
+                        [disabled]="loginHistory.page >= historyTotalPages",
+                        (click)="goHistoryPage(loginHistory.page + 1)")
+                        svg(class="w-4 h-4", fill="none", viewBox="0 0 24 24", stroke="currentColor")
+                            path(stroke-linecap="round", stroke-linejoin="round", stroke-width="2", d="M9 5l7 7-7 7")
