@@ -3,3 +3,18 @@
     width: 100%;
     height: 100%;
 }
+
+.filter-sidebar {
+    @media (max-width: 639px) {
+        position: fixed;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        z-index: 50;
+        box-shadow: -4px 0 16px rgba(0,0,0,0.1);
+
+        &.mobile-hidden {
+            display: none;
+        }
+    }
+}

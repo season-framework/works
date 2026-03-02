@@ -82,3 +82,11 @@
 | 2026-03-02 | 023 | 다크모드/라이트모드 토글 기능 구현 | [상세](devlog/2026-03-02/023-dark-mode-toggle.md) |
 | 2026-03-02 | 024 | 다크모드 동작 안함 수정 및 토글 UI 개선 | [상세](devlog/2026-03-02/024-darkmode-fix-toggle.md) |
 | 2026-03-02 | 025 | 카드/버블 여백 콤팩트화 (프로젝트/위키 목록, 메시지 버블) | [상세](devlog/2026-03-02/025-card-bubble-padding-compact.md) |
+| 2026-03-03 | 001 | 아이콘 포함 Input 포커스 영역 전수조사 및 수정 (focus-within 통일) | [상세](devlog/2026-03-03/001-input-focus-within-fix.md) |
+| 2026-03-03 | 002 | 모바일 캘린더 프로젝트 필터 반응형 토글 처리 | [상세](devlog/2026-03-03/002-mobile-calendar-filter-toggle.md) |
+| 2026-03-03 | 003 | 다크모드 색상 팔레트 재조정 (가시성 향상, 인디고 시프트) | [상세](devlog/2026-03-03/003-darkmode-palette-redesign.md) |
+| 2026-03-03 | 004 | 다크모드 상태/강조 색상 글로벌 오버라이드 확장 (green/red/amber/purple) | [상세](devlog/2026-03-03/004-darkmode-status-color-overrides.md) |
+| 2026-03-03 | 005 | CKEditor 다크모드 테마 적용 (toolbar/editable/content/dropdown) | [상세](devlog/2026-03-03/005-ckeditor-darkmode.md) |
+| 2026-03-03 | 006 | 이슈보드 플로팅 버튼/라벨 입력 다크모드 가시성 수정 | [상세](devlog/2026-03-03/006-floating-btn-label-input-darkmode.md) |
+| 2026-03-03 | 007 | 테이블 border 하드코딩 수정 및 전수 점검 (border-black → neutral-200) | [상세](devlog/2026-03-03/007-table-border-hardcode-fix.md) |
+| 2026-03-03 | 008 | 다크모드 전수 점검 및 잔여 이슈 수정 (yellow/indigo/violet/sky 등) | [상세](devlog/2026-03-03/008-darkmode-full-survey-fix.md) |

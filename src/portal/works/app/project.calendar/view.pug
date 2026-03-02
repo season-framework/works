@@ -11,12 +11,17 @@ div(class="w-full h-full flex overflow-hidden bg-white")
                     i(class="ti ti-chevron-right text-lg text-neutral-600")
                 button(class="ml-2 px-3 py-1 text-xs font-medium text-neutral-600 bg-neutral-100 rounded-md hover:bg-neutral-200 transition-colors",
                     (click)="goToday()") 오늘
-            div
+            div(class="flex items-center gap-2")
                 button(*ngIf="!readOnly",
                     class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-white bg-blue-500 rounded-md hover:bg-blue-600 transition-colors",
                     (click)="openCreateModal()")
                     i(class="ti ti-plus text-base")
                     span 일정 추가
+                button(class="sm:hidden flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md transition-colors",
+                    [ngClass]="showFilterSidebar ? 'bg-blue-500 text-white' : 'text-neutral-600 bg-neutral-100 hover:bg-neutral-200'",
+                    (click)="showFilterSidebar = !showFilterSidebar")
+                    i(class="ti ti-filter text-base")
+                    span 카테고리
 
         //- 캘린더 그리드
         div(class="flex-1 min-h-0 overflow-auto")
@@ -54,8 +59,12 @@ div(class="w-full h-full flex overflow-hidden bg-white")
                                             class="text-xs px-1.5 text-neutral-400")
                                             | +{{cell.events.length - 3}}건
 
+    //- 모바일 필터 오버레이 배경
+    div(*ngIf="showFilterSidebar", class="fixed inset-0 bg-black/30 z-40 sm:hidden", (click)="showFilterSidebar = false")
+
     //- 우측: 사이드바
-    div(class="w-[240px] flex-shrink-0 border-l border-neutral-200 flex flex-col bg-neutral-50 overflow-hidden")
+    div(class="filter-sidebar w-[240px] flex-shrink-0 border-l border-neutral-200 flex flex-col bg-neutral-50 overflow-hidden",
+        [class.mobile-hidden]="!showFilterSidebar")
         //- 내 일정만 보기 토글
         div(class="px-4 py-3 border-b border-neutral-200")
             label(class="flex items-center cursor-pointer gap-2")

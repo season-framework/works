@@ -32,3 +32,107 @@
         }
     }
 }
+
+// ── CKEditor Dark Mode ──
+[data-theme="dark"] {
+    // CKEditor toolbar
+    .ck.ck-toolbar {
+        background: #161619 !important;
+        border-color: #28282f !important;
+    }
+    .ck.ck-toolbar__separator {
+        background: #28282f !important;
+    }
+    .ck.ck-toolbar .ck-button {
+        color: #b4b4be !important;
+        &:hover {
+            background: #1a1a1e !important;
+        }
+        &.ck-on {
+            background: #222228 !important;
+            color: #ececf0 !important;
+        }
+    }
+
+    // CKEditor editable area
+    .ck-editor__editable,
+    .ck-editor__editable_inline {
+        background: #111113 !important;
+        color: #dddde3 !important;
+        border-color: #28282f !important;
+        &.ck-focused {
+            border-color: #5b6cf0 !important;
+            box-shadow: none !important;
+        }
+    }
+
+    // CKEditor content overrides
+    .ck-content {
+        color: #dddde3 !important;
+
+        h1, h2, h3, h4, h5, h6 {
+            color: #ececf0 !important;
+        }
+
+        h2 {
+            border-bottom-color: #28282f !important;
+        }
+
+        hr {
+            background: #28282f !important;
+        }
+
+        a {
+            color: #818cf8 !important;
+        }
+
+        blockquote {
+            border-left-color: #28282f !important;
+            color: #8a8a96 !important;
+        }
+
+        code {
+            background: #1a1a1e !important;
+            color: #c084fc !important;
+        }
+
+        pre {
+            background: #0c0c0e !important;
+            border-color: #28282f !important;
+            color: #dddde3 !important;
+        }
+
+        table {
+            td, th {
+                border-color: #28282f !important;
+            }
+            th {
+                background: #161619 !important;
+                color: #ececf0 !important;
+            }
+        }
+    }
+
+    // CKEditor dropdown / panel
+    .ck.ck-dropdown__panel,
+    .ck.ck-list {
+        background: #161619 !important;
+        border-color: #28282f !important;
+    }
+    .ck.ck-list__item .ck-button {
+        color: #b4b4be !important;
+        &:hover {
+            background: #1a1a1e !important;
+        }
+    }
+
+    // CKEditor placeholder
+    .ck.ck-placeholder::before {
+        color: #505060 !important;
+    }
+
+    // CKEditor root border
+    .ck.ck-editor__main > .ck-editor__editable:not(.ck-focused) {
+        border-color: #28282f !important;
+    }
+}

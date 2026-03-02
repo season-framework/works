@@ -52,9 +52,9 @@ div(class="h-full overflow-y-auto")
                     //- 검색
                     div
                         label(class="text-xs font-medium text-neutral-500 uppercase tracking-wider") 위키 제목
-                        div(class="relative mt-1.5")
+                        div(class="relative mt-1.5 border border-neutral-200 rounded-md transition-colors focus-within:ring-2 focus-within:ring-blue-500/20 focus-within:border-blue-400")
                             i(class="ti ti-search absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 text-base")
-                            input(type="text", class="w-full pl-9 pr-3 py-2 text-sm border border-neutral-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 placeholder-neutral-400 transition-colors", placeholder="검색어 입력", [(ngModel)]="search.text", (keyup.enter)="load()")
+                            input(type="text", class="w-full pl-9 pr-3 py-2 text-sm border-0 bg-transparent focus:outline-none placeholder-neutral-400", placeholder="검색어 입력", [(ngModel)]="search.text", (keyup.enter)="load()")
 
                     //- 공개 범위
                     div

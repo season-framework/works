@@ -117,9 +117,9 @@ div(class="relative w-full h-full")
                 div(class="ml-auto flex items-center gap-3")
                     span(class="text-xs text-neutral-400") 총 {{boardData.total}}건
                     div(class="relative")
-                        div(class="flex items-center border border-neutral-200 rounded-md bg-white overflow-hidden", [class.border-blue-400]="boardData.searchFocused")
+                        div(class="flex items-center border border-neutral-200 rounded-md bg-white overflow-hidden transition-colors focus-within:border-blue-400")
                             i(class="ti ti-search text-neutral-400 pl-2.5 text-sm")
-                            input(class="w-40 h-7 text-xs px-2 border-0 bg-transparent focus:outline-none placeholder-neutral-400", placeholder="제목 검색", [(ngModel)]="boardData.keyword", (keyup.enter)="boardSearch()", (focus)="boardData.searchFocused = true", (blur)="boardData.searchFocused = false")
+                            input(class="w-40 h-7 text-xs px-2 border-0 bg-transparent focus:outline-none placeholder-neutral-400", placeholder="제목 검색", [(ngModel)]="boardData.keyword", (keyup.enter)="boardSearch()")
                             button(class="px-2 h-7 text-neutral-400 hover:text-neutral-600 transition-colors", *ngIf="boardData.keyword", (click)="boardClearSearch()")
                                 i(class="ti ti-x text-xs")
 

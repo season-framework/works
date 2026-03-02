@@ -19,6 +19,7 @@ export class Component implements OnInit, OnDestroy {
     public showClosedProjects: boolean = false;
     public myOnly: boolean = false;
     public currentUserId: string = '';
+    public showFilterSidebar: boolean = false;
 
     // 드래그앤드롭
     public draggedEvent: any = null;

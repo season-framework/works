@@ -3,9 +3,9 @@ div(class="w-full h-full overflow-hidden flex mx-auto bg-white max-sm:flex-col")
     div(class="w-[340px] h-full overflow-hidden flex flex-col border-r border-neutral-200 max-sm:w-full max-sm:flex-1 max-2xl:w-72 min-h-0", [ngClass]="tab == 'issue'?'max-sm:hidden':''")
         //- 검색 바
         div(class="flex items-center gap-2 px-3 py-2.5 bg-neutral-50 border-b border-neutral-200")
-            div(class="relative flex-1")
+            div(class="relative flex-1 border border-neutral-200 rounded-md transition-colors focus-within:ring-2 focus-within:ring-blue-500/20 focus-within:border-blue-400")
                 i(class="ti ti-search absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 text-base")
-                input(type="text", class="w-full pl-9 pr-3 py-1.5 text-sm border border-neutral-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 placeholder-neutral-400 transition-colors", [(ngModel)]="searchText", placeholder="검색어 입력", (ngModelChange)="changed()")
+                input(type="text", class="w-full pl-9 pr-3 py-1.5 text-sm border-0 bg-transparent focus:outline-none placeholder-neutral-400", [(ngModel)]="searchText", placeholder="검색어 입력", (ngModelChange)="changed()")
             button(class="shrink-0 p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors", (click)="load(true, 1)", aria-label="새로고침")
                 i(class="ti ti-refresh text-base")
 

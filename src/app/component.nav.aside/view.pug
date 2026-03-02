@@ -83,9 +83,9 @@ div(class="flex flex-col max-sm:flex-row max-sm:flex-wrap h-screen max-sm:h-auto
                     //- 드롭다운 패널 (fixed로 overflow 클리핑 회피)
                     div(class="fixed bg-white border border-neutral-200 rounded-lg shadow-lg overflow-hidden z-[9999] w-[320px]", *ngIf="projectSwitcher.open", [ngStyle]="projectSwitcher.panelStyle")
                         div(class="px-2.5 pt-2.5 pb-2")
-                            div(class="flex items-center border border-neutral-200 rounded-md bg-neutral-50 overflow-hidden", [class.border-blue-400]="projectSwitcher.searchFocused")
+                            div(class="flex items-center border border-neutral-200 rounded-md bg-neutral-50 overflow-hidden transition-colors focus-within:border-blue-400")
                                 i(class="ti ti-search text-neutral-400 pl-2 text-sm")
-                                input(class="w-full h-8 text-sm px-2 border-0 bg-transparent focus:outline-none placeholder-neutral-400", placeholder="프로젝트 검색", [(ngModel)]="projectSwitcher.keyword", (click)="$event.stopPropagation()", (focus)="projectSwitcher.searchFocused = true", (blur)="projectSwitcher.searchFocused = false", (keydown)="onSwitcherKeydown($event)", (input)="onSwitcherInput()")
+                                input(class="w-full h-8 text-sm px-2 border-0 bg-transparent focus:outline-none placeholder-neutral-400", placeholder="프로젝트 검색", [(ngModel)]="projectSwitcher.keyword", (click)="$event.stopPropagation()", (keydown)="onSwitcherKeydown($event)", (input)="onSwitcherInput()")
                         div(class="max-h-80 overflow-y-auto project-switcher-list")
                             ng-container(*ngIf="filteredProjects().length === 0")
                                 div(class="px-3 py-4 text-center text-xs text-neutral-400") 프로젝트가 없습니다

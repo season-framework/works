@@ -158,6 +158,26 @@ code {
     }
 }
 
+// ── CKEditor Works Dark Mode (wrapper-specific) ──
+[data-theme="dark"] {
+    .ck-editor-noborder {
+        .ck-toolbar {
+            background: transparent !important;
+            border-color: transparent !important;
+        }
+        .ck-editor__editable_inline {
+            background: transparent !important;
+        }
+    }
+
+    .ck-editor-works {
+        .ck-editor__editable_inline {
+            background: #111113 !important;
+            color: #dddde3 !important;
+        }
+    }
+}
+
 .badge {
     color: #fff;
 }

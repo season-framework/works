@@ -41,6 +41,7 @@ export class Component implements OnInit, OnDestroy {
 
     // 필터
     public showMyOnly: boolean = false;
+    public showFilterSidebar: boolean = false;
 
     // 드래그앤드롭
     public draggedEvent: any = null;
