@@ -69,3 +69,5 @@
 | 2026-03-02 | 010 | SAML SSO 설정 오류 수정 (config None 방어/DB fallback) | [상세](devlog/2026-03-02/010-saml-sso-config-fix.md) |
 | 2026-03-02 | 011 | SSO 로그인 후 세션 미생성 버그 수정 (함수명 불일치) | [상세](devlog/2026-03-02/011-saml-acs-function-name-fix.md) |
 | 2026-03-02 | 012 | 대시보드 크로스 프로젝트 캘린더 위젯 추가 | [상세](devlog/2026-03-02/012-dashboard-calendar-widget.md) |
+| 2026-03-02 | 013 | 이슈보드 검색 기능 추가 (칸반/게시판 공통) | [상세](devlog/2026-03-02/013-issueboard-search.md) |
+| 2026-03-02 | 014 | 다크 배경 Input 포커스 스타일 개선 | [상세](devlog/2026-03-02/014-dark-input-focus-fix.md) |

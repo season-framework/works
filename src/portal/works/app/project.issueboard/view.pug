@@ -207,7 +207,7 @@ div(class="relative w-full h-full")
                 div(class="cursor-pointer min-w-44 px-3 py-2 text-sm hover:bg-neutral-800 rounded-md transition-colors", *ngIf="searchMember(member, memberSearchText)", (click)="searchByMember(member)")
                     span {{member.meta.name}}
             div(class="min-w-44 px-3 py-2")
-                input(class="flex items-center w-full h-7 text-xs bg-neutral-800 rounded-md px-2 text-white placeholder-neutral-400 border-0 focus:outline-none focus:ring-1 focus:ring-neutral-600", placeholder="사용자 검색", [(ngModel)]="memberSearchText")
+                input(class="flex items-center w-full h-7 text-xs bg-neutral-800 rounded-md px-2 text-white placeholder-neutral-400 border-0 outline-none focus:outline-none focus:ring-0 focus:shadow-none", placeholder="사용자 검색", [(ngModel)]="memberSearchText")
             div(class="flex justify-end pr-5")
                 div(class="size-3 -mb-[6px] rotate-45 bg-neutral-900")
 
@@ -236,6 +236,18 @@ div(class="relative w-full h-full")
             //- 멤버 조회
             div(class="cursor-pointer bg-neutral-900 rounded-lg text-center text-white border border-neutral-700 px-3.5 transition-all hover:bg-neutral-800 text-sm shadow-lg h-9 flex items-center justify-center", (click)="selectMember()")
                 span {{memberSearch ? '조회 취소' : '멤버 조회'}}
+
+        //- 검색 입력란
+        div(class="flex items-center bg-neutral-900 rounded-lg border border-neutral-700 shadow-lg h-9 mt-2 overflow-hidden transition-colors focus-within:border-neutral-500")
+            i(class="ti ti-search text-neutral-400 pl-3 text-sm")
+            input(class="flex-1 h-full text-sm px-2 bg-transparent text-white placeholder-neutral-400 border-0 outline-none focus:outline-none focus:ring-0 focus:shadow-none",
+                placeholder="이슈 검색",
+                [(ngModel)]="searchKeyword",
+                (keyup.enter)="onSearchKeyword()")
+            button(class="px-2.5 h-full text-neutral-400 hover:text-white transition-colors",
+                *ngIf="searchKeyword",
+                (click)="clearSearchKeyword()")
+                i(class="ti ti-x text-sm")
 
 ng-container(*ngIf="issue.modal > 0")
     wiz-portal-works-project-issueboard-issue([issue]="issue", class="overflow-hidden")

@@ -299,9 +299,17 @@ export class Component implements OnInit, OnDestroy {
         if (!issue) return true;
         // 상태 필터 적용
         if (this.statusFilter) {
-            return issue.status === this.statusFilter;
+            if (issue.status !== this.statusFilter) return false;
+        } else {
+            if (!["open", "work", "finish", "noti", "event"].includes(issue.status)) return false;
         }
-        return ["open", "work", "finish", "noti", "event"].includes(issue.status);
+        // 검색어 필터 적용 (칸반 모드 클라이언트 사이드)
+        if (this.searchKeyword) {
+            const keyword = this.searchKeyword.toLowerCase();
+            const title = (issue.title || '').toLowerCase();
+            if (!title.includes(keyword)) return false;
+        }
+        return true;
     }
 
     public async loadIssue(issueId: any) {
@@ -341,6 +349,28 @@ export class Component implements OnInit, OnDestroy {
     public targetMember: any = null;
     public memberSearch: boolean = false;
     public memberSearchText: string = '';
+
+    // ===== 이슈 검색 (칸반/게시판 공통) =====
+    public searchKeyword: string = '';
+
+    public async onSearchKeyword() {
+        if (this.viewMode === 'board') {
+            this.boardData.keyword = this.searchKeyword;
+            this.boardData.page = 1;
+            await this.loadBoardData();
+        }
+        await this.service.render();
+    }
+
+    public async clearSearchKeyword() {
+        this.searchKeyword = '';
+        if (this.viewMode === 'board') {
+            this.boardData.keyword = '';
+            this.boardData.page = 1;
+            await this.loadBoardData();
+        }
+        await this.service.render();
+    }
 
     // ===== 상태 필터 (칸반/게시판 공통) =====
     public statusFilter: string = '';
@@ -424,6 +454,8 @@ export class Component implements OnInit, OnDestroy {
             } else {
                 this.boardData.status = 'active';
             }
+            // 검색어 동기화
+            this.boardData.keyword = this.searchKeyword;
             this.boardData.page = 1;
             await this.loadBoardData();
         }
@@ -502,12 +534,14 @@ export class Component implements OnInit, OnDestroy {
     }
 
     public async boardSearch() {
+        this.searchKeyword = this.boardData.keyword;
         this.boardData.page = 1;
         await this.loadBoardData();
     }
 
     public async boardClearSearch() {
         this.boardData.keyword = '';
+        this.searchKeyword = '';
         this.boardData.page = 1;
         await this.loadBoardData();
     }
