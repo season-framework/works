@@ -66,3 +66,6 @@
 | 2026-03-02 | 007 | 프로젝트 캘린더 카테고리 편집 즉시 반영 수정 + 인스트럭션 9.11 등록 | [상세](devlog/2026-03-02/007-calendar-category-render-fix.md) |
 | 2026-03-02 | 008 | 프로젝트 캘린더 카테고리/모달 UI 개선 | [상세](devlog/2026-03-02/008-calendar-category-modal-ui.md) |
 | 2026-03-02 | 009 | 프로젝트 캘린더 카테고리 드래그앤드롭 순서 변경 기능 | [상세](devlog/2026-03-02/009-calendar-category-reorder.md) |
+| 2026-03-02 | 010 | SAML SSO 설정 오류 수정 (config None 방어/DB fallback) | [상세](devlog/2026-03-02/010-saml-sso-config-fix.md) |
+| 2026-03-02 | 011 | SSO 로그인 후 세션 미생성 버그 수정 (함수명 불일치) | [상세](devlog/2026-03-02/011-saml-acs-function-name-fix.md) |
+| 2026-03-02 | 012 | 대시보드 크로스 프로젝트 캘린더 위젯 추가 | [상세](devlog/2026-03-02/012-dashboard-calendar-widget.md) |

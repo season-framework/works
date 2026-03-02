@@ -26,6 +26,103 @@ div(class="flex-1 min-h-0 overflow-y-auto")
                     div(class="text-2xl font-bold text-green-600") {{issues.counts.finish}}
                     div(class="text-xs text-neutral-500 mt-1") 완료
 
+            //- ═══════════════════════════════════════════════
+            //- 내 캘린더 섹션 (전체 너비)
+            //- ═══════════════════════════════════════════════
+            div(class="mb-4")
+                div(class="bg-white rounded-lg border border-neutral-200 overflow-hidden")
+                    //- 헤더
+                    div(class="flex items-center justify-between px-5 py-4 border-b border-neutral-200")
+                        div(class="flex items-center gap-2")
+                            i(class="ti ti-calendar-event text-[18px] text-neutral-400")
+                            span(class="text-base font-medium text-neutral-800") 내 일정
+                        div(class="flex items-center gap-2")
+                            button(type="button",
+                                class="p-1 rounded hover:bg-neutral-100 text-neutral-400 hover:text-neutral-600 transition-colors",
+                                (click)="calPrev()")
+                                i(class="ti ti-chevron-left text-[16px]")
+                            span(class="text-sm font-medium text-neutral-700 min-w-[100px] text-center") {{calMonthLabel()}}
+                            button(type="button",
+                                class="p-1 rounded hover:bg-neutral-100 text-neutral-400 hover:text-neutral-600 transition-colors",
+                                (click)="calNext()")
+                                i(class="ti ti-chevron-right text-[16px]")
+                            button(type="button",
+                                class="ml-1 px-2 py-1 rounded text-xs text-neutral-500 hover:bg-neutral-100 transition-colors",
+                                (click)="calToday()") 오늘
+
+                    //- 캘린더 그리드
+                    div(class="p-4")
+                        //- 로딩
+                        ng-container(*ngIf="calLoading")
+                            div(class="flex items-center justify-center py-8")
+                                div(class="animate-spin rounded-full h-6 w-6 border-2 border-neutral-300 border-t-blue-500")
+
+                        ng-container(*ngIf="!calLoading")
+                            //- 요일 헤더
+                            div(class="grid grid-cols-7 mb-1")
+                                div(class="text-center text-xs font-medium text-red-400 py-1") 일
+                                div(class="text-center text-xs font-medium text-neutral-400 py-1") 월
+                                div(class="text-center text-xs font-medium text-neutral-400 py-1") 화
+                                div(class="text-center text-xs font-medium text-neutral-400 py-1") 수
+                                div(class="text-center text-xs font-medium text-neutral-400 py-1") 목
+                                div(class="text-center text-xs font-medium text-neutral-400 py-1") 금
+                                div(class="text-center text-xs font-medium text-blue-400 py-1") 토
+
+                            //- 날짜 그리드
+                            div(*ngFor="let week of calWeeks",
+                                class="grid grid-cols-7")
+                                ng-container(*ngFor="let cell of week; let i = index")
+                                    div(class="relative min-h-[72px] border-t border-neutral-100 p-1 cursor-pointer hover:bg-neutral-50 transition-colors",
+                                        [class.bg-blue-50]="calSelectedDate === cell.date && cell.isCurrentMonth",
+                                        (click)="selectDate(cell)")
+                                        //- 날짜 숫자
+                                        ng-container(*ngIf="cell.isCurrentMonth")
+                                            div(class="flex items-center justify-center")
+                                                span(class="text-xs w-6 h-6 flex items-center justify-center rounded-full",
+                                                    [class.bg-blue-500]="cell.isToday",
+                                                    [class.text-white]="cell.isToday",
+                                                    [class.font-bold]="cell.isToday",
+                                                    [class.text-red-400]="i === 0 && !cell.isToday",
+                                                    [class.text-blue-400]="i === 6 && !cell.isToday",
+                                                    [class.text-neutral-600]="i > 0 && i < 6 && !cell.isToday") {{cell.day}}
+                                            //- 이벤트 도트
+                                            div(class="mt-1 space-y-0.5 overflow-hidden", style="max-height: 42px")
+                                                ng-container(*ngFor="let ev of cell.events; let ei = index")
+                                                    ng-container(*ngIf="ei < 3")
+                                                        div(class="flex items-center gap-1 px-0.5")
+                                                            div(class="w-1.5 h-1.5 rounded-full shrink-0",
+                                                                [ngStyle]="{'background-color': calEventColor(ev)}")
+                                                            span(class="text-[10px] text-neutral-600 truncate leading-tight") {{ev.title}}
+                                                ng-container(*ngIf="cell.events.length > 3")
+                                                    div(class="text-[10px] text-neutral-400 px-0.5") +{{cell.events.length - 3}}
+
+                            //- 선택된 날짜 일정 상세
+                            ng-container(*ngIf="calSelectedDate")
+                                div(class="mt-3 border-t border-neutral-200 pt-3")
+                                    div(class="flex items-center gap-2 mb-2")
+                                        span(class="text-sm font-medium text-neutral-700") {{calSelectedDate}}
+                                        span(class="text-xs text-neutral-400") {{calSelectedEvents.length}}건
+                                    ng-container(*ngIf="calSelectedEvents.length === 0")
+                                        div(class="text-sm text-neutral-400 py-4 text-center") 일정이 없습니다
+                                    div(class="space-y-2")
+                                        ng-container(*ngFor="let ev of calSelectedEvents")
+                                            div(class="flex items-start gap-3 p-3 bg-neutral-50 rounded-lg hover:bg-neutral-100 transition-colors cursor-pointer",
+                                                [routerLink]="'/project/' + ev.project_namespace + '/calendar'")
+                                                div(class="w-1 h-full min-h-[36px] rounded-full shrink-0 mt-0.5",
+                                                    [ngStyle]="{'background-color': calEventColor(ev)}")
+                                                div(class="flex-1 min-w-0")
+                                                    div(class="flex items-center gap-2")
+                                                        span(class="text-sm font-medium text-neutral-800 truncate") {{ev.title}}
+                                                        ng-container(*ngIf="ev.all_day")
+                                                            span(class="text-[10px] bg-neutral-200 text-neutral-500 rounded px-1") 종일
+                                                    div(class="flex items-center gap-2 mt-1 text-xs text-neutral-400")
+                                                        span(class="truncate max-w-[120px]") {{ev.project_title}}
+                                                        ng-container(*ngIf="ev.category")
+                                                            span ·
+                                                            span {{ev.category.name}}
+                                                        span ·
+                                                        span {{calFormatDateRange(ev)}}
+
             div(class="grid gap-4 grid-cols-1 md:grid-cols-2")
                 //- 내 프로젝트 섹션
                 div(class="bg-white rounded-lg border border-neutral-200 overflow-hidden")

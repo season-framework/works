@@ -103,16 +103,22 @@ class Config(BaseConfig):
     }
 
     def __getattr__(self, attr):
-        """DB(system_config) 우선 조회, 없으면 season.py fallback."""
+        """DB(system_config) 우선 조회, 없으면 season.py fallback.
+        dict.get()으로 직접 조회하여 stdClass.__getattr__ → self.get() 재귀 방지."""
         if attr in Config.DB_KEY_MAP:
             category, key_name = Config.DB_KEY_MAP[attr]
-            # season.py 기본값 (BaseConfig 경유)
-            file_val = super(Config, self).__getattr__(attr)
+            # season.py 기본값 (dict에서 직접 조회하여 재귀 방지)
+            file_val = dict.get(self, attr)
+            if attr in Config.DEFAULT_VALUES:
+                _type, _default = Config.DEFAULT_VALUES[attr]
+                if file_val is None:
+                    file_val = _default
+                if _type is not None and file_val is not None:
+                    file_val = _type(file_val)
             try:
                 sys_config = wiz.model("portal/season/system_config")
                 db_val = sys_config.get(category, key_name)
                 if db_val is not None:
-                    # DEFAULT_VALUES 타입 적용
                     if attr in Config.DEFAULT_VALUES:
                         _type, _ = Config.DEFAULT_VALUES[attr]
                         if _type is not None:
@@ -121,14 +127,22 @@ class Config(BaseConfig):
             except:
                 pass
             return file_val
-        return super(Config, self).__getattr__(attr)
+        # Non-DB_KEY_MAP: dict에서 직접 조회 + DEFAULT_VALUES 적용 (재귀 방지)
+        val = dict.get(self, attr)
+        if attr in self.DEFAULT_VALUES:
+            _type, _default = self.DEFAULT_VALUES[attr]
+            if val is None:
+                val = _default
+            if _type is not None and val is not None:
+                val = _type(val)
+        return val
 
     def __getitem__(self, key):
         """dict 스타일 접근도 DB 조회 경유."""
         return self.__getattr__(key)
 
     def get(self, key, default=None):
-        """get() 호출도 DB 조회 경유."""
+        """get() 호출도 DB 조회 경유. dict.get 대신 __getattr__로 DB fallback 적용."""
         try:
             val = self.__getattr__(key)
             if val is None:

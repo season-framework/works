@@ -67,7 +67,6 @@ class Process:
                 outstanding={request_id: dict()},
             )
         except:
-            print("[process] expired response")
             wiz.response.abort(401)
 
         attributes = authn_response.get_identity()

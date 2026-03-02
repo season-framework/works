@@ -25,14 +25,10 @@ if wiz.request.match(f"{BASEURI}/login") is not None:
 BASE = "/auth"
 uri = wiz.request.uri()[len(BASE):]
 if uri.startswith("/"): uri = uri[1:]
+
 if config.auth_saml_use:
     struct = wiz.model("portal/saml/struct")
     if uri == "saml/acs":
-        # import logging
-        # import sys
-        # logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
-        # logging.getLogger('saml2').setLevel(logging.DEBUG)
-
         SAMLResponse = wiz.request.query("SAMLResponse", True)
         struct.process.acs(SAMLResponse)
     elif uri == "saml/sls":

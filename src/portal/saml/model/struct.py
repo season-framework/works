@@ -40,14 +40,21 @@ class Struct:
         return client
 
     def config_from_db(self):
-        orm = wiz.model("portal/season/orm")
-        db = orm.use("saml_sp_config", module="saml")
-        rows = db.rows()
+        try:
+            orm = wiz.model("portal/season/orm")
+            db = orm.use("saml_sp_config", module="saml")
+            rows = db.rows()
+        except Exception as e:
+            raise Exception(f"SAML SP 설정 DB 조회 실패: {str(e)}")
+
         to_json = ["NameIDFormat", "required_attributes", "optional_attributes", "contact", "org"]
         to_boolean = ["AuthnRequestSigned", "WantAssertionsSigned"]
         config = dict()
         for row in rows:
             config[row["key"]] = row["value"]
+
+        if not config:
+            raise Exception("SAML SP 설정이 DB에 없습니다. 관리자 페이지에서 SP 설정을 먼저 등록하세요.")
 
         # to json
         for key in to_json:
@@ -67,16 +74,24 @@ class Struct:
     def config(self, key=None):
         xmlsec_path = get_xmlsec_binary(["/usr/bin/xmlsec1"])
         season_config = wiz.model("portal/season/config")
-        saml_mode = season_config.get("saml_mode", "config") # config / db
+        saml_mode = season_config.get("saml_mode", "db") # config / db
+
+        saml_config = None
         if saml_mode == "config":
             saml_config = wiz.config("season").get("saml")
-        else: # db
+
+        # config 모드에서 설정을 찾지 못했으면 DB fallback
+        if saml_config is None:
             saml_config = self.config_from_db()
+
+        if saml_config is None:
+            raise Exception("SAML 설정을 찾을 수 없습니다. season.py의 saml dict 또는 DB saml_sp_config 테이블을 확인하세요.")
+
         saml_config = stdClass(saml_config)
 
         origin = self.base_domain
-        acs_endpoint = saml_config.get("acs", '/auth/saml/acs')
-        sls_endpoint = saml_config.get("sls", '/auth/saml/acs')
+        acs_endpoint = saml_config.get("acs", '/saml/acs')
+        sls_endpoint = saml_config.get("sls", '/saml/sls')
 
         public_key = saml_config.public_key
         if not public_key.startswith("/"): public_key = self.fs.abspath(public_key)

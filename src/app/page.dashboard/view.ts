@@ -18,12 +18,22 @@ export class Component implements OnInit {
     public plans: any[] = [];
     public users: any = {};
 
+    // 캘린더
+    public calYear: number = new Date().getFullYear();
+    public calMonth: number = new Date().getMonth() + 1;
+    public calEvents: any[] = [];
+    public calWeeks: any[][] = [];
+    public calLoading: boolean = false;
+    public calSelectedDate: string = '';
+    public calSelectedEvents: any[] = [];
+
     public async ngOnInit() {
         await this.service.init();
         await this.service.auth.init();
         await this.service.auth.allow(true, '/authenticate');
         await this.service.render();
         await this.load();
+        await this.loadCalendar();
     }
 
     public async load() {
@@ -41,6 +51,149 @@ export class Component implements OnInit {
         this.loaded = true;
         await this.service.render();
     }
+
+    // ── 캘린더 로직 ──
+
+    public async loadCalendar() {
+        this.calLoading = true;
+        await this.service.render();
+        const { code, data } = await wiz.call("my_calendar", { year: this.calYear, month: this.calMonth });
+        if (code == 200) {
+            this.calEvents = data.events || [];
+        } else {
+            this.calEvents = [];
+        }
+        this.buildCalendarGrid();
+        this.calLoading = false;
+        await this.service.render();
+    }
+
+    public buildCalendarGrid() {
+        const year = this.calYear;
+        const month = this.calMonth;
+        const firstDay = new Date(year, month - 1, 1);
+        const lastDay = new Date(year, month, 0);
+        const startDow = firstDay.getDay(); // 0=Sun
+        const totalDays = lastDay.getDate();
+
+        const today = moment().format('YYYY-MM-DD');
+        const weeks: any[][] = [];
+        let week: any[] = [];
+
+        // 이전 달 빈칸
+        for (let i = 0; i < startDow; i++) {
+            week.push({ day: 0, date: '', events: [], isToday: false, isCurrentMonth: false });
+        }
+
+        for (let d = 1; d <= totalDays; d++) {
+            const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+            const dayEvents = this.calEvents.filter(ev => {
+                const evStart = (ev.start || '').substring(0, 10);
+                const evEnd = (ev.end || '').substring(0, 10);
+                return dateStr >= evStart && dateStr <= evEnd;
+            });
+            week.push({
+                day: d,
+                date: dateStr,
+                events: dayEvents,
+                isToday: dateStr === today,
+                isCurrentMonth: true
+            });
+            if (week.length === 7) {
+                weeks.push(week);
+                week = [];
+            }
+        }
+
+        // 남은 빈칸
+        if (week.length > 0) {
+            while (week.length < 7) {
+                week.push({ day: 0, date: '', events: [], isToday: false, isCurrentMonth: false });
+            }
+            weeks.push(week);
+        }
+
+        this.calWeeks = weeks;
+    }
+
+    public async calPrev() {
+        this.calMonth--;
+        if (this.calMonth < 1) {
+            this.calMonth = 12;
+            this.calYear--;
+        }
+        this.calSelectedDate = '';
+        this.calSelectedEvents = [];
+        await this.loadCalendar();
+    }
+
+    public async calNext() {
+        this.calMonth++;
+        if (this.calMonth > 12) {
+            this.calMonth = 1;
+            this.calYear++;
+        }
+        this.calSelectedDate = '';
+        this.calSelectedEvents = [];
+        await this.loadCalendar();
+    }
+
+    public async calToday() {
+        const now = new Date();
+        this.calYear = now.getFullYear();
+        this.calMonth = now.getMonth() + 1;
+        this.calSelectedDate = '';
+        this.calSelectedEvents = [];
+        await this.loadCalendar();
+    }
+
+    public async selectDate(cell: any) {
+        if (!cell.isCurrentMonth) return;
+        if (this.calSelectedDate === cell.date) {
+            this.calSelectedDate = '';
+            this.calSelectedEvents = [];
+        } else {
+            this.calSelectedDate = cell.date;
+            this.calSelectedEvents = cell.events;
+        }
+        await this.service.render();
+    }
+
+    public calMonthLabel(): string {
+        return `${this.calYear}년 ${this.calMonth}월`;
+    }
+
+    public calEventColor(ev: any): string {
+        if (ev.category && ev.category.color) return ev.category.color;
+        if (ev.color) return ev.color;
+        return '#6366f1';
+    }
+
+    public calFormatTime(dateStr: string): string {
+        if (!dateStr) return '';
+        return moment(dateStr).format('HH:mm');
+    }
+
+    public calFormatDateRange(ev: any): string {
+        if (!ev.start) return '';
+        const s = moment(ev.start);
+        const e = ev.end ? moment(ev.end) : null;
+        if (ev.all_day) {
+            if (e && !s.isSame(e, 'day')) {
+                return `${s.format('M/D')} ~ ${e.format('M/D')}`;
+            }
+            return s.format('M월 D일');
+        }
+        if (e && !s.isSame(e, 'day')) {
+            return `${s.format('M/D HH:mm')} ~ ${e.format('M/D HH:mm')}`;
+        }
+        if (e) {
+            return `${s.format('HH:mm')} ~ ${e.format('HH:mm')}`;
+        }
+        return s.format('HH:mm');
+    }
+
+    // ── 기존 유틸리티 ──
 
     public getUserInfo(userId: string) {
         return this.users[userId] || null;
