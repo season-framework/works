@@ -1,12 +1,21 @@
-div(class="w-10/12 md:w-8/12 m-auto text-md mt-2 pt-3 border-t border-gray-300")
-    input.w-full.mb-2(*ngIf="search && list.length > 4", placeholder="Search IdP", [(ngModel)]="text", (ngModelChange)="service.render();")
-    a.flex.flex-row.p-2.mb-1.justify-center.border.border-blue-500.rounded-lg(
-        *ngFor="let item of list",
-        class="hover:bg-blue-100 hover:border-blue-700",
-        [class.hidden]="!filter(item)",
-        href="/saml/login?idp={{item.key}}",
-    )
-        ng-container(*ngIf="item.icon")
-            img.self-center([src]="item.icon", style="max-height: 20px;")
-            .vr.bg-black.mx-1.opacity-50
-        span {{item.display_name}}
+div.w-full
+    input.w-full(*ngIf="search && list.length > 4",
+        placeholder="IdP 검색",
+        [(ngModel)]="text",
+        (ngModelChange)="service.render();",
+        class="px-4 py-4 mb-3 rounded-[14px] bg-zinc-100 text-[15px] text-zinc-900 outline-none",
+        class="transition-all duration-200 placeholder:text-zinc-400",
+        class="focus:bg-white focus:shadow-[0_0_0_2px_#3b82f6,0_1px_3px_rgba(0,0,0,0.06)]",
+        class="hover:bg-[#ececee]")
+    .flex.flex-col.gap-2
+        a.flex.items-center.justify-center.w-full.cursor-pointer.no-underline(
+            *ngFor="let item of list",
+            [class.hidden]="!filter(item)",
+            href="/saml/login?idp={{item.key}}",
+            class="gap-2.5 px-5 py-4 rounded-[14px] border border-zinc-200 bg-white",
+            class="text-[15px] font-medium text-zinc-700",
+            class="transition-all duration-200",
+            class="hover:border-zinc-300 hover:bg-zinc-50 hover:shadow-sm hover:-translate-y-px")
+            ng-container(*ngIf="item.icon")
+                img([src]="item.icon", class="h-5 w-auto object-contain")
+            span {{item.display_name}}

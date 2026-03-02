@@ -75,3 +75,6 @@
 | 2026-03-02 | 016 | 로그인 이력 기록 및 세션 추적 백엔드 로직 구현 | [상세](devlog/2026-03-02/016-login-session-tracking.md) |
 | 2026-03-02 | 017 | 마이페이지 API — 로그인 이력 / 활성 기기 / 강제 로그아웃 | [상세](devlog/2026-03-02/017-mypage-api.md) |
 | 2026-03-02 | 018 | 마이페이지 Notion 스타일 UI 리디자인 + 로그인/기기 UI | [상세](devlog/2026-03-02/018-mypage-ui-redesign.md) |
+| 2026-03-02 | 019 | SSO 로그인 시 활성 기기 미등록 수정 (세션 토큰 발급 추가) | [상세](devlog/2026-03-02/019-sso-session-token-fix.md) |
+| 2026-03-02 | 020 | 로그인 페이지 디자인 리뉴얼 (Split 레이아웃) | [상세](devlog/2026-03-02/020-login-page-redesign.md) |
+| 2026-03-02 | 021 | 로그인 페이지 인풋/버튼 UX 고도화 (Toss/Apple 스타일) | [상세](devlog/2026-03-02/021-login-ux-enhancement.md) |
