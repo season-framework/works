@@ -46,6 +46,9 @@ export class Component implements OnInit, OnDestroy {
     // 드래그앤드롭
     public draggedEvent: any = null;
 
+    // 일별 일정 팝업
+    public dayPopup: any = { show: false, date: '', events: [], style: {} };
+
     public eventForm: any = {
         title: '',
         description: '',
@@ -56,7 +59,8 @@ export class Component implements OnInit, OnDestroy {
         all_day: false,
         color: '#3b82f6',
         category_id: '',
-        attendees: []
+        attendees: [],
+        group_attendees: []
     };
 
     public colors: string[] = [
@@ -68,7 +72,9 @@ export class Component implements OnInit, OnDestroy {
 
     @HostListener('document:keydown.escape')
     public onEscKey() {
-        if (this.showModal) {
+        if (this.dayPopup.show) {
+            this.closeDayPopup();
+        } else if (this.showModal) {
             this.closeModal();
         }
     }
@@ -271,6 +277,33 @@ export class Component implements OnInit, OnDestroy {
         return m ? (m.name || m.email) : userId;
     }
 
+    // ── 그룹 참가자 ──
+
+    public get hasProjectAll(): boolean {
+        return (this.eventForm.group_attendees || []).some((g: any) => g.group_type === 'project_all');
+    }
+
+    public async toggleProjectAll() {
+        if (!this.eventForm.group_attendees) this.eventForm.group_attendees = [];
+        if (this.hasProjectAll) {
+            this.eventForm.group_attendees = this.eventForm.group_attendees.filter((g: any) => g.group_type !== 'project_all');
+        } else {
+            this.eventForm.group_attendees.push({ group_type: 'project_all', group_id: '' });
+        }
+        await this.service.render();
+    }
+
+    public getGroupLabel(g: any): string {
+        if (g.group_type === 'project_all') return '프로젝트 전체';
+        return g.group_type;
+    }
+
+    public removeGroupFromForm(g: any) {
+        this.eventForm.group_attendees = (this.eventForm.group_attendees || []).filter((x: any) =>
+            !(x.group_type === g.group_type && x.group_id === g.group_id)
+        );
+    }
+
     // ── 필터 ──
 
     public toggleMyOnly() {
@@ -292,6 +325,8 @@ export class Component implements OnInit, OnDestroy {
             evts = evts.filter((ev: any) => {
                 if (ev.user_id === myId) return true;
                 if (ev.attendees && ev.attendees.some((a: any) => a.user_id === myId)) return true;
+                if (ev.resolved_attendees && ev.resolved_attendees.some((a: any) => a.user_id === myId)) return true;
+                if (ev.group_attendees && ev.group_attendees.some((g: any) => g.group_type === 'project_all')) return true;
                 return false;
             });
         }
@@ -463,7 +498,8 @@ export class Component implements OnInit, OnDestroy {
             all_day: false,
             color: '#3b82f6',
             category_id: '',
-            attendees: []
+            attendees: [],
+            group_attendees: []
         };
         this.attendeeSearch = '';
         this.showAttendeeDropdown = false;
@@ -485,7 +521,11 @@ export class Component implements OnInit, OnDestroy {
             all_day: this.selectedEvent.all_day,
             color: this.selectedEvent.color || '#3b82f6',
             category_id: this.selectedEvent.category_id || '',
-            attendees: (this.selectedEvent.attendees || []).map((a: any) => a.user_id)
+            attendees: (this.selectedEvent.attendees || []).map((a: any) => a.user_id),
+            group_attendees: (this.selectedEvent.group_attendees || []).map((g: any) => ({
+                group_type: g.group_type,
+                group_id: g.group_id || ''
+            }))
         };
         this.attendeeSearch = '';
         this.showAttendeeDropdown = false;
@@ -527,7 +567,8 @@ export class Component implements OnInit, OnDestroy {
             all_day: form.all_day,
             color: form.color,
             category_id: form.category_id || '',
-            attendees: JSON.stringify(form.attendees || [])
+            attendees: JSON.stringify(form.attendees || []),
+            group_attendees: JSON.stringify(form.group_attendees || [])
         };
 
         let res: any;
@@ -583,4 +624,37 @@ export class Component implements OnInit, OnDestroy {
     }
 
     public dayNames: string[] = ['일', '월', '화', '수', '목', '금', '토'];
+
+    public hasEventGroupAll(ev: any): boolean {
+        return ev.group_attendees && ev.group_attendees.some((g: any) => g.group_type === 'project_all');
+    }
+
+    // ── 일별 일정 팝업 ──
+
+    public openDayPopup(cell: any, event: MouseEvent) {
+        const rect = (event.target as HTMLElement).closest('[class*="min-h-"]')?.getBoundingClientRect();
+        let top = rect ? rect.bottom + 4 : event.clientY;
+        let left = rect ? rect.left : event.clientX;
+
+        // 화면 밖 방지
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+        if (left + 320 > vw) left = vw - 330;
+        if (left < 10) left = 10;
+        if (top + 400 > vh) top = vh - 410;
+        if (top < 10) top = 10;
+
+        this.dayPopup = {
+            show: true,
+            date: cell.date,
+            events: cell.events,
+            style: { top: top + 'px', left: left + 'px' }
+        };
+        this.service.render();
+    }
+
+    public closeDayPopup() {
+        this.dayPopup = { show: false, date: '', events: [], style: {} };
+        this.service.render();
+    }
 }

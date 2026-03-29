@@ -21,6 +21,13 @@ class Model:
         data['favorite'] = 0
         message_id = messagedb.insert(data)
 
+        # 멘션 처리: message 타입이 log가 아닌 경우에만
+        if data.get('type', '') != 'log' and data.get('message', ''):
+            self.issueboard.mention.create_mentions(message_id, issue_id, user_id, data['message'])
+
+        # 새 메시지 → 관련 사용자 읽음 상태 갱신 (안읽음으로 전환)
+        self.issueboard.read.markUnreadForOthers(issue_id, user_id)
+
         self.project.issueboard.issue.updateTime(issue_id)
 
         parent_id = 0
@@ -52,6 +59,9 @@ class Model:
         msg = messagedb.get(id=message_id)
         if msg is not None:
             issue_id = msg['issue_id']
+            # 멘션 업데이트
+            if msg.get('type', '') != 'log' and data.get('message', ''):
+                self.issueboard.mention.update_mentions(message_id, issue_id, user_id, data['message'])
             self.project.issueboard.issue.updateTime(issue_id)
 
         self.project.updateTime()

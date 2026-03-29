@@ -24,9 +24,14 @@ export class Component implements OnInit, OnDestroy {
     // 드래그앤드롭
     public draggedEvent: any = null;
 
+    // 일별 일정 팝업
+    public dayPopup: any = { show: false, date: '', events: [], style: {} };
+
     @HostListener('document:keydown.escape')
     public onEscKey() {
-        if (this.showModal) {
+        if (this.dayPopup.show) {
+            this.closeDayPopup();
+        } else if (this.showModal) {
             this.closeModal();
         }
     }
@@ -111,11 +116,16 @@ export class Component implements OnInit, OnDestroy {
             if (this.myOnly && this.currentUserId) {
                 if (ev.user_id !== this.currentUserId) {
                     const isAttendee = (ev.attendees || []).some((a: any) => a.user_id === this.currentUserId);
-                    if (!isAttendee) return false;
+                    const isGroupMember = (ev.group_attendees || []).some((g: any) => g.group_type === 'project_all');
+                    if (!isAttendee && !isGroupMember) return false;
                 }
             }
             return true;
         });
+    }
+
+    public hasEventGroupAll(ev: any): boolean {
+        return ev.group_attendees && ev.group_attendees.some((g: any) => g.group_type === 'project_all');
     }
 
     // ── 캘린더 그리드 ──
@@ -294,4 +304,33 @@ export class Component implements OnInit, OnDestroy {
     }
 
     public dayNames: string[] = ['일', '월', '화', '수', '목', '금', '토'];
+
+    // ── 일별 일정 팝업 ──
+
+    public openDayPopup(cell: any, event: MouseEvent) {
+        const rect = (event.target as HTMLElement).closest('[class*="min-h-"]')?.getBoundingClientRect();
+        let top = rect ? rect.bottom + 4 : event.clientY;
+        let left = rect ? rect.left : event.clientX;
+
+        // 화면 밖 방지
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+        if (left + 320 > vw) left = vw - 330;
+        if (left < 10) left = 10;
+        if (top + 400 > vh) top = vh - 410;
+        if (top < 10) top = 10;
+
+        this.dayPopup = {
+            show: true,
+            date: cell.date,
+            events: cell.events,
+            style: { top: top + 'px', left: left + 'px' }
+        };
+        this.service.render();
+    }
+
+    public closeDayPopup() {
+        this.dayPopup = { show: false, date: '', events: [], style: {} };
+        this.service.render();
+    }
 }

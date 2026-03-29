@@ -14,3 +14,30 @@ def my_calendar():
     except Exception as e:
         wiz.response.status(500, message=str(e))
     wiz.response.status(200, events=events)
+
+def unread_issues():
+    page = int(wiz.request.query("page", 1))
+    dump = int(wiz.request.query("dump", 20))
+    try:
+        result = Dashboard.unread_issues(limit=dump, page=page)
+    except Exception as e:
+        wiz.response.status(500, message=str(e))
+    wiz.response.status(200, **result)
+
+def all_issues():
+    page = int(wiz.request.query("page", 1))
+    dump = int(wiz.request.query("dump", 20))
+    try:
+        result = Dashboard.all_related_issues(limit=dump, page=page)
+    except Exception as e:
+        wiz.response.status(500, message=str(e))
+    wiz.response.status(200, **result)
+
+def mentioned_issues():
+    page = int(wiz.request.query("page", 1))
+    dump = int(wiz.request.query("dump", 20))
+    try:
+        result = Dashboard.mentioned_issues(limit=dump, page=page)
+    except Exception as e:
+        wiz.response.status(500, message=str(e))
+    wiz.response.status(200, **result)

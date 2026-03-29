@@ -1,0 +1,12 @@
+{
+    "id": "page.notification",
+    "mode": "page",
+    "title": "/notification",
+    "namespace": "notification",
+    "category": "notification",
+    "viewuri": "/notification",
+    "preview": "",
+    "controller": "user",
+    "layout": "layout.aside",
+    "template": "wiz-page-notification()"
+}

@@ -1,9 +1,9 @@
-div(class="h-full flex")
+div(class="h-full flex max-sm:flex-col")
     //- 좌측 관리 네비게이션
-    div(class="w-56 shrink-0 border-r border-neutral-200 bg-neutral-50 flex flex-col")
-        div(class="px-4 py-5")
+    div(class="w-56 shrink-0 max-sm:w-full border-r max-sm:border-r-0 max-sm:border-b border-neutral-200 bg-neutral-50 flex flex-col max-sm:flex-row max-sm:flex-wrap")
+        div(class="px-4 py-5 max-sm:py-3")
             h2(class="text-base font-semibold text-neutral-800") 관리자
-        nav(class="flex-1 px-3", style="display:flex;flex-direction:column;row-gap:2px;")
+        nav(class="flex-1 px-3 max-sm:flex-initial max-sm:flex max-sm:flex-wrap max-sm:gap-1 max-sm:pb-2", style="display:flex;flex-direction:column;row-gap:2px;")
             a(*ngFor="let menu of menus",
                 class="flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors cursor-pointer",
                 [ngClass]="isActive(menu.id) ? 'font-medium text-neutral-900 bg-neutral-200' : 'text-neutral-600 hover:bg-neutral-100'",
@@ -12,8 +12,8 @@ div(class="h-full flex")
                 span {{menu.label}}
 
     //- 우측 콘텐츠 영역
-    div(class="flex-1 overflow-y-auto")
-        div(class="max-w-5xl mx-auto px-8 py-8 space-y-8")
+    div(class="flex-1 min-h-0 overflow-y-auto")
+        div(class="max-w-5xl mx-auto px-4 sm:px-8 py-4 sm:py-8 space-y-6")
             //- 사용자 관리
             ng-container(*ngIf="currentSection === 'user'")
                 wiz-portal-season-admin-user

@@ -18,6 +18,16 @@ export class Component implements OnInit {
     public plans: any[] = [];
     public users: any = {};
 
+    // 안읽은 이슈
+    public unreadIssues: any[] = [];
+    public unreadTotal: number = 0;
+
+    // 활동 통계
+    public issuesByProject: any[] = [];
+    public activityTrend: any[] = [];
+    public maxProjectIssueCount: number = 1;
+    public maxTrendCount: number = 0;
+
     // 캘린더
     public calYear: number = new Date().getFullYear();
     public calMonth: number = new Date().getMonth() + 1;
@@ -47,12 +57,34 @@ export class Component implements OnInit {
             this.meetings = data.meetings || [];
             this.plans = data.plans || [];
             this.users = data.users || {};
+            this.issuesByProject = data.issues_by_project || [];
+            this.activityTrend = data.activity_trend || [];
+            this.maxProjectIssueCount = Math.max(...this.issuesByProject.map((i: any) => i.count), 1);
+            this.maxTrendCount = Math.max(...this.activityTrend.map((i: any) => i.count), 0);
         }
         this.loaded = true;
+        await this.service.render();
+
+        // 안읽은 이슈 로드 (비동기)
+        await this.loadUnreadIssues();
+    }
+
+    public async loadUnreadIssues() {
+        const { code, data } = await wiz.call("unread_issues", { page: 1, dump: 10 });
+        if (code == 200) {
+            this.unreadIssues = data.items || [];
+            this.unreadTotal = data.total || 0;
+        }
         await this.service.render();
     }
 
     // ── 캘린더 로직 ──
+
+    public navigateToIssue(item: any) {
+        if (item.project && item.project.namespace) {
+            this.service.href(`/project/${item.project.namespace}/issueboard/${item.id}`);
+        }
+    }
 
     public async loadCalendar() {
         this.calLoading = true;
@@ -256,6 +288,13 @@ export class Component implements OnInit {
         } catch (e) {
             return false;
         }
+    }
+
+    public trendDayLabel(dateStr: string): string {
+        if (!dateStr) return '';
+        const d = new Date(dateStr);
+        const labels = ['일', '월', '화', '수', '목', '금', '토'];
+        return labels[d.getDay()];
     }
 
     public navigateProject(namespace: string) {

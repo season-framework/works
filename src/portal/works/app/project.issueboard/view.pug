@@ -19,7 +19,7 @@ div(class="relative w-full h-full")
                 div(class="table w-max h-full overflow-hidden")
                     div(class="table h-full w-max overflow-hidden", [sortablejs]="labels", [sortablejsOptions]="config.labelSorted")
                         //- 라벨 컬럼
-                        div(class="table-cell p-0 h-full overflow-hidden border-r border-neutral-200", *ngFor="let label of labels", [ngClass]="labelExtended[label.id] ? 'w-[640px]' : 'w-[320px]'")
+                        div(class="table-cell p-0 h-full overflow-hidden border-r border-neutral-200", *ngFor="let label of labels", [ngClass]="labelExtended[label.id] ? 'w-[640px] max-sm:w-[85vw]' : 'w-[320px] max-sm:w-[85vw]'")
                             div(class="flex flex-col h-full overflow-auto pt-0.5")
                                 //- 컬럼 헤더
                                 div(class="flex h-11 items-center px-4 border-b border-neutral-200 bg-neutral-50/50")
@@ -47,7 +47,7 @@ div(class="relative w-full h-full")
                                     div(class="mt-3", [sortablejs]="label.issues", [sortablejsOptions]="config.issueSorted", [ngClass]="labelExtended[label.id] ? 'grid grid-cols-2 gap-x-3' : ''")
                                         ng-container(*ngFor="let issue_id of label.issues")
                                             div(class="rounded-lg mb-3 max-sm:mb-3", (click)="openIssue(issue_id)", [class.is-loaded]="isLoadedIssue(issue_id)", *ngIf="isSearchedUser(cache.issues[issue_id]) && onProcessIssue(cache.issues[issue_id])")
-                                                wiz-portal-works-widget-project-issueboard-issue([issue]="cache.issues[issue_id]", style="display: block; height: 100%;")
+                                                wiz-portal-works-widget-project-issueboard-issue([issue]="cache.issues[issue_id]", [unread]="unreadMap[issue_id]", style="display: block; height: 100%;")
 
                                     ng-container(*ngIf="label.issues.length > 0")
                                         div(class="my-2 py-2 rounded-md text-center text-sm text-neutral-400 cursor-pointer hover:bg-neutral-100 hover:text-neutral-700 transition-colors", *ngIf="!readOnly", (click)="addIssue(label)")
@@ -65,7 +65,7 @@ div(class="relative w-full h-full")
                                     div(class="issue-closed-items mt-3", *ngIf="hiddenIssues(label.id, 'close').length > 0", [ngClass]="labelExtended[label.id] ? 'grid grid-cols-2 gap-x-3' : ''")
                                         ng-container(*ngFor="let issue_id of hiddenIssues(label.id, 'close')")
                                             div(class="rounded-lg mb-3 max-sm:mb-3", (click)="openIssue(issue_id)", [class.is-loaded]="isLoadedIssue(issue_id)", *ngIf="isSearchedUser(cache.issues[issue_id]) && (!cache.issues[issue_id] || cache.issues[issue_id].status == 'close')")
-                                                wiz-portal-works-widget-project-issueboard-issue([issue]="cache.issues[issue_id]", style="display: block; height: 100%;")
+                                                wiz-portal-works-widget-project-issueboard-issue([issue]="cache.issues[issue_id]", [unread]="unreadMap[issue_id]", style="display: block; height: 100%;")
 
                                     ng-container(*ngIf="!hiddenIssues(label.id, 'close', true).isLastPage && hiddenIssues(label.id, 'close').length > 0")
                                         div(class="my-2 py-2 rounded-md text-center text-sm text-neutral-400 cursor-pointer hover:bg-neutral-100 hover:text-neutral-700 transition-colors", (click)="loadClosed(label)") 더 불러오기
@@ -81,7 +81,7 @@ div(class="relative w-full h-full")
                                     div(class="issue-closed-items mt-3", *ngIf="hiddenIssues(label.id, 'cancel').length > 0", [ngClass]="labelExtended[label.id] ? 'grid grid-cols-2 gap-x-3' : ''")
                                         ng-container(*ngFor="let issue_id of hiddenIssues(label.id, 'cancel')")
                                             div(class="rounded-lg mb-3 max-sm:mb-3", (click)="openIssue(issue_id)", [class.is-loaded]="isLoadedIssue(issue_id)", *ngIf="isSearchedUser(cache.issues[issue_id]) && (!cache.issues[issue_id] || cache.issues[issue_id].status == 'cancel')")
-                                                wiz-portal-works-widget-project-issueboard-issue([issue]="cache.issues[issue_id]", style="display: block; height: 100%;")
+                                                wiz-portal-works-widget-project-issueboard-issue([issue]="cache.issues[issue_id]", [unread]="unreadMap[issue_id]", style="display: block; height: 100%;")
 
                                     ng-container(*ngIf="!hiddenIssues(label.id, 'cancel', true).isLastPage && hiddenIssues(label.id, 'cancel').length > 0")
                                         div(class="my-2 py-2 rounded-md text-center text-sm text-neutral-400 cursor-pointer hover:bg-neutral-100 hover:text-neutral-700 transition-colors", (click)="loadCanceled(label)") 더 불러오기
@@ -108,13 +108,13 @@ div(class="relative w-full h-full")
     ng-container(*ngIf="viewMode === 'board'")
         div(class="absolute inset-0 overflow-y-auto z-[999] px-6 py-4")
             //- 상태 필터 탭 + 검색
-            div(class="flex items-center gap-1 mb-4")
+            div(class="flex items-center gap-1 mb-4 flex-wrap")
                 button(class="px-3 py-1.5 text-sm font-medium rounded-md transition-colors", [ngClass]="boardData.status === 'active' ? 'bg-neutral-900 text-white' : 'text-neutral-500 hover:bg-neutral-100 hover:text-neutral-700'", (click)="boardChangeStatus('active')") 진행중
                 button(class="px-3 py-1.5 text-sm font-medium rounded-md transition-colors", [ngClass]="boardData.status === 'noti' ? 'bg-neutral-900 text-white' : 'text-neutral-500 hover:bg-neutral-100 hover:text-neutral-700'", (click)="boardChangeStatus('noti')") 공지/알림
                 button(class="px-3 py-1.5 text-sm font-medium rounded-md transition-colors", [ngClass]="boardData.status === 'event' ? 'bg-neutral-900 text-white' : 'text-neutral-500 hover:bg-neutral-100 hover:text-neutral-700'", (click)="boardChangeStatus('event')") 일정
                 button(class="px-3 py-1.5 text-sm font-medium rounded-md transition-colors", [ngClass]="boardData.status === 'closed' ? 'bg-neutral-900 text-white' : 'text-neutral-500 hover:bg-neutral-100 hover:text-neutral-700'", (click)="boardChangeStatus('closed')") 종료
                 button(class="px-3 py-1.5 text-sm font-medium rounded-md transition-colors", [ngClass]="boardData.status === 'canceled' ? 'bg-neutral-900 text-white' : 'text-neutral-500 hover:bg-neutral-100 hover:text-neutral-700'", (click)="boardChangeStatus('canceled')") 취소
-                div(class="ml-auto flex items-center gap-3")
+                div(class="ml-auto max-sm:ml-0 max-sm:w-full max-sm:mt-1 flex items-center gap-3")
                     span(class="text-xs text-neutral-400") 총 {{boardData.total}}건
                     div(class="relative")
                         div(class="flex items-center border border-neutral-200 rounded-md bg-white overflow-hidden transition-colors focus-within:border-blue-400")
@@ -156,6 +156,7 @@ div(class="relative w-full h-full")
                                         //- 제목
                                         td(class="py-3 px-4 max-w-[360px]")
                                             div(class="flex items-center gap-2")
+                                                span(class="size-2 rounded-full bg-blue-500 shrink-0", *ngIf="unreadMap[row.id]")
                                                 i(class="ti ti-alert-circle text-red-500", *ngIf="row.level == 2")
                                                 i(class="ti ti-speakerphone text-red-500", *ngIf="row.level == 3")
                                                 span(class="font-medium text-neutral-800 truncate", [class.text-red-600]="row.level > 1") {{row.title}}
@@ -237,17 +238,24 @@ div(class="relative w-full h-full")
             div(class="cursor-pointer bg-neutral-900 rounded-lg text-center text-white border border-neutral-700 px-3.5 transition-all hover:bg-neutral-800 text-sm shadow-lg h-9 flex items-center justify-center", (click)="selectMember()")
                 span {{memberSearch ? '조회 취소' : '멤버 조회'}}
 
-        //- 검색 입력란
-        div(class="flex items-center bg-neutral-900 rounded-lg border border-neutral-700 shadow-lg h-9 mt-2 overflow-hidden transition-colors focus-within:border-neutral-500")
-            i(class="ti ti-search text-neutral-400 pl-3 text-sm")
-            input(class="flex-1 h-full text-sm px-2 bg-transparent text-white placeholder-neutral-400 border-0 outline-none focus:outline-none focus:ring-0 focus:shadow-none",
-                placeholder="이슈 검색",
-                [(ngModel)]="searchKeyword",
-                (keyup.enter)="onSearchKeyword()")
-            button(class="px-2.5 h-full text-neutral-400 hover:text-white transition-colors",
-                *ngIf="searchKeyword",
-                (click)="clearSearchKeyword()")
-                i(class="ti ti-x text-sm")
+        //- 검색 + 안읽음 필터
+        div(class="flex items-center gap-2 mt-2")
+            div(class="flex-1 flex items-center bg-neutral-900 rounded-lg border border-neutral-700 shadow-lg h-9 overflow-hidden transition-colors focus-within:border-neutral-500")
+                i(class="ti ti-search text-neutral-400 pl-3 text-sm")
+                input(class="flex-1 h-full text-sm px-2 bg-transparent text-white placeholder-neutral-400 border-0 outline-none focus:outline-none focus:ring-0 focus:shadow-none",
+                    placeholder="이슈 검색",
+                    [(ngModel)]="searchKeyword",
+                    (keyup.enter)="onSearchKeyword()")
+                button(class="px-2.5 h-full text-neutral-400 hover:text-white transition-colors",
+                    *ngIf="searchKeyword",
+                    (click)="clearSearchKeyword()")
+                    i(class="ti ti-x text-sm")
+            button(class="flex items-center gap-1.5 bg-neutral-900 rounded-lg border shadow-lg h-9 px-3 shrink-0 transition-all text-sm",
+                [ngClass]="showUnreadOnly ? 'border-blue-500 text-blue-400' : 'border-neutral-700 text-neutral-400 hover:text-white'",
+                (click)="toggleUnreadOnly()",
+                title="안읽은 이슈만 보기")
+                span(class="size-2 rounded-full shrink-0", [ngClass]="showUnreadOnly ? 'bg-blue-400' : 'bg-neutral-500'")
+                span(class="max-sm:hidden whitespace-nowrap") 안읽음
 
 ng-container(*ngIf="issue.modal > 0")
     wiz-portal-works-project-issueboard-issue([issue]="issue", class="overflow-hidden")

@@ -23,3 +23,4 @@ class Model(base):
     updated = pw.DateTimeField(index=True)
     todo = base.JSONArray()
     worker = base.JSONArray()
+    attachment = base.JSONArray()

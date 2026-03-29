@@ -9,6 +9,8 @@ export class Component implements OnInit {
         public project: Project,
     ) { }
 
+    public profileImage: string = '';
+
     // 프로젝트 스위칭 드롭다운
     public projectSwitcher: any = {
         open: false,
@@ -21,6 +23,17 @@ export class Component implements OnInit {
     public async ngOnInit() {
         await this.service.init();
         await this.loadMyProjects();
+        await this.loadProfileImage();
+    }
+
+    public async loadProfileImage() {
+        try {
+            const { code, data } = await wiz.call('profile_image');
+            if (code === 200 && data?.image) {
+                this.profileImage = data.image;
+                await this.service.render();
+            }
+        } catch (e) { }
     }
 
     @HostListener('document:click', ['$event'])

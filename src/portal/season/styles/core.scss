@@ -59,6 +59,11 @@ iframe {
             transparent);
 }
 
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--wc-scroll-thumb) var(--wc-scroll-background);
+}
+
 .border-bottom {
     border-bottom: 1px solid var(--wc-border);
 }

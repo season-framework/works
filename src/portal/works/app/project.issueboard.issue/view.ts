@@ -61,6 +61,17 @@ export class Component implements OnInit {
         tab: 'info'
     };
 
+    // 멘션 관련 상태
+    public mention: any = {
+        active: false,
+        keyword: '',
+        members: [],
+        filtered: [],
+        selectedIndex: 0
+    };
+
+    public isComposing: boolean = false;
+
     public shortcuts: any = [];
     public messageEvent: any = {};
 
@@ -120,10 +131,49 @@ export class Component implements OnInit {
                 await this.sendMessage();
             }, { priority: 'high' });
 
-            // this.editor.message.keystrokes.set('Shift+Space', async (event, cancel) => {
-            //     event.preventDefault();
-            //     await this.sendMessage();
-            // }, { priority: 'high' });
+            // 멘션 멤버 목록 초기화
+            await this.loadMentionMembers();
+
+            // IME 조합 상태 추적 (한글 등)
+            const editableEl = this.editor.message.editing.view.getDomRoot();
+            if (editableEl) {
+                editableEl.addEventListener('compositionstart', () => {
+                    this.isComposing = true;
+                });
+                editableEl.addEventListener('compositionend', () => {
+                    this.isComposing = false;
+                    setTimeout(() => this.checkMentionTrigger(), 0);
+                });
+            }
+
+            // CKEditor 입력 감지 — @ 멘션 트리거 (IME 조합 중 스킵)
+            this.editor.message.model.document.on('change:data', () => {
+                if (!this.isComposing) this.checkMentionTrigger();
+            });
+
+            // Esc/Enter/위/아래 키 핸들링 (멘션 드롭다운)
+            this.editor.message.editing.view.document.on('keydown', (evt, data) => {
+                if (!this.mention.active) return;
+                if (data.keyCode === 27) { // Esc
+                    data.preventDefault();
+                    evt.stop();
+                    this.closeMention();
+                } else if (data.keyCode === 13) { // Enter
+                    data.preventDefault();
+                    evt.stop();
+                    this.selectMentionMember(this.mention.filtered[this.mention.selectedIndex]);
+                } else if (data.keyCode === 38) { // Up
+                    data.preventDefault();
+                    evt.stop();
+                    this.mention.selectedIndex = Math.max(0, this.mention.selectedIndex - 1);
+                    this.service.render();
+                } else if (data.keyCode === 40) { // Down
+                    data.preventDefault();
+                    evt.stop();
+                    this.mention.selectedIndex = Math.min(this.mention.filtered.length - 1, this.mention.selectedIndex + 1);
+                    this.service.render();
+                }
+            }, { priority: 'highest' });
         }
 
         let self = this;
@@ -190,9 +240,11 @@ export class Component implements OnInit {
                 status: 'open',
                 planstart: moment().format("YYYY-MM-DD"),
                 todo: [],
-                worker: []
+                worker: [],
+                attachment: []
             };
         }
+        if (!this.data.info.attachment) this.data.info.attachment = [];
         if (this.data.info.planstart)
             this.data.info.planstart = moment(this.data.info.planstart).format("YYYY-MM-DD");
         if (this.data.info.planend)
@@ -210,6 +262,9 @@ export class Component implements OnInit {
         await this.service.render();
 
         if (this.issue.id == 'new') return;
+
+        // 읽음 처리
+        await this.api('markRead');
 
         await this.initMessage('message');
     }
@@ -400,6 +455,114 @@ export class Component implements OnInit {
         await this.service.render();
     }
 
+    public async loadMentionMembers() {
+        const { code, data } = await this.api('members');
+        if (code === 200) {
+            this.mention.members = data || [];
+        }
+    }
+
+    public checkMentionTrigger() {
+        try {
+            const model = this.editor.message.model;
+            const root = model.document.getRoot();
+            const selection = model.document.selection;
+            const position = selection.getFirstPosition();
+            if (!position) return;
+
+            // 현재 커서가 있는 텍스트 노드에서 @ 패턴 감지
+            const parent = position.parent;
+            if (!parent) return;
+
+            let textBefore = '';
+            for (const child of parent.getChildren()) {
+                if (child.is && child.is('$text')) {
+                    const data = child.data || '';
+                    if (child.endOffset <= position.offset) {
+                        textBefore += data;
+                    } else {
+                        textBefore += data.substring(0, position.offset - child.startOffset);
+                        break;
+                    }
+                }
+            }
+
+            // @ 뒤의 키워드 추출
+            const atIndex = textBefore.lastIndexOf('@');
+            if (atIndex >= 0) {
+                const before = atIndex > 0 ? textBefore[atIndex - 1] : ' ';
+                if (atIndex === 0 || before === ' ' || before === '\n') {
+                    const keyword = textBefore.substring(atIndex + 1);
+                    if (keyword.length <= 20 && !keyword.includes(' ')) {
+                        this.mention.active = true;
+                        this.mention.keyword = keyword;
+                        this.mention.selectedIndex = 0;
+                        this.mention.filtered = this.mention.members.filter((m: any) => {
+                            return m.name.toLowerCase().includes(keyword.toLowerCase()) ||
+                                   m.email.toLowerCase().includes(keyword.toLowerCase());
+                        }).slice(0, 8);
+                        this.service.render();
+                        return;
+                    }
+                }
+            }
+
+            if (this.mention.active) {
+                this.closeMention();
+            }
+        } catch (e) {
+            // CKEditor 내부 에러 무시
+        }
+    }
+
+    public closeMention() {
+        this.mention.active = false;
+        this.mention.keyword = '';
+        this.mention.filtered = [];
+        this.mention.selectedIndex = 0;
+        this.service.render();
+    }
+
+    public async selectMentionMember(member: any) {
+        if (!member) return;
+
+        const model = this.editor.message.model;
+        const selection = model.document.selection;
+        const position = selection.getFirstPosition();
+        if (!position) return;
+
+        // 현재 커서 위치에서 @keyword 부분을 @이름으로 치환
+        const parent = position.parent;
+        let textBefore = '';
+        for (const child of parent.getChildren()) {
+            if (child.is && child.is('$text')) {
+                const data = child.data || '';
+                if (child.endOffset <= position.offset) {
+                    textBefore += data;
+                } else {
+                    textBefore += data.substring(0, position.offset - child.startOffset);
+                    break;
+                }
+            }
+        }
+
+        const atIndex = textBefore.lastIndexOf('@');
+        if (atIndex < 0) return;
+
+        const mentionText = `@${member.name} `;
+        const deleteCount = position.offset - atIndex;
+
+        model.change((writer: any) => {
+            const startPos = writer.createPositionAt(parent, atIndex);
+            const endPos = writer.createPositionAt(parent, position.offset);
+            const range = writer.createRange(startPos, endPos);
+            writer.remove(range);
+            writer.insertText(mentionText, writer.createPositionAt(parent, atIndex));
+        });
+
+        this.closeMention();
+    }
+
     public async sendMessage() {
         if (this.readOnly) return;
 
@@ -498,6 +661,59 @@ export class Component implements OnInit {
 
         delete this.cache.message.uploading;
         await this.service.render();
+    }
+
+    public async uploadDescription(filetype: string = "file") {
+        if (this.readOnly) return;
+        if (!this.isRole(['owner', 'manager'])) return;
+        let accept: any = filetype == 'image' ? 'image/*' : null;
+
+        let ns = "issueboard.issue.desc.attachment:" + this.issue.id;
+
+        let res = await this.project.attachment(ns, accept, true, -1, async (fi: number, flength: number, ui: number, ut: number) => {
+            this.cache.descUploading = { index: fi, total: flength, process: ui * 100 / ut };
+            await this.service.render();
+        });
+
+        if (!this.data.info.attachment) this.data.info.attachment = [];
+        for (let i = 0; i < res.data.length; i++) {
+            this.data.info.attachment.push(res.data[i]);
+        }
+
+        let errormsg = [];
+        for (let i = 0; i < res.error.length; i++)
+            errormsg.push(res.error[i].filename);
+
+        if (errormsg.length > 0) {
+            await this.alert(`${errormsg.join(", ")} 파일 업로드 중 오류가 발생했습니다.`, "파일 업로드 오류", "error", "확인", false);
+        }
+
+        delete this.cache.descUploading;
+        await this.service.render();
+    }
+
+    public async removeDescAttachment(file: any) {
+        if (this.readOnly) return;
+        if (!this.isRole(['owner', 'manager'])) return;
+        this.data.info.attachment.remove(file);
+        await this.service.render();
+    }
+
+    public getFileIcon(filename: string): string {
+        const ext = (filename || '').split('.').pop()?.toLowerCase() || '';
+        const map: any = {
+            pdf: 'ti-file-type-pdf text-red-500',
+            doc: 'ti-file-type-doc text-blue-600', docx: 'ti-file-type-doc text-blue-600',
+            xls: 'ti-file-type-xls text-green-600', xlsx: 'ti-file-type-xls text-green-600',
+            ppt: 'ti-file-type-ppt text-orange-500', pptx: 'ti-file-type-ppt text-orange-500',
+            zip: 'ti-file-zip text-amber-600', rar: 'ti-file-zip text-amber-600', '7z': 'ti-file-zip text-amber-600', tar: 'ti-file-zip text-amber-600', gz: 'ti-file-zip text-amber-600',
+            png: 'ti-photo text-violet-500', jpg: 'ti-photo text-violet-500', jpeg: 'ti-photo text-violet-500', gif: 'ti-photo text-violet-500', webp: 'ti-photo text-violet-500', svg: 'ti-photo text-violet-500', bmp: 'ti-photo text-violet-500',
+            mp4: 'ti-video text-pink-500', avi: 'ti-video text-pink-500', mov: 'ti-video text-pink-500', mkv: 'ti-video text-pink-500',
+            mp3: 'ti-music text-cyan-500', wav: 'ti-music text-cyan-500', flac: 'ti-music text-cyan-500',
+            txt: 'ti-file-text text-neutral-500', csv: 'ti-file-text text-neutral-500', log: 'ti-file-text text-neutral-500',
+            html: 'ti-file-code text-orange-500', css: 'ti-file-code text-blue-500', js: 'ti-file-code text-yellow-500', ts: 'ti-file-code text-blue-500', py: 'ti-file-code text-green-500', json: 'ti-file-code text-neutral-500',
+        };
+        return map[ext] || 'ti-file text-neutral-400';
     }
 
     public imageUrl(image: any) {

@@ -2,6 +2,13 @@
     display: block;
 }
 
+// ─── 사이드메뉴 액션 버튼 활성 상태 ───
+.nav-action-active {
+    background-color: #eff6ff; // blue-50
+    color: #2563eb !important; // blue-600
+    font-weight: 500;
+}
+
 // 모바일에서만 메뉴 접기/펼치기 (데스크탑에서는 항상 표시)
 @media (max-width: 639px) {
     .mobile-nav-collapsed {
@@ -58,19 +65,23 @@
     }
 }
 
-// 다크모드 오버라이드
-[data-theme="dark"] {
+// 다크모드 오버라이드 — :host-context로 상위 <html> 의 data-theme 참조
+:host-context([data-theme="dark"]) {
+    .nav-action-active {
+        background-color: #1e3a5f; // dark blue tint
+        color: #60a5fa !important; // blue-400
+    }
     .theme-toggle-track {
-        background: #27272a; // zinc-800
+        background: #18181b; // zinc-900 — 사이드바 배경과 자연스럽게 통합
     }
     .theme-toggle-thumb {
-        background: #3f3f46; // zinc-700
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        background: #2a2a30; // 사이드바 대비 미세하게 밝은 톤
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
     }
     .theme-toggle-option {
         color: #52525b; // zinc-600
         &.is-active {
-            color: #fafafa;
+            color: #e4e4e7; // zinc-200
         }
     }
 }

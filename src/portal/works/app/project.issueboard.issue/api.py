@@ -62,3 +62,30 @@ def favoriteMessage():
     favorite = wiz.request.query("favorite", True)
     project.issueboard.message.updateFavorite(message_id, favorite)
     wiz.response.status(200)
+
+def markRead():
+    issue_id = wiz.request.query("issue_id", True)
+    user_id = wiz.session.get("id")
+    try:
+        project.issueboard.read.markRead(user_id, issue_id)
+    except Exception as e:
+        wiz.response.status(500, message=str(e))
+    wiz.response.status(200)
+
+def members():
+    members = project.member.members()
+    result = []
+    for m in members:
+        # 실제 프로젝트 멤버만 포함 (memberdb 레코드가 있는 항목만)
+        # member.members()는 전체 사용자를 guest로 추가하므로,
+        # memberdb 레코드의 id 필드 존재 여부로 실제 멤버를 구분
+        if not m.get('id'):
+            continue
+        if m.get('meta') and m['meta'].get('id'):
+            result.append(dict(
+                id=m['meta']['id'],
+                name=m['meta'].get('name', ''),
+                email=m['meta'].get('email', ''),
+                profile_image=m['meta'].get('profile_image', '')
+            ))
+    wiz.response.status(200, result)

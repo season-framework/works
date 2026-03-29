@@ -26,6 +26,11 @@ export default class Display {
 
     public markdown(text: string) {
         let converter = new showdown.Converter();
-        return converter.makeHtml(text);
+        let html = converter.makeHtml(text);
+        // 멘션 하이라이트: @이름을 스타일된 배지로 변환
+        // Angular의 [innerHTML] DomSanitizer가 inline style 속성을 제거하므로 class 사용
+        html = html.replace(/(^|[\s>])@([^\s<>&]+)/g,
+            '$1<span class="wiz-mention">@$2</span>');
+        return html;
     }
 }

@@ -85,11 +85,19 @@ def loadAllIssues():
         kwargs['status'] = ['cancel']
 
     keyword = wiz.request.query("keyword", "").strip()
+    unread_only = wiz.request.query("unread_only", "false")
 
     all_rows = issuedb.rows(**kwargs)
 
     if keyword:
         all_rows = [r for r in all_rows if keyword.lower() in (r.get('title', '') or '').lower()]
+
+    if unread_only == "true":
+        user_id = wiz.session.get("id")
+        all_issue_ids = [r['id'] for r in all_rows]
+        if all_issue_ids:
+            unread_map = project.issueboard.read.getUnreadMap(user_id, all_issue_ids)
+            all_rows = [r for r in all_rows if unread_map.get(r['id'])]
 
     for row in all_rows:
         row['label_title'] = label_map.get(row.get('label_id'), '미분류')
@@ -127,3 +135,13 @@ def loadAllIssues():
     rows = all_rows[start_idx:end_idx]
 
     wiz.response.status(200, rows=rows, total=total, lastpage=lastpage, page=page)
+
+def unreadMap():
+    issue_ids = wiz.request.query("issue_ids", "[]")
+    issue_ids = json.loads(issue_ids)
+    user_id = wiz.session.get("id")
+    try:
+        result = project.issueboard.read.getUnreadMap(user_id, issue_ids)
+    except Exception as e:
+        wiz.response.status(500, message=str(e))
+    wiz.response.status(200, result)

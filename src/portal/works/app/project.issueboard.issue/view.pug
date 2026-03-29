@@ -1,13 +1,13 @@
 div(*ngIf="cache.loaded", class="w-full h-full overflow-hidden", [ngClass]="containerClass()")
     div(class="w-full h-full overflow-hidden", [ngClass]="issue.modal ? 'lg:pt-7' : ''")
-        div(class="overflow-hidden bg-white", [ngClass]="(issue.modal ? 'mx-auto lg:rounded-xl max-w-screen-2xl w-5/4 h-full lg:h-[90vh]' : 'w-full h-full') + (issue.id == 'new' ? ' max-w-[840px]' : '')", role="document", '#body'='')
+        div(class="overflow-hidden bg-white", [ngClass]="(issue.modal ? 'mx-auto lg:rounded-xl max-w-screen-2xl w-full lg:w-5/4 h-full lg:h-[90vh]' : 'w-full h-full') + (issue.id == 'new' ? ' max-w-[840px]' : '')", role="document", '#body'='')
             div(class="w-full h-full overflow-hidden flex flex-col", [class.modal-content]="issue.modal")
                 //- 헤더
-                div(class="flex items-center px-4 py-3 border-b border-neutral-200 h-14 shrink-0 gap-3")
-                    input(class="flex-1 border-0 shadow-none outline-none text-base font-semibold text-neutral-900 placeholder-neutral-400", [(ngModel)]="data.info.title", placeholder="이슈 제목을 입력해주세요", [disabled]="!isRole(['owner', 'manager'])")
-                    div(class="flex items-center gap-2")
-                        button(class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors", (click)="update()", *ngIf="!readOnly && isRole(['owner', 'manager'])")
-                            span 저장하기
+                div(class="flex items-center px-4 py-3 border-b border-neutral-200 h-14 shrink-0 gap-2")
+                    input(class="flex-1 min-w-0 border-0 shadow-none outline-none text-base max-sm:text-sm font-semibold text-neutral-900 placeholder-neutral-400", [(ngModel)]="data.info.title", placeholder="이슈 제목을 입력해주세요", [disabled]="!isRole(['owner', 'manager'])")
+                    div(class="flex items-center gap-1 shrink-0")
+                        button(class="inline-flex items-center gap-1 px-2 py-1.5 max-sm:px-2 text-sm max-sm:text-xs font-medium bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors", (click)="update()", *ngIf="!readOnly && isRole(['owner', 'manager'])")
+                            span 저장
                             wiz-component-spinner(class="ml-1", *ngIf="cache.isUpdate")
                         button(class="hidden lg:flex items-center justify-center size-8 rounded-md text-neutral-400 hover:bg-neutral-100 hover:text-neutral-600 transition-colors movable-btn", (mousedown)="onStartMoving($event)", (mouseup)="onStopMoving($event)", *ngIf="isMovable")
                             i(class="ti ti-arrows-move text-lg")
@@ -189,6 +189,41 @@ div(*ngIf="cache.loaded", class="w-full h-full overflow-hidden", [ngClass]="cont
                                 div
                                     div(class="flex items-center mb-2")
                                         span(class="text-sm font-medium text-neutral-500") 설명
+                                        div(class="ml-auto", *ngIf="!readOnly && isRole(['owner', 'manager'])")
+                                            button(class="inline-flex items-center gap-1 px-2 py-1 text-xs text-neutral-500 hover:text-neutral-700 hover:bg-neutral-100 rounded-md transition-colors",
+                                                (click)="uploadDescription('file')")
+                                                i(class="ti ti-paperclip text-sm")
+                                                span 파일 첨부
+
+                                    //- 설명 첨부파일
+                                    div(class="mb-3 border border-neutral-200 rounded-lg overflow-hidden",
+                                        *ngIf="(data.info.attachment && data.info.attachment.length > 0) || cache.descUploading")
+                                        div(class="flex items-center px-3 py-2 bg-neutral-50 border-b border-neutral-100")
+                                            i(class="ti ti-files text-sm text-neutral-400")
+                                            span(class="text-xs font-medium text-neutral-500 ml-1.5") 첨부파일
+                                            span(class="text-xs text-neutral-400 ml-1") ({{data.info.attachment?.length || 0}})
+                                        ng-container(*ngFor="let file of data.info.attachment")
+                                            div(class="flex items-center px-3 py-2 border-b border-neutral-100 last:border-b-0 hover:bg-neutral-50/50 transition-colors group")
+                                                i(class="ti text-base mr-2.5", [ngClass]="getFileIcon(file.filename)")
+                                                a(class="flex-1 min-w-0 text-[13px] text-neutral-700 hover:text-blue-600 truncate transition-colors cursor-pointer",
+                                                    [href]="project.downloadUrl(file.id, file.filename)",
+                                                    target="_blank") {{file.filename}}
+                                                div(class="flex items-center gap-0.5 ml-2 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity")
+                                                    a(class="inline-flex items-center justify-center size-7 rounded-md text-neutral-400 hover:bg-blue-50 hover:text-blue-500 transition-colors",
+                                                        [href]="project.downloadUrl(file.id, file.filename)",
+                                                        target="_blank")
+                                                        i(class="ti ti-download text-base")
+                                                    button(class="inline-flex items-center justify-center size-7 rounded-md text-neutral-400 hover:bg-red-50 hover:text-red-500 transition-colors",
+                                                        *ngIf="!readOnly && isRole(['owner', 'manager'])",
+                                                        (click)="removeDescAttachment(file)")
+                                                        i(class="ti ti-trash text-base")
+
+                                        //- 업로드 진행률
+                                        div(class="flex items-center px-3 py-2 border-t border-neutral-100 bg-blue-50/50",
+                                            *ngIf="cache.descUploading")
+                                            wiz-component-spinner(class="mr-2")
+                                            span(class="text-xs text-blue-600") {{cache.descUploading.index}}/{{cache.descUploading.total}} 업로드 중 ({{cache.descUploading.process | number: '1.0-0'}}%)
+
                                     div(class="ck-editor-auto ck-editor-works height-fit text-base prose max-w-full")
                                         textarea('#description'='', [attr.namespace]="NAMESPACE")
 
@@ -270,7 +305,22 @@ div(*ngIf="cache.loaded", class="w-full h-full overflow-hidden", [ngClass]="cont
                                                 i(class="ti ti-x text-sm")
 
                             //- 메시지 작성
-                            div(class="min-h-44 bg-white border-t border-neutral-200 p-3", *ngIf="!readOnly")
+                            div(class="min-h-44 bg-white border-t border-neutral-200 p-3 relative", *ngIf="!readOnly")
+                                //- 멘션 드롭다운
+                                div(class="absolute bottom-full left-3 right-3 mb-1 z-[5000]", *ngIf="mention.active && mention.filtered.length > 0")
+                                    div(class="bg-white border border-neutral-200 rounded-lg shadow-lg max-h-48 overflow-y-auto")
+                                        div(class="px-2.5 py-1.5 text-xs text-neutral-400 border-b border-neutral-100") 멤버 멘션
+                                        ng-container(*ngFor="let m of mention.filtered; let i = index")
+                                            div(class="flex items-center gap-2 px-3 py-2 cursor-pointer transition-colors",
+                                                [ngClass]="i === mention.selectedIndex ? 'bg-blue-50 text-blue-700' : 'text-neutral-700 hover:bg-neutral-50'",
+                                                (mousedown)="$event.preventDefault()",
+                                                (click)="selectMentionMember(m)")
+                                                div(class="flex items-center justify-center size-7 rounded-full bg-blue-100 text-blue-600 text-xs font-medium bg-contain bg-center bg-cover bg-no-repeat shrink-0", [style.background-image]="m.profile_image ? 'url(' + m.profile_image + ')' : ''")
+                                                    span(*ngIf="!m.profile_image") {{m.name[0]}}
+                                                div(class="flex flex-col")
+                                                    span(class="text-sm font-medium") {{m.name}}
+                                                    span(class="text-xs text-neutral-400") {{m.email}}
+
                                 div(class="ck-editor-small ck-editor-works height-sm prose max-w-full")
                                     textarea('#comment'='', [namespace]="NAMESPACE")
                                 div(class="flex items-center mt-2 gap-1")

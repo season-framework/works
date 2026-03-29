@@ -127,16 +127,40 @@ def remove_attendee():
         wiz.response.status(400, message=str(e))
     wiz.response.status(200, True)
 
+def add_group_attendee():
+    event_id = wiz.request.query("event_id", True)
+    group_type = wiz.request.query("group_type", True)
+    group_id = wiz.request.query("group_id", "")
+    try:
+        result = project.calendar.addGroupAttendee(event_id, group_type, group_id)
+    except Exception as e:
+        wiz.response.status(400, message=str(e))
+    wiz.response.status(200, result)
+
+def remove_group_attendee():
+    event_id = wiz.request.query("event_id", True)
+    group_type = wiz.request.query("group_type", True)
+    group_id = wiz.request.query("group_id", "")
+    try:
+        project.calendar.removeGroupAttendee(event_id, group_type, group_id)
+    except Exception as e:
+        wiz.response.status(400, message=str(e))
+    wiz.response.status(200, True)
+
 def members():
-    rows = project.member.members()
+    memberdb = orm.use("member", module="works")
+    userdb = orm.use("user")
+    users = memberdb.rows(project_id=project_id)
     result = []
-    for m in rows:
-        meta = m.get('meta', {})
+    for m in users:
+        user = userdb.get(id=m['user'])
+        if user is None:
+            continue
         result.append(dict(
-            id=m.get('user', ''),
-            name=meta.get('name', ''),
-            email=meta.get('email', ''),
+            id=m['user'],
+            name=user.get('name', ''),
+            email=user.get('email', ''),
             role=m.get('role', ''),
-            profile_image=meta.get('profile_image', '')
+            profile_image=user.get('profile_image', '')
         ))
     wiz.response.status(200, result)

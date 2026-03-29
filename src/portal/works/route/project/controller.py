@@ -186,7 +186,7 @@ elif action == "drive/deletes":
         fs.remove(path)
     wiz.response.status(200)
 
-elif action == "drive/upload":
+elif action.startswith("drive/upload"):
     try:
         project.member.accessLevel(['admin', 'manager', 'user'])
     except Exception as e:
@@ -219,7 +219,7 @@ elif action == "drive/upload":
         fs.write.file(target, f)
     wiz.response.status(200)
 
-elif action == "drive/download":
+elif action.startswith("drive/download"):
     try:
         project.member.accessLevel(['admin', 'manager', 'user', 'guest'])
     except Exception as e:

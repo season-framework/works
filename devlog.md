@@ -48,6 +48,10 @@
 | 2026-03-01 | 002 | 사용자 관리 API 구현 (page.admin/api.py) | [상세](devlog/2026-03-01/002-admin-user-api.md) |
 | 2026-03-01 | 003 | 사용자 관리 UI 컴포넌트 구현 (admin.user) | [상세](devlog/2026-03-01/003-admin-user-ui.md) |
 | 2026-03-01 | 004 | system_config DB 모델 및 SystemConfig Resolver 구현 | [상세](devlog/2026-03-01/004-system-config-db-resolver.md) |
+| 2026-03-12 | 001 | 대시보드 활동 통계 지표 설계 및 구성 확정 | [상세](devlog/2026-03-12/001-dashboard-stats-design.md) |
+| 2026-03-12 | 002 | 대시보드 활동 통계 백엔드 집계 추가 | [상세](devlog/2026-03-12/002-dashboard-stats-backend.md) |
+| 2026-03-12 | 003 | 대시보드 활동 통계 차트 UI 구현 | [상세](devlog/2026-03-12/003-dashboard-stats-ui.md) |
+| 2026-03-12 | 004 | 대시보드 통계 노출 검증 및 마무리 정리 | [상세](devlog/2026-03-12/004-dashboard-stats-verify.md) |
 | 2026-03-01 | 005 | 시스템 설정 API 구현 (page.admin/api.py) | [상세](devlog/2026-03-01/005-admin-config-api.md) |
 | 2026-03-01 | 006 | 시스템 설정 UI 컴포넌트 구현 (admin.config) | [상세](devlog/2026-03-01/006-admin-config-ui.md) |
 | 2026-03-01 | 007 | 프로젝트 전체 관리 API 구현 (page.admin/api.py) | [상세](devlog/2026-03-01/007-admin-project-api.md) |
@@ -90,3 +94,25 @@
 | 2026-03-03 | 006 | 이슈보드 플로팅 버튼/라벨 입력 다크모드 가시성 수정 | [상세](devlog/2026-03-03/006-floating-btn-label-input-darkmode.md) |
 | 2026-03-03 | 007 | 테이블 border 하드코딩 수정 및 전수 점검 (border-black → neutral-200) | [상세](devlog/2026-03-03/007-table-border-hardcode-fix.md) |
 | 2026-03-03 | 008 | 다크모드 전수 점검 및 잔여 이슈 수정 (yellow/indigo/violet/sky 등) | [상세](devlog/2026-03-03/008-darkmode-full-survey-fix.md) |
+| 2026-03-03 | 009 | 캘린더 이벤트 3개 제한 제거 — 모든 이벤트 표시 | [상세](devlog/2026-03-03/009-calendar-event-limit-remove.md) |
+| 2026-03-05 | 001 | 멘션 기능 + 읽음/안읽음 추적 + 알림함 통합 구현 | [상세](devlog/2026-03-05/001-mention-read-unread-notification.md) |
+| 2026-03-05 | 002 | 다크모드 토글 버튼 어둡게 조정 | [상세](devlog/2026-03-05/002-darkmode-toggle-darken.md) |
+| 2026-03-05 | 003 | 캘린더 이벤트 3개 제한 + 더보기 팝업 | [상세](devlog/2026-03-05/003-calendar-event-limit-popup.md) |
+| 2026-03-05 | 004 | 대시보드 알림함 + 멘션 범위 + 읽음 갱신 수정 | [상세](devlog/2026-03-05/004-notification-mention-read-fix.md) |
+| 2026-03-06 | 001 | 다크모드 토글 :host-context 셀렉터 수정 | [상세](devlog/2026-03-06/001-darkmode-toggle-host-context.md) |
+| 2026-03-06 | 002 | 멘션 텍스트 배지 스타일 적용 | [상세](devlog/2026-03-06/002-mention-styled-badge.md) |
+| 2026-03-06 | 003 | 대시보드 안읽은 이슈/멘션 카드 표시 및 알림함 탭 기능 | [상세](devlog/2026-03-06/003-dashboard-unread-mention-cards.md) |
+| 2026-03-06 | 004 | 멘션 배지 CSS 클래스 방식 전환 (DomSanitizer 우회) | [상세](devlog/2026-03-06/004-mention-badge-css-class.md) |
+| 2026-03-06 | 005 | 대시보드 여백 축소 — 정보 밀도 개선 | [상세](devlog/2026-03-06/005-dashboard-spacing-reduce.md) |
+| 2026-03-06 | 006 | 알림함 독립 페이지 + 사이드메뉴 아이콘 | [상세](devlog/2026-03-06/006-notification-page.md) |
+| 2026-03-06 | 007 | 모바일 이슈카드 오버플로우 수정 | [상세](devlog/2026-03-06/007-mobile-issue-card-overflow.md) |
+| 2026-03-06 | 008 | 모바일 전체 페이지 전수조사 및 반응형 수정 | [상세](devlog/2026-03-06/008-mobile-responsive-audit.md) |
+| 2026-03-06 | 009 | 사이드메뉴 사용자 영역 UI 개선 (프로필 아이콘, 버튼 분리) | [상세](devlog/2026-03-06/009-sidebar-user-area-redesign.md) |
+| 2026-03-06 | 010 | 사이드바 프로필 이미지 표시 + 메뉴 아이콘 바 재설계 | [상세](devlog/2026-03-06/010-sidebar-profile-image-menu-redesign.md) |
+| 2026-03-06 | 011 | 알림함 이슈 클릭 시 이슈카드 팝업 표시 | [상세](devlog/2026-03-06/011-notification-issue-card-popup.md) |
+| 2026-03-06 | 012 | 이슈보드 안읽은 이슈 필터 토글 버튼 추가 | [상세](devlog/2026-03-06/012-issueboard-unread-filter-toggle.md) |
+| 2026-03-27 | 001 | 프로젝트 드라이브 다운로드/업로드 404 버그 수정 | [상세](devlog/2026-03-27/001-drive-download-404-fix.md) |
+| 2026-03-27 | 002 | CKEditor 한글 입력 자음/모음 분리 버그 수정 | [상세](devlog/2026-03-27/002-ckeditor-hangul-ime-fix.md) |
+| 2026-03-27 | 003 | 이슈 설명 영역 파일 업로드 기능 구현 | [상세](devlog/2026-03-27/003-issue-description-attachment.md) |
+| 2026-03-27 | 004 | Firefox 브라우저 호환성 감사 및 스크롤바 CSS 수정 | [상세](devlog/2026-03-27/004-firefox-compatibility-audit.md) |
+| 2026-03-29 | 001 | 캘린더 그룹 참가자(추상 그룹) 기능 구현 (FN-0001~0008) | [상세](devlog/2026-03-29/001-calendar-group-attendee.md) |

@@ -42,6 +42,11 @@ iframe {
             transparent);
 }
 
+* {
+    scrollbar-width: thin;
+    scrollbar-color: #ABABAB #F5F5F5;
+}
+
 a,
 button,
 select {

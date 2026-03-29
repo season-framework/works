@@ -148,6 +148,8 @@
     max-height: 260px;
     overflow-y: auto;
     line-height: 1.7;
+    scrollbar-width: thin;
+    scrollbar-color: #d4d4d8 transparent;
 
     &::-webkit-scrollbar {
         width: 4px;

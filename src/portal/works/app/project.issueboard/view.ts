@@ -32,6 +32,8 @@ export class Component implements OnInit, OnDestroy {
         hiddenIssues: {}
     };
 
+    public unreadMap: any = {};
+
     public issue: any = {
         id: null,
         modal: false,
@@ -147,7 +149,28 @@ export class Component implements OnInit, OnDestroy {
         }
         await this.sortLabel();
         this.cache.loaded = true;
+        await this.loadUnreadMap();
         await this.service.render();
+    }
+
+    public async loadUnreadMap() {
+        // 모든 레이블의 이슈 ID 수집
+        let allIssueIds: string[] = [];
+        for (let label of this.labels) {
+            if (label.issues) {
+                for (let id of label.issues) {
+                    if (!allIssueIds.includes(id)) allIssueIds.push(id);
+                }
+            }
+        }
+        if (allIssueIds.length === 0) return;
+        const { code, data } = await wiz.call("unreadMap", {
+            project_id: this.project.id(),
+            issue_ids: JSON.stringify(allIssueIds)
+        });
+        if (code === 200) {
+            this.unreadMap = data || {};
+        }
     }
 
     public hiddenIssues(label_id: string, status: string, as_object: boolean = false) {
@@ -265,6 +288,13 @@ export class Component implements OnInit, OnDestroy {
         this.issue.label_id = label.id;
         this.issue.label = label;
         this.issue.parent = this;
+
+        // 이슈 모달 닫힐 때 unread 상태 즉시 갱신
+        this.issue.event.hide = async () => {
+            await this.loadUnreadMap();
+            await this.service.render();
+        };
+
         await this.service.render();
     }
 
@@ -297,6 +327,10 @@ export class Component implements OnInit, OnDestroy {
 
     public onProcessIssue(issue: any) {
         if (!issue) return true;
+        // 안읽은 이슈만 보기 필터
+        if (this.showUnreadOnly) {
+            if (!this.unreadMap[issue.id]) return false;
+        }
         // 상태 필터 적용
         if (this.statusFilter) {
             if (issue.status !== this.statusFilter) return false;
@@ -352,6 +386,7 @@ export class Component implements OnInit, OnDestroy {
 
     // ===== 이슈 검색 (칸반/게시판 공통) =====
     public searchKeyword: string = '';
+    public showUnreadOnly: boolean = false;
 
     public async onSearchKeyword() {
         if (this.viewMode === 'board') {
@@ -366,6 +401,16 @@ export class Component implements OnInit, OnDestroy {
         this.searchKeyword = '';
         if (this.viewMode === 'board') {
             this.boardData.keyword = '';
+            this.boardData.page = 1;
+            await this.loadBoardData();
+        }
+        await this.service.render();
+    }
+
+    // ===== 안읽은 이슈 필터 =====
+    public async toggleUnreadOnly() {
+        this.showUnreadOnly = !this.showUnreadOnly;
+        if (this.viewMode === 'board') {
             this.boardData.page = 1;
             await this.loadBoardData();
         }
@@ -470,7 +515,8 @@ export class Component implements OnInit, OnDestroy {
             project_id: this.project.id(),
             page: this.boardData.page,
             status: this.boardData.status,
-            keyword: this.boardData.keyword || ''
+            keyword: this.boardData.keyword || '',
+            unread_only: this.showUnreadOnly ? 'true' : 'false'
         });
 
         if (code === 200) {
@@ -488,6 +534,18 @@ export class Component implements OnInit, OnDestroy {
             this.boardData.rows = processedRows;
             this.boardData.lastpage = data.lastpage || 1;
             this.boardData.total = data.total || 0;
+
+            // 게시판 모드 안읽음 맵 로드
+            let boardIssueIds = processedRows.filter(r => r._type === 'data').map(r => r.id);
+            if (boardIssueIds.length > 0) {
+                const unreadRes = await wiz.call("unreadMap", {
+                    project_id: this.project.id(),
+                    issue_ids: JSON.stringify(boardIssueIds)
+                });
+                if (unreadRes.code === 200) {
+                    Object.assign(this.unreadMap, unreadRes.data || {});
+                }
+            }
         }
         this.boardData.loading = false;
         await this.service.render();

@@ -5,6 +5,8 @@ Label = wiz.model("portal/works/struct/issueboard/label")
 Issue = wiz.model("portal/works/struct/issueboard/issue")
 Worker = wiz.model("portal/works/struct/issueboard/worker")
 Message = wiz.model("portal/works/struct/issueboard/message")
+Mention = wiz.model("portal/works/struct/issueboard/mention")
+Read = wiz.model("portal/works/struct/issueboard/read")
 
 class Model:
     def __init__(self, project):
@@ -15,6 +17,8 @@ class Model:
         self.label = Label(self)
         self.worker = Worker(self)
         self.message = Message(self)
+        self.mention = Mention(self)
+        self.read = Read(self)
 
     def emit(self, event, data):
         socketio = wiz.server.app.socketio

@@ -1,0 +1,91 @@
+div(class="flex-1 min-h-0 overflow-y-auto")
+    div(class="max-w-4xl mx-auto px-5 py-4")
+        //- 헤더
+        div(class="mb-4")
+            div(class="flex items-center gap-2")
+                i(class="ti ti-bell text-[20px] text-blue-500")
+                h1(class="text-lg font-semibold text-neutral-900") 알림함
+
+        //- 탭
+        div(class="flex border-b border-neutral-200 mb-4")
+            button(type="button",
+                class="px-4 py-2 text-[13px] font-medium border-b-2 transition-colors -mb-px",
+                [ngClass]="tab === 'all' ? 'border-blue-500 text-blue-600' : 'border-transparent text-neutral-500 hover:text-neutral-700'",
+                (click)="switchTab('all')") 관련된 전체 이슈
+            button(type="button",
+                class="px-4 py-2 text-[13px] font-medium border-b-2 transition-colors -mb-px ml-1",
+                [ngClass]="tab === 'mention' ? 'border-blue-500 text-blue-600' : 'border-transparent text-neutral-500 hover:text-neutral-700'",
+                (click)="switchTab('mention')") 멘션된 이슈
+
+        //- 로딩
+        ng-container(*ngIf="loading")
+            div(class="flex items-center justify-center py-16")
+                div(class="animate-spin rounded-full h-6 w-6 border-2 border-neutral-300 border-t-blue-500")
+
+        ng-container(*ngIf="!loading")
+            //- 결과 요약
+            div(class="flex items-center justify-between mb-2")
+                span(class="text-xs text-neutral-400") 총 {{total}}건
+                ng-container(*ngIf="total > dump")
+                    span(class="text-xs text-neutral-400") {{page}} / {{maxPage()}} 페이지
+
+            //- 비어있을 때
+            ng-container(*ngIf="items.length === 0")
+                div(class="bg-white rounded-lg border border-neutral-200")
+                    div(class="flex flex-col items-center justify-center py-16 text-center")
+                        i(class="ti ti-bell-off text-3xl text-neutral-300 mb-2")
+                        p(class="text-sm text-neutral-500",
+                            *ngIf="tab === 'all'") 관련된 이슈가 없습니다
+                        p(class="text-sm text-neutral-500",
+                            *ngIf="tab === 'mention'") 멘션된 이슈가 없습니다
+
+            //- 목록
+            ng-container(*ngIf="items.length > 0")
+                div(class="bg-white rounded-lg border border-neutral-200 overflow-hidden")
+                    div(class="divide-y divide-neutral-100")
+                        ng-container(*ngFor="let item of items")
+                            div(class="flex items-start px-4 py-3 cursor-pointer transition-colors",
+                                [ngClass]="item.is_read ? 'bg-neutral-50 opacity-60 hover:bg-neutral-100' : 'hover:bg-blue-50'",
+                                (click)="openIssue(item)")
+                                div(class="flex items-center mr-2 mt-1")
+                                    span(*ngIf="!item.is_read",
+                                        class="size-2 rounded-full shrink-0",
+                                        [ngClass]="item.is_mentioned ? 'bg-amber-500' : 'bg-blue-500'")
+                                    span(*ngIf="item.is_read",
+                                        class="size-2 rounded-full bg-neutral-300 shrink-0")
+                                div(class="flex-1 min-w-0")
+                                    div(class="flex items-center gap-1 flex-wrap")
+                                        span(class="text-xs rounded-full px-2 py-0.5 shrink-0 ring-1 ring-inset",
+                                            [ngClass]="displayStatus(item.status).cls") {{displayStatus(item.status).text}}
+                                        ng-container(*ngIf="item.is_mentioned")
+                                            span(class="text-xs rounded-full px-2 py-0.5 shrink-0 bg-amber-50 text-amber-700 ring-1 ring-inset ring-amber-200") 멘션
+                                        span(class="text-[13px] truncate font-medium",
+                                            [ngClass]="item.is_read ? 'text-neutral-500' : 'text-neutral-800'") {{item.title}}
+                                    div(class="flex items-center mt-0.5 text-xs text-neutral-400 flex-wrap")
+                                        span(class="truncate max-w-[150px]") {{item.project?.title}}
+                                        span(class="mx-1") ·
+                                        span {{displayDate(item.updated)}}
+                                        ng-container(*ngIf="item.worker")
+                                            span(class="mx-1") ·
+                                            span 담당: {{getUserName(item.worker)}}
+                                        ng-container(*ngIf="item.planend")
+                                            span(class="mx-1") ·
+                                            span([ngClass]="isOverdue(item.planend) ? 'text-red-500 font-medium' : ''") 마감 {{displayShortDate(item.planend)}}
+
+            //- 페이지네이션
+            ng-container(*ngIf="total > dump")
+                div(class="flex items-center justify-between mt-3")
+                    span(class="text-xs text-neutral-500") {{page}} / {{maxPage()}} 페이지
+                    div(class="flex items-center gap-2")
+                        button(type="button",
+                            class="px-3 py-1 rounded text-xs border border-neutral-300 text-neutral-600 hover:bg-neutral-100 transition-colors disabled:opacity-40",
+                            [disabled]="page <= 1",
+                            (click)="prevPage()") 이전
+                        button(type="button",
+                            class="px-3 py-1 rounded text-xs border border-neutral-300 text-neutral-600 hover:bg-neutral-100 transition-colors disabled:opacity-40",
+                            [disabled]="page >= maxPage()",
+                            (click)="nextPage()") 다음
+
+//- 이슈카드 팝업
+ng-container(*ngIf="issue.modal")
+    wiz-portal-works-project-issueboard-issue([issue]="issue", class="overflow-hidden")

@@ -4,6 +4,7 @@ config = wiz.model("portal/works/config")
 orm = wiz.model("portal/season/orm")
 calendardb = orm.use("calendar", module="works")
 attendeedb = orm.use("calendar/attendee", module="works")
+attendeegroupdb = orm.use("calendar/attendee_group", module="works")
 categorydb = orm.use("calendar/category", module="works")
 memberdb = orm.use("member", module="works")
 projectdb = orm.use("project", module="works")
@@ -60,7 +61,7 @@ class MyCalendar:
         return results
 
     def searchMyEvents(self, user_id, year, month):
-        """내가 작성자이거나 참가자인 일정 전체 조회 (cross-project)"""
+        """내가 작성자이거나 참가자인 일정 + 그룹 참가자 일정 전체 조회 (cross-project)"""
         start_date = f"{year}-{month:02d}-01 00:00:00"
         if month == 12:
             end_date = f"{year + 1}-01-01 00:00:00"
@@ -98,10 +99,32 @@ class MyCalendar:
             if ev_end >= start_date and ev_start < end_date:
                 att_events.append(ev)
 
+        # 3) 그룹 참가자 일정 (내가 속한 프로젝트의 project_all 이벤트)
+        memberships = memberdb.rows(user=user_id)
+        my_project_ids = set([m['project_id'] for m in memberships])
+        group_events = []
+        for pid in my_project_ids:
+            group_rows = attendeegroupdb.rows(project_id=pid, group_type='project_all')
+            for gr in group_rows:
+                eid = gr.get('event_id', '')
+                ev = calendardb.get(id=eid)
+                if ev is None:
+                    continue
+                if ev.get('status') != 'active':
+                    continue
+                if hasattr(ev.get('end'), 'strftime'):
+                    ev_end = ev['end'].strftime('%Y-%m-%d %H:%M:%S')
+                    ev_start = ev['start'].strftime('%Y-%m-%d %H:%M:%S')
+                else:
+                    ev_end = str(ev.get('end', ''))
+                    ev_start = str(ev.get('start', ''))
+                if ev_end >= start_date and ev_start < end_date:
+                    group_events.append(ev)
+
         # 합치기 (중복 제거)
         seen = set()
         merged = []
-        for row in own_rows + att_events:
+        for row in own_rows + att_events + group_events:
             rid = row.get('id', '')
             if rid in seen:
                 continue
@@ -122,7 +145,7 @@ class MyCalendar:
             proj = projectdb.get(id=pid)
             row['project_title'] = proj.get('title', '') if proj else ''
             row['project_namespace'] = proj.get('namespace', '') if proj else ''
-            # 참가자 정보
+            # 개별 참가자 정보
             att_list = attendeedb.rows(event_id=rid)
             attendees = []
             for a in att_list:
@@ -132,6 +155,13 @@ class MyCalendar:
                     user_name=u.get('name', '') if u else ''
                 ))
             row['attendees'] = attendees
+            # 그룹 참가자 정보
+            group_att_list = attendeegroupdb.rows(event_id=rid)
+            group_attendees = []
+            for g in group_att_list:
+                g = self.formatDatetime(g, ['created'])
+                group_attendees.append(g)
+            row['group_attendees'] = group_attendees
             merged.append(row)
 
         merged.sort(key=lambda x: x.get('start', ''))

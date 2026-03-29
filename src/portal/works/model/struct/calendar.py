@@ -5,6 +5,9 @@ orm = wiz.model("portal/season/orm")
 db = orm.use("calendar", module="works")
 attendeedb = orm.use("calendar/attendee", module="works")
 categorydb = orm.use("calendar/category", module="works")
+attendeegroupdb = orm.use("calendar/attendee_group", module="works")
+memberdb = orm.use("member", module="works")
+userdb = orm.use("user")
 
 class Model:
     def __init__(self, project):
@@ -90,7 +93,7 @@ class Model:
                 continue
             categorydb.update(dict(sort_order=int(sort_order), updated=now), id=cat_id)
 
-    # ── 참가자 ──
+    # ── 개별 참가자 ──
 
     def getAttendees(self, event_id):
         rows = attendeedb.rows(event_id=event_id, project_id=self.project_id)
@@ -120,9 +123,53 @@ class Model:
         self.project.member.accessLevel(['admin', 'manager', 'user'])
         attendeedb.delete(event_id=event_id, user_id=user_id, project_id=self.project_id)
 
+    # ── 그룹 참가자 ──
+
+    def addGroupAttendee(self, event_id, group_type, group_id=''):
+        self.project.member.accessLevel(['admin', 'manager', 'user'])
+        existing = db.get(id=event_id, project_id=self.project_id)
+        if existing is None:
+            raise Exception("Event not found")
+        dup = attendeegroupdb.get(event_id=event_id, project_id=self.project_id, group_type=group_type, group_id=group_id)
+        if dup is not None:
+            return dup
+        data = dict()
+        data['event_id'] = event_id
+        data['project_id'] = self.project_id
+        data['group_type'] = group_type
+        data['group_id'] = group_id
+        data['created'] = datetime.datetime.now()
+        insert_id = attendeegroupdb.insert(data)
+        return attendeegroupdb.get(id=insert_id)
+
+    def removeGroupAttendee(self, event_id, group_type, group_id=''):
+        self.project.member.accessLevel(['admin', 'manager', 'user'])
+        attendeegroupdb.delete(event_id=event_id, project_id=self.project_id, group_type=group_type, group_id=group_id)
+
+    def getGroupAttendees(self, event_id):
+        rows = attendeegroupdb.rows(event_id=event_id, project_id=self.project_id)
+        for i in range(len(rows)):
+            rows[i] = self.formatDatetime(rows[i], ['created'])
+        return rows
+
+    def resolveGroupMembers(self, group_type, group_id=''):
+        """그룹 타입에 따라 실제 사용자 목록을 반환"""
+        if group_type == 'project_all':
+            members = memberdb.rows(project_id=self.project_id)
+            user_ids = list(set([m['user'] for m in members]))
+            result = []
+            for uid in user_ids:
+                user = self.transformUser(uid)
+                result.append(dict(
+                    user_id=uid,
+                    user_name=user.get('name', '') if user else ''
+                ))
+            return result
+        return []
+
     def _attachExtras(self, row):
         event_id = row.get('id', '')
-        # 참가자 목록
+        # 개별 참가자 목록
         att_rows = attendeedb.rows(event_id=event_id)
         attendees = []
         for a in att_rows:
@@ -132,6 +179,31 @@ class Model:
             a['user_name'] = user.get('name', '') if user else ''
             attendees.append(a)
         row['attendees'] = attendees
+
+        # 그룹 참가자 목록
+        group_rows = attendeegroupdb.rows(event_id=event_id, project_id=self.project_id)
+        group_attendees = []
+        for g in group_rows:
+            g = self.formatDatetime(g, ['created'])
+            group_attendees.append(g)
+        row['group_attendees'] = group_attendees
+
+        # 그룹을 resolve하여 전체 참가자 목록 생성
+        resolved_ids = set([a.get('user_id', '') for a in att_rows])
+        resolved_attendees = list(attendees)
+        for g in group_rows:
+            members = self.resolveGroupMembers(g.get('group_type', ''), g.get('group_id', ''))
+            for m in members:
+                if m['user_id'] not in resolved_ids:
+                    resolved_ids.add(m['user_id'])
+                    resolved_attendees.append(dict(
+                        user_id=m['user_id'],
+                        user_name=m['user_name'],
+                        user=self.transformUser(m['user_id']),
+                        from_group=g.get('group_type', '')
+                    ))
+        row['resolved_attendees'] = resolved_attendees
+
         # 카테고리 정보
         cat_id = row.get('category_id', '')
         if cat_id:
@@ -150,11 +222,18 @@ class Model:
 
         project_id = self.project_id
 
-        start_date = f"{year}-{month:02d}-01 00:00:00"
+        # 이전 달 1일부터 다음 달 말일까지 (캘린더 그리드에 겹치는 주 포함)
+        if month == 1:
+            start_date = f"{year - 1}-12-01 00:00:00"
+        else:
+            start_date = f"{year}-{month - 1:02d}-01 00:00:00"
+
         if month == 12:
+            end_date = f"{year + 1}-02-01 00:00:00"
+        elif month == 11:
             end_date = f"{year + 1}-01-01 00:00:00"
         else:
-            end_date = f"{year}-{month + 1:02d}-01 00:00:00"
+            end_date = f"{year}-{month + 2:02d}-01 00:00:00"
 
         rows = db.rows(
             project_id=project_id,
@@ -194,9 +273,21 @@ class Model:
                 if isinstance(att, str):
                     att = json.loads(att)
                 attendees = att if isinstance(att, list) else []
-            except:
+            except Exception:
                 attendees = []
             del data['attendees']
+
+        group_attendees = []
+        if 'group_attendees' in data:
+            try:
+                import json
+                ga = data['group_attendees']
+                if isinstance(ga, str):
+                    ga = json.loads(ga)
+                group_attendees = ga if isinstance(ga, list) else []
+            except Exception:
+                group_attendees = []
+            del data['group_attendees']
 
         data['project_id'] = self.project_id
         data['user_id'] = config.session_user_id()
@@ -214,11 +305,20 @@ class Model:
 
         insert_id = db.insert(data)
 
-        # 참가자 추가
+        # 개별 참가자 추가
         for uid in attendees:
             try:
                 self.addAttendee(insert_id, uid)
-            except:
+            except Exception:
+                pass
+
+        # 그룹 참가자 추가
+        for g in group_attendees:
+            try:
+                gt = g.get('group_type', '') if isinstance(g, dict) else str(g)
+                gid = g.get('group_id', '') if isinstance(g, dict) else ''
+                self.addGroupAttendee(insert_id, gt, gid)
+            except Exception:
                 pass
 
         self.project.updateTime()
@@ -243,9 +343,21 @@ class Model:
                 if isinstance(att, str):
                     att = json.loads(att)
                 attendees = att if isinstance(att, list) else []
-            except:
+            except Exception:
                 attendees = []
             del data['attendees']
+
+        group_attendees = None
+        if 'group_attendees' in data:
+            try:
+                import json
+                ga = data['group_attendees']
+                if isinstance(ga, str):
+                    ga = json.loads(ga)
+                group_attendees = ga if isinstance(ga, list) else []
+            except Exception:
+                group_attendees = []
+            del data['group_attendees']
 
         data['project_id'] = self.project_id
         data['updated'] = datetime.datetime.now()
@@ -259,10 +371,12 @@ class Model:
             del data['user']
         if 'category' in data:
             del data['category']
+        if 'resolved_attendees' in data:
+            del data['resolved_attendees']
 
         db.update(data, id=event_id)
 
-        # 참가자 동기화
+        # 개별 참가자 동기화
         if attendees is not None:
             existing_att = attendeedb.rows(event_id=event_id, project_id=self.project_id)
             existing_uids = set([a['user_id'] for a in existing_att])
@@ -270,10 +384,30 @@ class Model:
             for uid in new_uids - existing_uids:
                 try:
                     self.addAttendee(event_id, uid)
-                except:
+                except Exception:
                     pass
             for uid in existing_uids - new_uids:
                 self.removeAttendee(event_id, uid)
+
+        # 그룹 참가자 동기화
+        if group_attendees is not None:
+            existing_groups = attendeegroupdb.rows(event_id=event_id, project_id=self.project_id)
+            existing_group_keys = set()
+            for eg in existing_groups:
+                key = (eg.get('group_type', ''), eg.get('group_id', ''))
+                existing_group_keys.add(key)
+            new_group_keys = set()
+            for g in group_attendees:
+                gt = g.get('group_type', '') if isinstance(g, dict) else str(g)
+                gid = g.get('group_id', '') if isinstance(g, dict) else ''
+                new_group_keys.add((gt, gid))
+            for gt, gid in new_group_keys - existing_group_keys:
+                try:
+                    self.addGroupAttendee(event_id, gt, gid)
+                except Exception:
+                    pass
+            for gt, gid in existing_group_keys - new_group_keys:
+                self.removeGroupAttendee(event_id, gt, gid)
 
         self.project.updateTime()
         return self.get(event_id)
@@ -296,4 +430,3 @@ class Model:
 
         db.update(dict(status='deleted', updated=datetime.datetime.now()), id=event_id)
         self.project.updateTime()
-

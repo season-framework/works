@@ -7,7 +7,7 @@
     "category": "project",
     "controller": "",
     "type": "widget",
-    "template": "wiz-portal-works-widget-project-issueboard-issue([issue]=\"\")",
+    "template": "wiz-portal-works-widget-project-issueboard-issue([issue]=\"\", [unread]=\"\")",
     "ng.build": {
         "id": "portal.works.widget.project.issueboard.issue",
         "name": "PortalWorksWidgetProjectIssueboardIssueComponent",

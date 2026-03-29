@@ -9,6 +9,7 @@ export class Component implements OnInit {
     ) { }
 
     @Input() issue: any;
+    @Input() unread: boolean = false;
 
     public innerWidth: any;
 

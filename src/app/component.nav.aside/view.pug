@@ -11,18 +11,32 @@ div(class="flex flex-col max-sm:flex-row max-sm:flex-wrap h-screen max-sm:h-auto
     nav(class="flex flex-col text-sm mt-4 border-t border-neutral-200 max-sm:!basis-full max-sm:mt-0 max-sm:border-t-0",
         *ngIf="service.auth.show(true)",
         [ngClass]="{'mobile-nav-collapsed': service.navbar.isMenuCollapsed}")
-        div(class="px-4 py-3")
-            p(class="text-sm text-neutral-700 font-medium") {{service.auth.session.name}}
-            p(class="text-xs text-neutral-400 mt-0.5") {{service.auth.session.email}}
-        div(class="flex bg-neutral-100 border-y border-neutral-200 h-9")
-            button(class="flex-1 text-center text-sm text-neutral-600 hover:bg-neutral-200/60 transition-colors", routerLink="/mypage", routerLinkActive="font-medium text-neutral-900 !bg-neutral-200/60")
-                i.ti.ti-user-circle.text-base.align-middle
-                span.ml-1.align-middle 마이페이지
-            button(class="flex-1 text-center text-sm text-neutral-600 border-l border-neutral-200 hover:bg-neutral-200/60 transition-colors", (click)="logout()")
-                i.ti.ti-logout.text-base.align-middle
-                span.ml-1.align-middle 로그아웃
-            button(*ngIf="service.auth.session.membership === 'admin'", class="w-9 text-neutral-500 hover:bg-neutral-200/60 transition-colors border-l border-neutral-200", routerLink="/admin", routerLinkActive="!bg-neutral-200/60")
-                i.ti.ti-settings.text-lg
+        //- 사용자 프로필
+        a(routerLink="/mypage", class="flex items-center gap-3 px-4 py-3 hover:bg-neutral-100 transition-colors cursor-pointer group")
+            div(*ngIf="!profileImage",
+                class="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 text-white shrink-0 shadow-sm")
+                span(class="text-sm font-semibold") {{service.auth.session.name?.[0] || '?'}}
+            div(*ngIf="profileImage",
+                class="w-10 h-10 rounded-full bg-cover bg-center bg-no-repeat shrink-0 shadow-sm ring-2 ring-white",
+                [ngStyle]="{'background-image': 'url(' + profileImage + ')'}")
+            div(class="min-w-0 flex-1")
+                p(class="text-sm text-neutral-800 font-medium truncate group-hover:text-neutral-900") {{service.auth.session.name}}
+                p(class="text-xs text-neutral-400 truncate") {{service.auth.session.email}}
+        //- 액션 아이콘 바
+        div(class="flex items-center mx-3 mb-2 gap-1")
+            a(routerLink="/notification", routerLinkActive="nav-action-active",
+                class="flex-1 flex items-center justify-center h-8 rounded-md text-neutral-400 hover:bg-neutral-200/60 hover:text-neutral-600 transition-colors",
+                title="알림")
+                i.ti.ti-bell(class="text-[17px]")
+            a(*ngIf="service.auth.session.membership === 'admin'",
+                routerLink="/admin", routerLinkActive="nav-action-active",
+                class="flex-1 flex items-center justify-center h-8 rounded-md text-neutral-400 hover:bg-neutral-200/60 hover:text-neutral-600 transition-colors",
+                title="관리자")
+                i.ti.ti-settings-2(class="text-[17px]")
+            button(class="flex-1 flex items-center justify-center h-8 rounded-md text-neutral-400 hover:bg-neutral-200/60 hover:text-red-500 transition-colors",
+                (click)="logout()",
+                title="로그아웃")
+                i.ti.ti-logout(class="text-[17px]")
 
     nav(class="flex grow flex-col mt-1 max-sm:mt-0 max-sm:!basis-full px-2",
         [ngClass]="{'mobile-nav-collapsed': service.navbar.isMenuCollapsed}")

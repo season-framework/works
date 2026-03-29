@@ -166,6 +166,9 @@
         background-color: #2e2e38 !important;
         background-image: none !important;
     }
+    * {
+        scrollbar-color: #2e2e38 #111113 !important;
+    }
 
     // ── Form inputs (global) ──
     input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not(.auth-input),
