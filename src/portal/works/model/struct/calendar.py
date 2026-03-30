@@ -8,6 +8,8 @@ categorydb = orm.use("calendar/category", module="works")
 attendeegroupdb = orm.use("calendar/attendee_group", module="works")
 memberdb = orm.use("member", module="works")
 userdb = orm.use("user")
+Notification = wiz.model("portal/works/struct/notification")
+projectdb = orm.use("project", module="works")
 
 class Model:
     def __init__(self, project):
@@ -32,6 +34,50 @@ class Model:
                 if hasattr(data[key], 'strftime'):
                     data[key] = data[key].strftime('%Y-%m-%d %H:%M:%S')
         return data
+
+    def _getProjectTitle(self):
+        try:
+            proj = projectdb.get(id=self.project_id, fields="title")
+            return proj['title'] if proj else ''
+        except Exception:
+            return ''
+
+    def _collectAttendeeUserIds(self, event_id):
+        """이벤트의 모든 참가자(개별+그룹) user_id 집합 반환"""
+        uids = set()
+        att_rows = attendeedb.rows(event_id=event_id, project_id=self.project_id)
+        for a in att_rows:
+            uids.add(a.get('user_id', ''))
+        group_rows = attendeegroupdb.rows(event_id=event_id, project_id=self.project_id)
+        for g in group_rows:
+            members = self.resolveGroupMembers(g.get('group_type', ''), g.get('group_id', ''))
+            for m in members:
+                uids.add(m['user_id'])
+        uids.discard('')
+        return uids
+
+    def _notifyCalendar(self, ntype, event_id, event_title, user_ids, exclude_user_id=None):
+        """캘린더 알림 일괄 생성 (자기 자신 제외)"""
+        proj_title = self._getProjectTitle()
+        type_labels = {
+            'calendar_invited': '초대되었습니다',
+            'calendar_updated': '수정되었습니다',
+            'calendar_deleted': '삭제되었습니다',
+        }
+        label = type_labels.get(ntype, '알림')
+        title = f"[{proj_title}] '{event_title}' 일정에 {label}"
+        try:
+            Notification.create_bulk(
+                user_ids=list(user_ids),
+                ntype=ntype,
+                title=title,
+                project_id=self.project_id,
+                ref_type='calendar',
+                ref_id=event_id,
+                exclude_user_id=exclude_user_id
+            )
+        except Exception:
+            pass
 
     # ── 카테고리 ──
 
@@ -322,6 +368,13 @@ class Model:
                 pass
 
         self.project.updateTime()
+
+        # 참가자에게 알림 생성
+        all_uids = self._collectAttendeeUserIds(insert_id)
+        if all_uids:
+            event_title = data.get('title', '')
+            self._notifyCalendar('calendar_invited', insert_id, event_title, all_uids, exclude_user_id=data.get('user_id', ''))
+
         return self.get(insert_id)
 
     def update(self, data):
@@ -410,6 +463,15 @@ class Model:
                 self.removeGroupAttendee(event_id, gt, gid)
 
         self.project.updateTime()
+
+        # 참가자에게 수정 알림
+        all_uids = self._collectAttendeeUserIds(event_id)
+        if all_uids:
+            updated_event = db.get(id=event_id)
+            event_title = updated_event.get('title', '') if updated_event else ''
+            current_user = config.session_user_id()
+            self._notifyCalendar('calendar_updated', event_id, event_title, all_uids, exclude_user_id=current_user)
+
         return self.get(event_id)
 
     def move(self, event_id, new_start, new_end):
@@ -428,5 +490,14 @@ class Model:
         if existing is None:
             raise Exception("Event not found")
 
+        # 삭제 전에 참가자 목록과 제목 확보
+        all_uids = self._collectAttendeeUserIds(event_id)
+        event_title = existing.get('title', '') if hasattr(existing.get('title', ''), '__len__') else str(existing.get('title', ''))
+
         db.update(dict(status='deleted', updated=datetime.datetime.now()), id=event_id)
         self.project.updateTime()
+
+        # 참가자에게 삭제 알림
+        if all_uids:
+            current_user = config.session_user_id()
+            self._notifyCalendar('calendar_deleted', event_id, event_title, all_uids, exclude_user_id=current_user)

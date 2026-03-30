@@ -41,9 +41,14 @@ div(class="h-full overflow-y-auto")
                                         span(class="flex items-center gap-1")
                                             i(class="ti ti-refresh text-[14px]")
                                             | {{displayDate(item.updated)}}
-                                        span(class="flex items-center gap-1", *ngIf="item.untrack")
-                                            i(class="ti ti-eye-off text-[14px]")
-                                            | 추적 안함
+                                //- 즐겨찾기(track/untrack) 별 아이콘
+                                div(class="shrink-0 ml-3 flex items-center")
+                                    button(class="p-1 rounded-md transition-colors", (click)="toggleUntrack($event, item)",
+                                        [class.text-yellow-400]="!item.untrack",
+                                        [class.hover:text-yellow-500]="!item.untrack",
+                                        [class.text-neutral-300]="item.untrack",
+                                        [class.hover:text-yellow-400]="item.untrack")
+                                        i(class="text-lg", [class.ti-star-filled]="!item.untrack", [class.ti-star]="item.untrack")
 
                     //- 페이지네이션
                     div(class="sticky -bottom-0 py-4 backdrop-blur", *ngIf="list.length > 0")

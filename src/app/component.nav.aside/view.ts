@@ -1,15 +1,18 @@
-import { OnInit } from '@angular/core';
+import { OnInit, OnDestroy } from '@angular/core';
 import { HostListener } from '@angular/core';
 import { Service } from '@wiz/libs/portal/season/service';
 import { Project } from '@wiz/libs/portal/works/project';
 
-export class Component implements OnInit {
+export class Component implements OnInit, OnDestroy {
     constructor(
         public service: Service,
         public project: Project,
     ) { }
 
     public profileImage: string = '';
+    public unreadCount: number = 0;
+    public pushEnabled: boolean = true;
+    private pollTimer: any = null;
 
     // 프로젝트 스위칭 드롭다운
     public projectSwitcher: any = {
@@ -24,6 +27,69 @@ export class Component implements OnInit {
         await this.service.init();
         await this.loadMyProjects();
         await this.loadProfileImage();
+        await this.loadUnreadCount();
+        this.checkPushState();
+        this.pollTimer = setInterval(() => this.loadUnreadCount(), 30000);
+    }
+
+    public ngOnDestroy() {
+        if (this.pollTimer) {
+            clearInterval(this.pollTimer);
+            this.pollTimer = null;
+        }
+    }
+
+    public async loadUnreadCount() {
+        try {
+            const { code, data } = await wiz.call('unread_count');
+            if (code === 200) {
+                this.unreadCount = data?.count || 0;
+                await this.service.render();
+            }
+        } catch (e) { }
+    }
+
+    private checkPushState() {
+        if (typeof Notification === 'undefined' || !('PushManager' in window)) {
+            this.pushEnabled = true;
+            return;
+        }
+        if (Notification.permission === 'denied') {
+            this.pushEnabled = true;
+            return;
+        }
+        if (Notification.permission === 'granted' && (window as any).__pushSubscribed) {
+            this.pushEnabled = true;
+            return;
+        }
+        this.pushEnabled = false;
+    }
+
+    public async enablePush(event: any) {
+        event.stopPropagation();
+        try {
+            const permission = await Notification.requestPermission();
+            if (permission === 'granted') {
+                const reg = (window as any).__swRegistration || await navigator.serviceWorker.ready;
+                const vapidKey = (window as any).__vapidKey;
+                const toUint8 = (window as any).__urlBase64ToUint8Array;
+                if (!reg || !vapidKey || !toUint8) return;
+                const sub = await reg.pushManager.subscribe({
+                    userVisibleOnly: true,
+                    applicationServerKey: toUint8(vapidKey)
+                });
+                const sendSub = (window as any).__sendPushSubscription;
+                if (sendSub) sendSub(sub);
+                (window as any).__pushSubscribed = true;
+                this.pushEnabled = true;
+                await this.service.render();
+            } else if (permission === 'denied') {
+                this.pushEnabled = true;
+                await this.service.render();
+            }
+        } catch (e) {
+            console.error('Push notification setup failed:', e);
+        }
     }
 
     public async loadProfileImage() {

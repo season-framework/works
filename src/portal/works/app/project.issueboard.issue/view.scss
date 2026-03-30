@@ -1,0 +1,21 @@
+:host {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.modal-resize {
+    resize: both;
+    min-width: 480px;
+    min-height: 400px;
+
+    @media (max-width: 639px) {
+        resize: none;
+        min-width: unset;
+        min-height: unset;
+    }
+
+    &::-webkit-resizable {
+        display: block;
+    }
+}

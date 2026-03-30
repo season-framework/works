@@ -109,6 +109,7 @@ class Model:
         data['updated'] = datetime.datetime.now()
 
         # 변경 이력 추적 로그
+        changes = []
         tracker = dict(title="제목", process="진행률", level="중요도", status="진행상태", planstart="시작일", planend="종료일")
         mapper = dict()
         mapper['status'] = dict(open="시작되지 않음", work="진행중", finish="완료됨", close="종료됨", cancel="취소")
@@ -129,15 +130,18 @@ class Model:
                 if after in mapper[key]: after = mapper[key][after]
             msg = f"'{translate}' 항목이 '{before}' 에서 '{after}' (으)로 변경되었습니다"
             self.issueboard.message.log(issue_id, msg)
+            changes.append(translate)
         
         if data['todo'] != issue['todo']:
             msg = f"'TODO' 항목이 변경되었습니다"
             self.issueboard.message.log(issue_id, msg)
+            changes.append("TODO")
         
         if 'description' in data:
             if data['description'] != issue['description']:
                 msg = f"'설명' 항목이 변경되었습니다"
                 self.issueboard.message.log(issue_id, msg)
+                changes.append("설명")
 
         if 'worker' in data:
             if data['worker'] != issue['worker']:
@@ -151,6 +155,7 @@ class Model:
                     _workers = ", ".join(_workers)
                     msg = f"작업자가 변경되었습니다. 현재 작업자: {_workers}"
                 self.issueboard.message.log(issue_id, msg)
+                changes.append("작업자")
 
         issuedb.update(data, id=issue_id, project_id=self.project_id)
         data = issuedb.get(id=issue_id, project_id=self.project_id)
@@ -159,4 +164,33 @@ class Model:
         self.issueboard.emit("issue", issue_id)
 
         self.project.updateTime()
+
+        # Push 알림: 의미있는 변경이 있을 때 관련 사용자에게 발송
+        if changes:
+            try:
+                Push = wiz.model("portal/works/struct/push")
+                related_users = set()
+                related_users.add(issue['user_id'])
+                if data.get('worker'):
+                    for w in data['worker']:
+                        related_users.add(w)
+                if issue.get('worker'):
+                    for w in issue['worker']:
+                        related_users.add(w)
+                related_users.discard(user_id)
+                related_users.discard('')
+
+                if related_users:
+                    project_title = self.project.data.get('title', '')
+                    issue_title = data.get('title', issue.get('title', ''))
+                    title = f"[{project_title}] {issue_title}"
+                    body = ", ".join(changes) + " 항목이 변경되었습니다"
+                    for uid in related_users:
+                        try:
+                            Push.send(uid, title, body, url="/notification")
+                        except Exception:
+                            pass
+            except Exception:
+                pass
+
         return data

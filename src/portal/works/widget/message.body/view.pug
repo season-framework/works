@@ -13,13 +13,16 @@
             .ml-2
             .cursor-pointer(*ngIf="msg.type != 'log'")
                 i.ti.ti-star.text-neutral-300((click)="event.favoriteMessage(msg)", *ngIf="msg.favorite == 0", class="hover:text-yellow-500")
-                i.ti.ti-star-filled.text-yellow-500((click)="event.favoriteMessage(msg)", *ngIf="msg.favorite == 1")
+                i.ti.ti-filled.ti-star.text-yellow-500((click)="event.favoriteMessage(msg)", *ngIf="msg.favorite == 1")
 
     div(*ngIf="msg.attachment && msg.attachment.length > 0", class="mb-[4px]")
         ng-container(*ngFor="let file of msg.attachment")
             a.inline-flex.items-center.gap-1.rounded-md.text-xs.bg-neutral-100.text-neutral-600.mr-1.mt-1.transition(class="hover:bg-neutral-200 px-2 py-0.5 overflow-hidden max-w-[180px] text-ellipsis text-nowrap", [attr.href]="project.downloadUrl(file.id, file.filename)", target="_blank", [title]="file.filename")
                 i.ti.ti-download
                 span {{file.filename}}
+        button.inline-flex.items-center.gap-1.rounded-md.text-xs.bg-blue-50.text-blue-600.mr-1.mt-1.transition(*ngIf="msg.attachment.length > 1 && event.downloadFilesZip", class="hover:bg-blue-100 px-2 py-0.5", (click)="event.downloadFilesZip(msg.attachment, 'message_files')")
+            i.ti.ti-archive.text-sm
+            span 일괄 다운로드
 
     .relative.break-all.text-sm.text-neutral-600(*ngIf="msg.type == 'log'") {{msg.message}}
     .relative.break-all.prose.text-sm(*ngIf="msg.type != 'log'", [innerHtml]="project.display.markdown(msg.message)")

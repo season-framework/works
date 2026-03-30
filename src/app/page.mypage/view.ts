@@ -136,6 +136,27 @@ export class Component implements OnInit {
         }
     }
 
+    public async forceLogoutAll() {
+        let res = await this.service.alert.show({
+            title: '',
+            message: '현재 기기를 제외한 모든 기기를 로그아웃하시겠습니까?',
+            cancel: '취소',
+            actionBtn: 'error',
+            action: '전체 로그아웃',
+            status: 'error'
+        });
+
+        if (!res) return;
+
+        const { code, data } = await wiz.call("force_logout_all");
+        if (code == 200) {
+            await this.alert(`${data.count}개 기기가 로그아웃 되었습니다`, 'success');
+            await this.loadActiveSessions();
+        } else {
+            await this.alert("오류가 발생했습니다");
+        }
+    }
+
     public togglePassword() {
         this.passwordOpen = !this.passwordOpen;
         this.service.render();

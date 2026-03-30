@@ -116,3 +116,5 @@
 | 2026-03-27 | 003 | 이슈 설명 영역 파일 업로드 기능 구현 | [상세](devlog/2026-03-27/003-issue-description-attachment.md) |
 | 2026-03-27 | 004 | Firefox 브라우저 호환성 감사 및 스크롤바 CSS 수정 | [상세](devlog/2026-03-27/004-firefox-compatibility-audit.md) |
 | 2026-03-29 | 001 | 캘린더 그룹 참가자(추상 그룹) 기능 구현 (FN-0001~0008) | [상세](devlog/2026-03-29/001-calendar-group-attendee.md) |
+| 2026-03-29 | 002 | 통합 알림 시스템 및 PWA Push 알림 구현 (FN-0009~0018) | [상세](devlog/2026-03-29/002-notification-push-system.md) |
+| 2026-03-30 | 001 | UI 개선 일괄 작업 (FN-0001~0007): 즐겨찾기, 일괄다운로드, 모달개선, 로딩투명화, 대시보드모달, 계획삭제 | [상세](devlog/2026-03-30/001-ui-improvements-batch.md) || 2026-03-30 | 002 | Push 알림 서버 전송 실패(RecursionError) 수정 — gevent+exec() SSL 재귀 우회 | [상세](devlog/2026-03-30/002-push-recursion-fix.md) |

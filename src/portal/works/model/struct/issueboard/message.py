@@ -3,12 +3,45 @@ import datetime
 config = wiz.model("portal/works/config")
 orm = wiz.model("portal/season/orm")
 messagedb = orm.use("issueboard/message", module="works")
+issuedb = orm.use("issueboard/issue", module="works")
 
 class Model:
     def __init__(self, issueboard):
         self.issueboard = issueboard
         self.project = issueboard.project
         self.project_id = issueboard.project.data['id']
+
+    def _send_push_to_related(self, issue_id, sender_user_id, message_text):
+        """이슈 관련 사용자에게 push 알림 발송 (발신자 제외)"""
+        try:
+            Push = wiz.model("portal/works/struct/push")
+            issue = issuedb.get(id=issue_id, project_id=self.project_id, fields="user_id,worker,title")
+            if issue is None:
+                return
+
+            related_users = set()
+            related_users.add(issue['user_id'])
+            if issue.get('worker'):
+                for w in issue['worker']:
+                    related_users.add(w)
+            related_users.discard(sender_user_id)
+            related_users.discard('')
+
+            if not related_users:
+                return
+
+            project_title = self.project.data.get('title', '')
+            issue_title = issue.get('title', '')
+            title = f"[{project_title}] {issue_title}"
+            body = message_text[:100] if message_text else "새 메시지가 있습니다"
+
+            for uid in related_users:
+                try:
+                    Push.send(uid, title, body, url="/notification")
+                except Exception:
+                    pass
+        except Exception:
+            pass
 
     def create(self, data):
         self.project.member.accessLevel(['admin', 'manager', 'user'])
@@ -36,6 +69,10 @@ class Model:
 
         self.issueboard.emit("message", {"issue_id": issue_id, "message_id": str(message_id), "parent_id": str(parent_id)})
         self.project.updateTime()
+
+        # Push 알림 발송 (log 타입 제외)
+        if data.get('type', '') != 'log':
+            self._send_push_to_related(issue_id, user_id, data.get('message', ''))
 
     def updateFavorite(self, message_id, favorite):
         self.project.member.accessLevel(['admin', 'manager', 'user'])

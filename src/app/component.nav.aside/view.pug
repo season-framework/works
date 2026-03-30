@@ -25,9 +25,16 @@ div(class="flex flex-col max-sm:flex-row max-sm:flex-wrap h-screen max-sm:h-auto
         //- 액션 아이콘 바
         div(class="flex items-center mx-3 mb-2 gap-1")
             a(routerLink="/notification", routerLinkActive="nav-action-active",
-                class="flex-1 flex items-center justify-center h-8 rounded-md text-neutral-400 hover:bg-neutral-200/60 hover:text-neutral-600 transition-colors",
+                class="relative flex-1 flex items-center justify-center h-8 rounded-md text-neutral-400 hover:bg-neutral-200/60 hover:text-neutral-600 transition-colors",
                 title="알림")
                 i.ti.ti-bell(class="text-[17px]")
+                span(*ngIf="unreadCount > 0",
+                    class="absolute -top-1 -right-0.5 min-w-[16px] h-4 flex items-center justify-center rounded-full bg-red-500 text-white text-[10px] font-bold px-1") {{unreadCount > 99 ? '99+' : unreadCount}}
+            button(*ngIf="!pushEnabled",
+                class="flex-1 flex items-center justify-center h-8 rounded-md text-amber-500 hover:bg-amber-50 hover:text-amber-600 transition-colors animate-pulse",
+                (click)="enablePush($event)",
+                title="푸시 알림 활성화")
+                i.ti.ti-bell-ringing(class="text-[17px]")
             a(*ngIf="service.auth.session.membership === 'admin'",
                 routerLink="/admin", routerLinkActive="nav-action-active",
                 class="flex-1 flex items-center justify-center h-8 rounded-md text-neutral-400 hover:bg-neutral-200/60 hover:text-neutral-600 transition-colors",
@@ -67,7 +74,7 @@ div(class="flex flex-col max-sm:flex-row max-sm:flex-wrap h-screen max-sm:h-auto
                 div(class="flex items-center gap-2 px-3 py-2 mt-2")
                     span(class="cursor-pointer transition-all hover:scale-110", (click)="project.untrack(!project.data().userconfig_untrack)")
                         i.ti.ti-star(class="text-[18px] text-neutral-400", *ngIf="project.data().userconfig_untrack")
-                        i.ti.ti-star-filled(class="text-[18px] text-amber-400", *ngIf="!project.data().userconfig_untrack")
+                        i.ti.ti-filled.ti-star(class="text-[18px] text-amber-400", *ngIf="!project.data().userconfig_untrack")
                     span(class="text-sm font-medium text-neutral-900 truncate") {{project.data().title}}
                 div(class="space-y-0.5 ml-2")
                     a(class="flex items-center gap-3 px-3 py-1.5 rounded-md text-sm text-neutral-500 hover:bg-neutral-200/60 transition-colors", [routerLink]="project.menuLink('info')", routerLinkActive="font-medium text-neutral-900 bg-neutral-200/60") 프로젝트 정보

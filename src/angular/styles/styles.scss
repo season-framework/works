@@ -4,6 +4,23 @@
 @import "portal/works/core";
 @import "portal/wiki/core";
 
+@font-face {
+    font-family: "tabler-icons-filled";
+    font-style: normal;
+    font-weight: 400;
+    src: url("/assets/font/tabler-icons-filled.woff2") format("woff2"),
+         url("/assets/font/tabler-icons-filled.woff") format("woff"),
+         url("/assets/font/tabler-icons-filled.ttf") format("truetype");
+}
+
+.ti-filled {
+    font-family: "tabler-icons-filled" !important;
+}
+
+.ti-filled.ti-star:before { content: "\f6a6"; }
+.ti-filled.ti-circle:before { content: "\f671"; }
+.ti-filled.ti-hourglass:before { content: "\f756"; }
+
 html,
 body,
 app-root {

@@ -1,4 +1,7 @@
 import json
+import zipfile
+import io
+import urllib
 
 pid = wiz.request.query("project_id", True)
 projectModel = wiz.model("portal/works/project")
@@ -76,9 +79,6 @@ def members():
     members = project.member.members()
     result = []
     for m in members:
-        # 실제 프로젝트 멤버만 포함 (memberdb 레코드가 있는 항목만)
-        # member.members()는 전체 사용자를 guest로 추가하므로,
-        # memberdb 레코드의 id 필드 존재 여부로 실제 멤버를 구분
         if not m.get('id'):
             continue
         if m.get('meta') and m['meta'].get('id'):
@@ -89,3 +89,40 @@ def members():
                 profile_image=m['meta'].get('profile_image', '')
             ))
     wiz.response.status(200, result)
+
+def download_files_zip():
+    flask = wiz.response._flask
+    files_data = wiz.request.query("files", True)
+    files_data = json.loads(files_data)
+    zip_name = wiz.request.query("zip_name", "files")
+
+    fs = wiz.model("portal/works/fs").use(f"project/{project.id}/attachment")
+
+    buf = io.BytesIO()
+    try:
+        with zipfile.ZipFile(buf, 'w', zipfile.ZIP_DEFLATED) as zf:
+            used_names = {}
+            for item in files_data:
+                fid = item.get('id', '')
+                fname = item.get('filename', fid)
+                if not fs.isfile(fid):
+                    continue
+                filepath = fs.abspath(fid)
+                if fname in used_names:
+                    used_names[fname] += 1
+                    name_parts = fname.rsplit('.', 1)
+                    if len(name_parts) == 2:
+                        fname = f"{name_parts[0]}_{used_names[fname]}.{name_parts[1]}"
+                    else:
+                        fname = f"{fname}_{used_names[fname]}"
+                else:
+                    used_names[fname] = 0
+                zf.write(filepath, fname)
+    except Exception as e:
+        wiz.response.status(500, message=str(e))
+    buf.seek(0)
+
+    encoded_name = urllib.parse.quote(zip_name + ".zip")
+    resp = flask.Response(buf.getvalue(), mimetype='application/zip')
+    resp.headers['Content-Disposition'] = f"attachment; filename*=UTF-8''{encoded_name}"
+    wiz.response.response(resp)

@@ -1,6 +1,7 @@
 div(*ngIf="cache.loaded", class="w-full h-full overflow-hidden", [ngClass]="containerClass()")
-    div(class="w-full h-full overflow-hidden", [ngClass]="issue.modal ? 'lg:pt-7' : ''")
-        div(class="overflow-hidden bg-white", [ngClass]="(issue.modal ? 'mx-auto lg:rounded-xl max-w-screen-2xl w-full lg:w-5/4 h-full lg:h-[90vh]' : 'w-full h-full') + (issue.id == 'new' ? ' max-w-[840px]' : '')", role="document", '#body'='')
+    div(class="w-full h-full overflow-hidden flex justify-center",
+        [ngClass]="issue.modal && isMovable ? 'items-start sm:pt-6 lg:pt-10' : 'items-center'")
+        div(class="overflow-hidden bg-white", [ngClass]="(issue.modal && isMovable ? 'w-full h-full sm:w-11/12 sm:h-[92%] sm:rounded-xl max-w-[1400px] modal-resize' : 'w-full h-full') + (issue.id == 'new' ? ' max-w-[840px]' : '')", role="document", '#body'='')
             div(class="w-full h-full overflow-hidden flex flex-col", [class.modal-content]="issue.modal")
                 //- 헤더
                 div(class="flex items-center px-4 py-3 border-b border-neutral-200 h-14 shrink-0 gap-2")
@@ -91,7 +92,7 @@ div(*ngIf="cache.loaded", class="w-full h-full overflow-hidden", [ngClass]="cont
                                         label(class="cursor-pointer")
                                             input(type="radio", name="level", value=1, class="sr-only peer/level", [(ngModel)]="data.info.level", [disabled]="!isRole(['owner', 'manager'])")
                                             span(class="inline-flex items-center gap-1 px-2.5 py-1 text-xs rounded-md border border-neutral-200 text-neutral-500 transition-all whitespace-nowrap peer-checked/level:border-blue-400 peer-checked/level:bg-blue-50 peer-checked/level:text-blue-600 hover:bg-neutral-50")
-                                                i(class="ti ti-circle-filled text-sm")
+                                                i(class="ti ti-filled ti-circle text-sm")
                                                 span 중간
                                         label(class="cursor-pointer")
                                             input(type="radio", name="level", value=2, class="sr-only peer/level", [(ngModel)]="data.info.level", [disabled]="!isRole(['owner', 'manager'])")
@@ -131,7 +132,7 @@ div(*ngIf="cache.loaded", class="w-full h-full overflow-hidden", [ngClass]="cont
                                         label(class="cursor-pointer")
                                             input(type="radio", name="status", value="finish", class="sr-only peer/status", [(ngModel)]="data.info.status", [disabled]="!isRole(['owner', 'manager'])")
                                             span(class="inline-flex items-center gap-1 px-2.5 py-1 text-xs rounded-md border border-neutral-200 text-neutral-500 transition-all whitespace-nowrap peer-checked/status:border-blue-400 peer-checked/status:bg-blue-50 peer-checked/status:text-blue-600 hover:bg-neutral-50")
-                                                i(class="ti ti-hourglass-filled text-sm")
+                                                i(class="ti ti-filled ti-hourglass text-sm")
                                                 span 완료
                                         label(class="cursor-pointer", *ngIf="isRole(['owner'])")
                                             input(type="radio", name="status", value="close", class="sr-only peer/status", [(ngModel)]="data.info.status", [disabled]="!isRole(['owner', 'manager'])")
@@ -202,6 +203,11 @@ div(*ngIf="cache.loaded", class="w-full h-full overflow-hidden", [ngClass]="cont
                                             i(class="ti ti-files text-sm text-neutral-400")
                                             span(class="text-xs font-medium text-neutral-500 ml-1.5") 첨부파일
                                             span(class="text-xs text-neutral-400 ml-1") ({{data.info.attachment?.length || 0}})
+                                            div(class="ml-auto", *ngIf="data.info.attachment?.length > 1")
+                                                button(class="inline-flex items-center gap-1 px-2 py-1 text-xs text-neutral-500 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors",
+                                                    (click)="downloadFilesZip(data.info.attachment, data.info.title || 'attachments')")
+                                                    i(class="ti ti-download text-sm")
+                                                    span 일괄 다운로드
                                         ng-container(*ngFor="let file of data.info.attachment")
                                             div(class="flex items-center px-3 py-2 border-b border-neutral-100 last:border-b-0 hover:bg-neutral-50/50 transition-colors group")
                                                 i(class="ti text-base mr-2.5", [ngClass]="getFileIcon(file.filename)")

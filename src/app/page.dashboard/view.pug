@@ -1,144 +1,311 @@
-div(class="flex-1 min-h-0 overflow-y-auto")
-    div(class="max-w-6xl mx-auto px-5 py-4")
-        //- 헤더
-        div(class="mb-4")
-            h1(class="text-lg font-semibold text-neutral-900") 대시보드
-            p(class="mt-0.5 text-sm text-neutral-500") 내 프로젝트와 작업 현황을 한눈에 확인하세요
+div(class="relative w-full h-full overflow-hidden")
+    div(class="flex-1 min-h-0 overflow-y-auto w-full h-full")
+        div(class="max-w-6xl mx-auto px-5 py-4")
+            //- 헤더
+            div(class="mb-4")
+                h1(class="text-lg font-semibold text-neutral-900") 대시보드
+                p(class="mt-0.5 text-sm text-neutral-500") 내 프로젝트와 작업 현황을 한눈에 확인하세요
 
-        //- 로딩
-        ng-container(*ngIf="!loaded")
-            div(class="grid gap-3 grid-cols-1 md:grid-cols-2")
-                div(class="bg-white rounded-lg border border-neutral-200 p-4", *ngFor="let i of [1,2,3,4]")
-                    div(class="bg-neutral-100 rounded h-5 mb-3 w-1/3 animate-pulse")
-                    div(class="bg-neutral-100 rounded h-4 mb-2 w-2/3 animate-pulse")
-                    div(class="bg-neutral-100 rounded h-4 w-1/2 animate-pulse")
+            //- 로딩
+            ng-container(*ngIf="!loaded")
+                div(class="grid gap-3 grid-cols-1 md:grid-cols-2")
+                    div(class="bg-white rounded-lg border border-neutral-200 p-4", *ngFor="let i of [1,2,3,4]")
+                        div(class="bg-neutral-100 rounded h-5 mb-3 w-1/3 animate-pulse")
+                        div(class="bg-neutral-100 rounded h-4 mb-2 w-2/3 animate-pulse")
+                        div(class="bg-neutral-100 rounded h-4 w-1/2 animate-pulse")
 
-        ng-container(*ngIf="loaded")
-            //- ═══════════════════════════════════════════════
-            //- 활동 통계 섹션
-            //- ═══════════════════════════════════════════════
-            div(class="grid gap-3 mb-3 grid-cols-1 md:grid-cols-3")
-                //- 1. 이슈 상태 분포
-                div(class="bg-white rounded-lg border border-neutral-200 overflow-hidden cursor-pointer",
-                    (click)="navigateIssues()")
-                    div(class="flex items-center justify-between px-4 py-2.5 border-b border-neutral-200")
-                        div(class="flex items-center gap-2")
-                            i(class="ti ti-chart-bar text-[16px] text-neutral-400")
-                            span(class="text-[13px] font-semibold text-neutral-800") 이슈 상태 분포
-                        span(class="text-xs text-neutral-400") {{issues.total}}건
-                    div(class="p-4")
-                        ng-container(*ngIf="issues.total === 0")
-                            div(class="flex flex-col items-center justify-center py-4 text-center")
-                                i(class="ti ti-chart-bar-off text-2xl text-neutral-300 mb-1")
-                                p(class="text-sm text-neutral-400") 배정된 이슈가 없습니다
-                        ng-container(*ngIf="issues.total > 0")
-                            div(class="flex h-5 rounded-full overflow-hidden")
-                                div(class="bg-neutral-300 transition-all",
-                                    [ngStyle]="{'width': (issues.counts.open / issues.total * 100) + '%'}")
-                                div(class="bg-blue-500 transition-all",
-                                    [ngStyle]="{'width': (issues.counts.work / issues.total * 100) + '%'}")
-                                div(class="bg-green-500 transition-all",
-                                    [ngStyle]="{'width': (issues.counts.finish / issues.total * 100) + '%'}")
-                            div(class="flex items-center gap-4 mt-3 flex-wrap")
-                                div(class="flex items-center gap-1.5")
-                                    div(class="w-2 h-2 rounded-full bg-neutral-300")
-                                    span(class="text-xs text-neutral-500") 대기 {{issues.counts.open}}
-                                div(class="flex items-center gap-1.5")
-                                    div(class="w-2 h-2 rounded-full bg-blue-500")
-                                    span(class="text-xs text-neutral-500") 진행 {{issues.counts.work}}
-                                div(class="flex items-center gap-1.5")
-                                    div(class="w-2 h-2 rounded-full bg-green-500")
-                                    span(class="text-xs text-neutral-500") 완료 {{issues.counts.finish}}
+            ng-container(*ngIf="loaded")
+                //- ═══════════════════════════════════════════════
+                //- 활동 통계 섹션
+                //- ═══════════════════════════════════════════════
+                div(class="grid gap-3 mb-3 grid-cols-1 md:grid-cols-3")
+                    //- 1. 이슈 상태 분포
+                    div(class="bg-white rounded-lg border border-neutral-200 overflow-hidden cursor-pointer",
+                        (click)="navigateIssues()")
+                        div(class="flex items-center justify-between px-4 py-2.5 border-b border-neutral-200")
+                            div(class="flex items-center gap-2")
+                                i(class="ti ti-chart-bar text-[16px] text-neutral-400")
+                                span(class="text-[13px] font-semibold text-neutral-800") 이슈 상태 분포
+                            span(class="text-xs text-neutral-400") {{issues.total}}건
+                        div(class="p-4")
+                            ng-container(*ngIf="issues.total === 0")
+                                div(class="flex flex-col items-center justify-center py-4 text-center")
+                                    i(class="ti ti-chart-bar-off text-2xl text-neutral-300 mb-1")
+                                    p(class="text-sm text-neutral-400") 배정된 이슈가 없습니다
+                            ng-container(*ngIf="issues.total > 0")
+                                div(class="flex h-5 rounded-full overflow-hidden")
+                                    div(class="bg-neutral-300 transition-all",
+                                        [ngStyle]="{'width': (issues.counts.open / issues.total * 100) + '%'}")
+                                    div(class="bg-blue-500 transition-all",
+                                        [ngStyle]="{'width': (issues.counts.work / issues.total * 100) + '%'}")
+                                    div(class="bg-green-500 transition-all",
+                                        [ngStyle]="{'width': (issues.counts.finish / issues.total * 100) + '%'}")
+                                div(class="flex items-center gap-4 mt-3 flex-wrap")
+                                    div(class="flex items-center gap-1.5")
+                                        div(class="w-2 h-2 rounded-full bg-neutral-300")
+                                        span(class="text-xs text-neutral-500") 대기 {{issues.counts.open}}
+                                    div(class="flex items-center gap-1.5")
+                                        div(class="w-2 h-2 rounded-full bg-blue-500")
+                                        span(class="text-xs text-neutral-500") 진행 {{issues.counts.work}}
+                                    div(class="flex items-center gap-1.5")
+                                        div(class="w-2 h-2 rounded-full bg-green-500")
+                                        span(class="text-xs text-neutral-500") 완료 {{issues.counts.finish}}
 
-                //- 2. 프로젝트별 이슈 분포
-                div(class="bg-white rounded-lg border border-neutral-200 overflow-hidden")
-                    div(class="flex items-center justify-between px-4 py-2.5 border-b border-neutral-200")
-                        div(class="flex items-center gap-2")
-                            i(class="ti ti-folders text-[16px] text-neutral-400")
-                            span(class="text-[13px] font-semibold text-neutral-800") 프로젝트별 이슈
-                    div(class="p-4")
-                        ng-container(*ngIf="issuesByProject.length === 0")
-                            div(class="flex flex-col items-center justify-center py-4 text-center")
-                                i(class="ti ti-folder-off text-2xl text-neutral-300 mb-1")
-                                p(class="text-sm text-neutral-400") 배정된 이슈가 없습니다
-                        div(class="space-y-2.5")
-                            ng-container(*ngFor="let item of issuesByProject")
-                                a(class="block cursor-pointer group",
-                                    [routerLink]="'/project/' + item.project.namespace + '/issueboard'")
-                                    div(class="flex items-center justify-between mb-0.5")
-                                        span(class="text-xs text-neutral-600 truncate max-w-[140px] group-hover:text-blue-600 transition-colors") {{item.project.title}}
-                                        span(class="text-xs text-neutral-400 font-medium") {{item.count}}
-                                    div(class="h-2 bg-neutral-100 rounded-full overflow-hidden")
-                                        div(class="h-full bg-blue-500 rounded-full transition-all",
-                                            [ngStyle]="{'width': (item.count / maxProjectIssueCount * 100) + '%'}")
+                    //- 2. 프로젝트별 이슈 분포
+                    div(class="bg-white rounded-lg border border-neutral-200 overflow-hidden")
+                        div(class="flex items-center justify-between px-4 py-2.5 border-b border-neutral-200")
+                            div(class="flex items-center gap-2")
+                                i(class="ti ti-folders text-[16px] text-neutral-400")
+                                span(class="text-[13px] font-semibold text-neutral-800") 프로젝트별 이슈
+                        div(class="p-4")
+                            ng-container(*ngIf="issuesByProject.length === 0")
+                                div(class="flex flex-col items-center justify-center py-4 text-center")
+                                    i(class="ti ti-folder-off text-2xl text-neutral-300 mb-1")
+                                    p(class="text-sm text-neutral-400") 배정된 이슈가 없습니다
+                            div(class="space-y-2.5")
+                                ng-container(*ngFor="let item of issuesByProject")
+                                    a(class="block cursor-pointer group",
+                                        [routerLink]="'/project/' + item.project.namespace + '/issueboard'")
+                                        div(class="flex items-center justify-between mb-0.5")
+                                            span(class="text-xs text-neutral-600 truncate max-w-[140px] group-hover:text-blue-600 transition-colors") {{item.project.title}}
+                                            span(class="text-xs text-neutral-400 font-medium") {{item.count}}
+                                        div(class="h-2 bg-neutral-100 rounded-full overflow-hidden")
+                                            div(class="h-full bg-blue-500 rounded-full transition-all",
+                                                [ngStyle]="{'width': (item.count / maxProjectIssueCount * 100) + '%'}")
 
-                //- 3. 최근 2주 활동 추이
-                div(class="bg-white rounded-lg border border-neutral-200 overflow-hidden")
-                    div(class="flex items-center justify-between px-4 py-2.5 border-b border-neutral-200")
-                        div(class="flex items-center gap-2")
-                            i(class="ti ti-activity text-[16px] text-neutral-400")
-                            span(class="text-[13px] font-semibold text-neutral-800") 최근 2주 활동
-                    div(class="p-4")
-                        ng-container(*ngIf="maxTrendCount === 0")
-                            div(class="flex flex-col items-center justify-center py-4 text-center")
-                                i(class="ti ti-chart-line text-2xl text-neutral-300 mb-1")
-                                p(class="text-sm text-neutral-400") 최근 2주간 활동이 없습니다
-                        ng-container(*ngIf="maxTrendCount > 0")
-                            div(class="flex items-end gap-0.5 h-16")
-                                ng-container(*ngFor="let item of activityTrend")
-                                    div(class="flex-1 flex flex-col items-center justify-end h-full")
-                                        div(class="text-[9px] text-neutral-400 mb-0.5",
-                                            *ngIf="item.count > 0") {{item.count}}
-                                        div(class="w-full rounded-t transition-all",
-                                            [ngClass]="item.is_today ? 'bg-blue-500' : 'bg-neutral-300'",
-                                            [ngStyle]="{'height': (item.count / maxTrendCount * 100) + '%', 'min-height': item.count > 0 ? '4px' : '0px'}")
-                            div(class="flex gap-0.5 mt-1")
-                                ng-container(*ngFor="let item of activityTrend")
-                                    div(class="flex-1 text-center")
-                                        span(class="text-[9px]",
-                                            [ngClass]="item.is_today ? 'text-blue-500 font-bold' : 'text-neutral-400'") {{trendDayLabel(item.date)}}
+                    //- 3. 최근 2주 활동 추이
+                    div(class="bg-white rounded-lg border border-neutral-200 overflow-hidden")
+                        div(class="flex items-center justify-between px-4 py-2.5 border-b border-neutral-200")
+                            div(class="flex items-center gap-2")
+                                i(class="ti ti-activity text-[16px] text-neutral-400")
+                                span(class="text-[13px] font-semibold text-neutral-800") 최근 2주 활동
+                        div(class="p-4")
+                            ng-container(*ngIf="maxTrendCount === 0")
+                                div(class="flex flex-col items-center justify-center py-4 text-center")
+                                    i(class="ti ti-chart-line text-2xl text-neutral-300 mb-1")
+                                    p(class="text-sm text-neutral-400") 최근 2주간 활동이 없습니다
+                            ng-container(*ngIf="maxTrendCount > 0")
+                                div(class="flex items-end gap-0.5 h-16")
+                                    ng-container(*ngFor="let item of activityTrend")
+                                        div(class="flex-1 flex flex-col items-center justify-end h-full")
+                                            div(class="text-[9px] text-neutral-400 mb-0.5",
+                                                *ngIf="item.count > 0") {{item.count}}
+                                            div(class="w-full rounded-t transition-all",
+                                                [ngClass]="item.is_today ? 'bg-blue-500' : 'bg-neutral-300'",
+                                                [ngStyle]="{'height': (item.count / maxTrendCount * 100) + '%', 'min-height': item.count > 0 ? '4px' : '0px'}")
+                                div(class="flex gap-0.5 mt-1")
+                                    ng-container(*ngFor="let item of activityTrend")
+                                        div(class="flex-1 text-center")
+                                            span(class="text-[9px]",
+                                                [ngClass]="item.is_today ? 'text-blue-500 font-bold' : 'text-neutral-400'") {{trendDayLabel(item.date)}}
 
-            //- ═══════════════════════════════════════════════
-            //- 안읽은 이슈 섹션 (항상 표시)
-            //- ═══════════════════════════════════════════════
-            div(class="mb-3")
-                div(class="bg-white rounded-lg border overflow-hidden",
-                    [ngClass]="unreadTotal > 0 ? 'border-blue-200' : 'border-neutral-200'")
-                    div(class="flex items-center justify-between px-4 py-2.5 border-b",
-                        [ngClass]="unreadTotal > 0 ? 'border-blue-100 bg-blue-50' : 'border-neutral-200'")
-                        div(class="flex items-center gap-2")
-                            i(class="ti ti-bell-ringing text-[16px]",
-                                [ngClass]="unreadTotal > 0 ? 'text-blue-500' : 'text-neutral-400'")
-                            span(class="text-[13px] font-semibold",
-                                [ngClass]="unreadTotal > 0 ? 'text-blue-800' : 'text-neutral-800'") 안읽은 이슈
-                            ng-container(*ngIf="unreadTotal > 0")
-                                span(class="text-xs bg-blue-500 text-white rounded-full px-2 py-0.5 font-medium") {{unreadTotal}}
-                        ng-container(*ngIf="unreadTotal > 0")
-                            a(class="text-xs text-blue-600 cursor-pointer hover:underline font-medium",
-                                routerLink="/notification") 전체보기
+                //- ═══════════════════════════════════════════════
+                //- 알림 섹션 (항상 표시)
+                //- ═══════════════════════════════════════════════
+                div(class="mb-3")
+                    div(class="bg-white rounded-lg border overflow-hidden",
+                        [ngClass]="notifTotal > 0 ? 'border-blue-200' : 'border-neutral-200'")
+                        div(class="flex items-center justify-between px-4 py-2.5 border-b",
+                            [ngClass]="notifTotal > 0 ? 'border-blue-100 bg-blue-50' : 'border-neutral-200'")
+                            div(class="flex items-center gap-2")
+                                i(class="ti ti-bell-ringing text-[16px]",
+                                    [ngClass]="notifTotal > 0 ? 'text-blue-500' : 'text-neutral-400'")
+                                span(class="text-[13px] font-semibold",
+                                    [ngClass]="notifTotal > 0 ? 'text-blue-800' : 'text-neutral-800'") 알림
+                                ng-container(*ngIf="notifTotal > 0")
+                                    span(class="text-xs bg-blue-500 text-white rounded-full px-2 py-0.5 font-medium") {{notifTotal}}
+                            ng-container(*ngIf="notifTotal > 0")
+                                a(class="text-xs text-blue-600 cursor-pointer hover:underline font-medium",
+                                    routerLink="/notification") 전체보기
 
-                    //- 비어있을 때
-                    ng-container(*ngIf="unreadTotal === 0")
-                        div(class="flex flex-col items-center justify-center py-6 text-center")
-                            i(class="ti ti-bell-off text-2xl text-neutral-300 mb-1")
-                            p(class="text-sm text-neutral-400") 안읽은 이슈가 없습니다
+                        //- 비어있을 때
+                        ng-container(*ngIf="notifTotal === 0")
+                            div(class="flex flex-col items-center justify-center py-6 text-center")
+                                i(class="ti ti-bell-off text-2xl text-neutral-300 mb-1")
+                                p(class="text-sm text-neutral-400") 새로운 알림이 없습니다
 
-                    //- 항목 목록
-                    ng-container(*ngIf="unreadTotal > 0")
-                        div(class="divide-y divide-blue-50", style="max-height: 260px; overflow-y: auto")
-                            ng-container(*ngFor="let item of unreadIssues")
-                                div(class="flex items-start px-4 py-2 cursor-pointer hover:bg-blue-50 transition-colors",
-                                    (click)="navigateToIssue(item)")
-                                    div(class="flex items-center mr-2 mt-1")
-                                        span(class="size-2 rounded-full shrink-0",
-                                            [ngClass]="item.is_mentioned ? 'bg-amber-500' : 'bg-blue-500'")
+                        //- 항목 목록
+                        ng-container(*ngIf="notifTotal > 0")
+                            div(class="divide-y divide-blue-50", style="max-height: 260px; overflow-y: auto")
+                                ng-container(*ngFor="let item of notifications")
+                                    div(class="flex items-start px-4 py-2 cursor-pointer hover:bg-blue-50 transition-colors",
+                                        (click)="onNotifClick(item)")
+                                        div(class="flex items-center mr-2 mt-1")
+                                            span(class="size-2 rounded-full shrink-0",
+                                                [ngClass]="item.is_mentioned ? 'bg-amber-500' : item.ref_type === 'calendar' ? 'bg-green-500' : 'bg-blue-500'")
+                                        div(class="flex-1 min-w-0")
+                                            //- 이슈 타입
+                                            ng-container(*ngIf="item.ref_type === 'issue'")
+                                                div(class="flex items-center gap-1")
+                                                    span(class="text-xs rounded-full px-2 py-0.5 shrink-0 ring-1 ring-inset",
+                                                        [ngClass]="displayStatus(item.status).cls") {{displayStatus(item.status).text}}
+                                                    ng-container(*ngIf="item.is_mentioned")
+                                                        span(class="text-xs rounded-full px-2 py-0.5 shrink-0 bg-amber-50 text-amber-700 ring-1 ring-inset ring-amber-200") 멘션
+                                                    span(class="text-[13px] text-neutral-700 truncate ml-1 font-medium") {{item.title}}
+                                                div(class="flex items-center mt-0.5 text-xs text-neutral-400")
+                                                    span(class="truncate max-w-[120px]") {{item.project?.title || item.message}}
+                                                    span(class="mx-1") ·
+                                                    span {{displayDate(item.created)}}
+                                                    ng-container(*ngIf="item.planend")
+                                                        span(class="mx-1") ·
+                                                        span([ngClass]="isOverdue(item.planend) ? 'text-red-500 font-medium' : ''") 마감 {{displayShortDate(item.planend)}}
+                                            //- 캘린더/기타 알림 타입
+                                            ng-container(*ngIf="item.ref_type !== 'issue'")
+                                                div(class="flex items-center gap-1")
+                                                    span(class="text-xs rounded-full px-2 py-0.5 shrink-0 bg-green-50 text-green-700 ring-1 ring-inset ring-green-200") {{notifTypeLabel(item.type)}}
+                                                    span(class="text-[13px] text-neutral-700 truncate ml-1 font-medium") {{item.title}}
+                                                div(class="flex items-center mt-0.5 text-xs text-neutral-400")
+                                                    span(*ngIf="item.project?.title", class="truncate max-w-[120px]") {{item.project.title}}
+                                                    span(*ngIf="item.project?.title", class="mx-1") ·
+                                                    span(*ngIf="item.message", class="truncate max-w-[200px]") {{item.message}}
+                                                    span(*ngIf="item.message", class="mx-1") ·
+                                                    span {{displayDate(item.created)}}
+
+                //- ═══════════════════════════════════════════════
+                //- 내 캘린더 섹션 (전체 너비)
+                //- ═══════════════════════════════════════════════
+                div(class="mb-3")
+                    div(class="bg-white rounded-lg border border-neutral-200 overflow-hidden")
+                        //- 헤더
+                        div(class="flex items-center justify-between px-4 py-2.5 border-b border-neutral-200")
+                            div(class="flex items-center gap-2")
+                                i(class="ti ti-calendar-event text-[16px] text-neutral-400")
+                                span(class="text-[13px] font-semibold text-neutral-800 hidden md:inline") 내 일정
+                            div(class="flex items-center gap-2")
+                                button(type="button",
+                                    class="p-1 rounded hover:bg-neutral-100 text-neutral-400 hover:text-neutral-600 transition-colors",
+                                    (click)="calPrev()")
+                                    i(class="ti ti-chevron-left text-[14px]")
+                                span(class="text-[13px] font-medium text-neutral-700 text-center")
+                                    span(class="hidden md:inline") {{calMonthLabel()}}
+                                    span(class="md:hidden") {{calMonth}}월
+                                button(type="button",
+                                    class="p-1 rounded hover:bg-neutral-100 text-neutral-400 hover:text-neutral-600 transition-colors",
+                                    (click)="calNext()")
+                                    i(class="ti ti-chevron-right text-[14px]")
+                                button(type="button",
+                                    class="ml-1 p-1 md:px-2 md:py-0.5 rounded text-xs text-neutral-500 hover:bg-neutral-100 transition-colors",
+                                    (click)="calToday()")
+                                    i(class="ti ti-calendar-check text-[14px] md:hidden")
+                                    span(class="hidden md:inline") 오늘
+
+                        //- 캘린더 그리드
+                        div(class="p-3")
+                            //- 로딩
+                            ng-container(*ngIf="calLoading")
+                                div(class="flex items-center justify-center py-6")
+                                    div(class="animate-spin rounded-full h-6 w-6 border-2 border-neutral-300 border-t-blue-500")
+
+                            ng-container(*ngIf="!calLoading")
+                                //- 요일 헤더
+                                div(class="grid grid-cols-7 mb-1")
+                                    div(class="text-center text-xs font-medium text-red-400 py-0.5") 일
+                                    div(class="text-center text-xs font-medium text-neutral-400 py-0.5") 월
+                                    div(class="text-center text-xs font-medium text-neutral-400 py-0.5") 화
+                                    div(class="text-center text-xs font-medium text-neutral-400 py-0.5") 수
+                                    div(class="text-center text-xs font-medium text-neutral-400 py-0.5") 목
+                                    div(class="text-center text-xs font-medium text-neutral-400 py-0.5") 금
+                                    div(class="text-center text-xs font-medium text-blue-400 py-0.5") 토
+
+                                //- 날짜 그리드
+                                div(*ngFor="let week of calWeeks",
+                                    class="grid grid-cols-7")
+                                    ng-container(*ngFor="let cell of week; let i = index")
+                                        div(class="relative min-h-[64px] border-t border-neutral-100 p-1 cursor-pointer hover:bg-neutral-50 transition-colors",
+                                            [class.bg-blue-50]="calSelectedDate === cell.date && cell.isCurrentMonth",
+                                            (click)="selectDate(cell)")
+                                            //- 날짜 숫자
+                                            ng-container(*ngIf="cell.isCurrentMonth")
+                                                div(class="flex items-center justify-center")
+                                                    span(class="text-xs w-5 h-5 flex items-center justify-center rounded-full",
+                                                        [class.bg-blue-500]="cell.isToday",
+                                                        [class.text-white]="cell.isToday",
+                                                        [class.font-bold]="cell.isToday",
+                                                        [class.text-red-400]="i === 0 && !cell.isToday",
+                                                        [class.text-blue-400]="i === 6 && !cell.isToday",
+                                                        [class.text-neutral-600]="i > 0 && i < 6 && !cell.isToday") {{cell.day}}
+                                                //- 이벤트 도트 (최대 3개)
+                                                div(class="mt-0.5 space-y-0.5")
+                                                    ng-container(*ngFor="let ev of cell.events; let ei = index")
+                                                        div(*ngIf="ei < 3", class="flex items-center gap-1 px-0.5")
+                                                            div(class="w-1.5 h-1.5 rounded-full shrink-0",
+                                                                [ngStyle]="{'background-color': calEventColor(ev)}")
+                                                            span(class="text-[10px] text-neutral-600 truncate leading-tight") {{ev.title}}
+                                                    div(*ngIf="cell.events.length > 3",
+                                                        class="text-[10px] text-blue-500 font-medium px-0.5 cursor-pointer hover:text-blue-600",
+                                                        (click)="selectDate(cell); $event.stopPropagation()") +{{cell.events.length - 3}}건
+
+                                //- 선택된 날짜 일정 상세
+                                ng-container(*ngIf="calSelectedDate")
+                                    div(class="mt-2 border-t border-neutral-200 pt-2")
+                                        div(class="flex items-center gap-2 mb-1")
+                                            span(class="text-[13px] font-medium text-neutral-700") {{calSelectedDate}}
+                                            span(class="text-xs text-neutral-400") {{calSelectedEvents.length}}건
+                                        ng-container(*ngIf="calSelectedEvents.length === 0")
+                                            div(class="text-sm text-neutral-400 py-3 text-center") 일정이 없습니다
+                                        div(class="space-y-1.5")
+                                            ng-container(*ngFor="let ev of calSelectedEvents")
+                                                div(class="flex items-start gap-2 p-2 bg-neutral-50 rounded-lg hover:bg-neutral-100 transition-colors cursor-pointer",
+                                                    [routerLink]="'/project/' + ev.project_namespace + '/calendar'")
+                                                    div(class="w-1 h-full min-h-[32px] rounded-full shrink-0 mt-0.5",
+                                                        [ngStyle]="{'background-color': calEventColor(ev)}")
+                                                    div(class="flex-1 min-w-0")
+                                                        div(class="flex items-center gap-2")
+                                                            span(class="text-[13px] font-medium text-neutral-800 truncate") {{ev.title}}
+                                                            ng-container(*ngIf="ev.all_day")
+                                                                span(class="text-[10px] bg-neutral-200 text-neutral-500 rounded px-1") 종일
+                                                            ng-container(*ngIf="ev.group_attendees?.length")
+                                                                span(class="text-[10px] bg-indigo-100 text-indigo-600 rounded px-1 inline-flex items-center gap-0.5")
+                                                                    i(class="ti ti-users-group text-[10px]")
+                                                                    | 전체
+                                                        div(class="flex items-center gap-2 mt-0.5 text-xs text-neutral-400")
+                                                            span(class="truncate max-w-[120px]") {{ev.project_title}}
+                                                            ng-container(*ngIf="ev.category")
+                                                                span ·
+                                                                span {{ev.category.name}}
+                                                            span ·
+                                                            span {{calFormatDateRange(ev)}}
+
+                div(class="grid gap-3 grid-cols-1 md:grid-cols-2")
+                    //- 내 프로젝트 섹션
+                    div(class="bg-white rounded-lg border border-neutral-200 overflow-hidden")
+                        div(class="flex items-center justify-between px-4 py-2.5 border-b border-neutral-200")
+                            div(class="flex items-center gap-2")
+                                i(class="ti ti-folder text-[16px] text-neutral-400")
+                                span(class="text-[13px] font-semibold text-neutral-800") 내 프로젝트
+                            span(class="text-xs text-neutral-400") {{projects.length}}건
+                        div(class="divide-y divide-neutral-100", style="max-height: 320px; overflow-y: auto")
+                            ng-container(*ngIf="projects.length === 0")
+                                div(class="flex flex-col items-center justify-center py-8 text-center")
+                                    i(class="ti ti-folder-off text-3xl text-neutral-300 mb-2")
+                                    p(class="text-sm text-neutral-500") 참여 중인 프로젝트가 없습니다
+                            ng-container(*ngFor="let item of projects")
+                                a(class="flex items-center px-4 py-2 cursor-pointer hover:bg-neutral-50 transition-colors", [routerLink]="'/project/' + item.namespace")
+                                    div(class="shrink-0 w-8 h-8 rounded-md bg-neutral-100 border border-neutral-200 bg-contain bg-center bg-cover bg-no-repeat", [ngStyle]="{'background-image': 'url(' + item.icon + ')'}")
+                                    div(class="flex-1 ml-2.5 min-w-0")
+                                        div(class="flex items-center")
+                                            span(class="text-[13px] font-medium text-neutral-800 truncate") {{item.title}}
+                                            span(class="text-xs rounded-full px-2 py-0.5 ml-2 shrink-0 ring-1 ring-inset", [ngClass]="displayRole(item.role).cls") {{displayRole(item.role).text}}
+                                        div(class="text-xs text-neutral-400 mt-0.5") {{displayDate(item.updated)}}
+
+                    //- 배정된 이슈 섹션
+                    div(class="bg-white rounded-lg border border-neutral-200 overflow-hidden")
+                        div(class="flex items-center justify-between px-4 py-2.5 border-b border-neutral-200")
+                            div(class="flex items-center gap-2")
+                                i(class="ti ti-message-circle text-[16px] text-neutral-400")
+                                span(class="text-[13px] font-semibold text-neutral-800") 배정된 이슈
+                            a(class="text-xs text-blue-600 cursor-pointer hover:underline", routerLink="/issues") 전체보기
+                        div(class="divide-y divide-neutral-100", style="max-height: 320px; overflow-y: auto")
+                            ng-container(*ngIf="issues.recent.length === 0")
+                                div(class="flex flex-col items-center justify-center py-8 text-center")
+                                    i(class="ti ti-message-circle-off text-3xl text-neutral-300 mb-2")
+                                    p(class="text-sm text-neutral-500") 배정된 이슈가 없습니다
+                            ng-container(*ngFor="let item of issues.recent")
+                                div(class="flex items-start px-4 py-2 cursor-pointer hover:bg-neutral-50 transition-colors", (click)="openIssue(item)")
                                     div(class="flex-1 min-w-0")
-                                        div(class="flex items-center gap-1")
-                                            span(class="text-xs rounded-full px-2 py-0.5 shrink-0 ring-1 ring-inset",
-                                                [ngClass]="displayStatus(item.status).cls") {{displayStatus(item.status).text}}
-                                            ng-container(*ngIf="item.is_mentioned")
-                                                span(class="text-xs rounded-full px-2 py-0.5 shrink-0 bg-amber-50 text-amber-700 ring-1 ring-inset ring-amber-200") 멘션
-                                            span(class="text-[13px] text-neutral-700 truncate ml-1 font-medium") {{item.title}}
+                                        div(class="flex items-center")
+                                            span(class="text-xs rounded-full px-2 py-0.5 shrink-0 ring-1 ring-inset", [ngClass]="displayStatus(item.status).cls") {{displayStatus(item.status).text}}
+                                            span(class="text-[13px] text-neutral-700 truncate ml-2") {{item.title}}
                                         div(class="flex items-center mt-0.5 text-xs text-neutral-400")
                                             span(class="truncate max-w-[120px]") {{item.project?.title}}
                                             span(class="mx-1") ·
@@ -147,224 +314,58 @@ div(class="flex-1 min-h-0 overflow-y-auto")
                                                 span(class="mx-1") ·
                                                 span([ngClass]="isOverdue(item.planend) ? 'text-red-500 font-medium' : ''") 마감 {{displayShortDate(item.planend)}}
 
-            //- ═══════════════════════════════════════════════
-            //- 내 캘린더 섹션 (전체 너비)
-            //- ═══════════════════════════════════════════════
-            div(class="mb-3")
-                div(class="bg-white rounded-lg border border-neutral-200 overflow-hidden")
-                    //- 헤더
-                    div(class="flex items-center justify-between px-4 py-2.5 border-b border-neutral-200")
-                        div(class="flex items-center gap-2")
-                            i(class="ti ti-calendar-event text-[16px] text-neutral-400")
-                            span(class="text-[13px] font-semibold text-neutral-800") 내 일정
-                        div(class="flex items-center gap-2")
-                            button(type="button",
-                                class="p-1 rounded hover:bg-neutral-100 text-neutral-400 hover:text-neutral-600 transition-colors",
-                                (click)="calPrev()")
-                                i(class="ti ti-chevron-left text-[14px]")
-                            span(class="text-[13px] font-medium text-neutral-700 min-w-[100px] text-center") {{calMonthLabel()}}
-                            button(type="button",
-                                class="p-1 rounded hover:bg-neutral-100 text-neutral-400 hover:text-neutral-600 transition-colors",
-                                (click)="calNext()")
-                                i(class="ti ti-chevron-right text-[14px]")
-                            button(type="button",
-                                class="ml-1 px-2 py-0.5 rounded text-xs text-neutral-500 hover:bg-neutral-100 transition-colors",
-                                (click)="calToday()") 오늘
-
-                    //- 캘린더 그리드
-                    div(class="p-3")
-                        //- 로딩
-                        ng-container(*ngIf="calLoading")
-                            div(class="flex items-center justify-center py-6")
-                                div(class="animate-spin rounded-full h-6 w-6 border-2 border-neutral-300 border-t-blue-500")
-
-                        ng-container(*ngIf="!calLoading")
-                            //- 요일 헤더
-                            div(class="grid grid-cols-7 mb-1")
-                                div(class="text-center text-xs font-medium text-red-400 py-0.5") 일
-                                div(class="text-center text-xs font-medium text-neutral-400 py-0.5") 월
-                                div(class="text-center text-xs font-medium text-neutral-400 py-0.5") 화
-                                div(class="text-center text-xs font-medium text-neutral-400 py-0.5") 수
-                                div(class="text-center text-xs font-medium text-neutral-400 py-0.5") 목
-                                div(class="text-center text-xs font-medium text-neutral-400 py-0.5") 금
-                                div(class="text-center text-xs font-medium text-blue-400 py-0.5") 토
-
-                            //- 날짜 그리드
-                            div(*ngFor="let week of calWeeks",
-                                class="grid grid-cols-7")
-                                ng-container(*ngFor="let cell of week; let i = index")
-                                    div(class="relative min-h-[64px] border-t border-neutral-100 p-1 cursor-pointer hover:bg-neutral-50 transition-colors",
-                                        [class.bg-blue-50]="calSelectedDate === cell.date && cell.isCurrentMonth",
-                                        (click)="selectDate(cell)")
-                                        //- 날짜 숫자
-                                        ng-container(*ngIf="cell.isCurrentMonth")
-                                            div(class="flex items-center justify-center")
-                                                span(class="text-xs w-5 h-5 flex items-center justify-center rounded-full",
-                                                    [class.bg-blue-500]="cell.isToday",
-                                                    [class.text-white]="cell.isToday",
-                                                    [class.font-bold]="cell.isToday",
-                                                    [class.text-red-400]="i === 0 && !cell.isToday",
-                                                    [class.text-blue-400]="i === 6 && !cell.isToday",
-                                                    [class.text-neutral-600]="i > 0 && i < 6 && !cell.isToday") {{cell.day}}
-                                            //- 이벤트 도트 (최대 3개)
-                                            div(class="mt-0.5 space-y-0.5")
-                                                ng-container(*ngFor="let ev of cell.events; let ei = index")
-                                                    div(*ngIf="ei < 3", class="flex items-center gap-1 px-0.5")
-                                                        div(class="w-1.5 h-1.5 rounded-full shrink-0",
-                                                            [ngStyle]="{'background-color': calEventColor(ev)}")
-                                                        span(class="text-[10px] text-neutral-600 truncate leading-tight") {{ev.title}}
-                                                div(*ngIf="cell.events.length > 3",
-                                                    class="text-[10px] text-blue-500 font-medium px-0.5 cursor-pointer hover:text-blue-600",
-                                                    (click)="selectDate(cell); $event.stopPropagation()") +{{cell.events.length - 3}}건
-
-                            //- 선택된 날짜 일정 상세
-                            ng-container(*ngIf="calSelectedDate")
-                                div(class="mt-2 border-t border-neutral-200 pt-2")
-                                    div(class="flex items-center gap-2 mb-1")
-                                        span(class="text-[13px] font-medium text-neutral-700") {{calSelectedDate}}
-                                        span(class="text-xs text-neutral-400") {{calSelectedEvents.length}}건
-                                    ng-container(*ngIf="calSelectedEvents.length === 0")
-                                        div(class="text-sm text-neutral-400 py-3 text-center") 일정이 없습니다
-                                    div(class="space-y-1.5")
-                                        ng-container(*ngFor="let ev of calSelectedEvents")
-                                            div(class="flex items-start gap-2 p-2 bg-neutral-50 rounded-lg hover:bg-neutral-100 transition-colors cursor-pointer",
-                                                [routerLink]="'/project/' + ev.project_namespace + '/calendar'")
-                                                div(class="w-1 h-full min-h-[32px] rounded-full shrink-0 mt-0.5",
-                                                    [ngStyle]="{'background-color': calEventColor(ev)}")
-                                                div(class="flex-1 min-w-0")
-                                                    div(class="flex items-center gap-2")
-                                                        span(class="text-[13px] font-medium text-neutral-800 truncate") {{ev.title}}
-                                                        ng-container(*ngIf="ev.all_day")
-                                                            span(class="text-[10px] bg-neutral-200 text-neutral-500 rounded px-1") 종일
-                                                        ng-container(*ngIf="ev.group_attendees?.length")
-                                                            span(class="text-[10px] bg-indigo-100 text-indigo-600 rounded px-1 inline-flex items-center gap-0.5")
-                                                                i(class="ti ti-users-group text-[10px]")
-                                                                | 전체
-                                                    div(class="flex items-center gap-2 mt-0.5 text-xs text-neutral-400")
-                                                        span(class="truncate max-w-[120px]") {{ev.project_title}}
-                                                        ng-container(*ngIf="ev.category")
-                                                            span ·
-                                                            span {{ev.category.name}}
-                                                        span ·
-                                                        span {{calFormatDateRange(ev)}}
-
-            div(class="grid gap-3 grid-cols-1 md:grid-cols-2")
-                //- 내 프로젝트 섹션
-                div(class="bg-white rounded-lg border border-neutral-200 overflow-hidden")
-                    div(class="flex items-center justify-between px-4 py-2.5 border-b border-neutral-200")
-                        div(class="flex items-center gap-2")
-                            i(class="ti ti-folder text-[16px] text-neutral-400")
-                            span(class="text-[13px] font-semibold text-neutral-800") 내 프로젝트
-                        span(class="text-xs text-neutral-400") {{projects.length}}건
-                    div(class="divide-y divide-neutral-100", style="max-height: 320px; overflow-y: auto")
-                        ng-container(*ngIf="projects.length === 0")
-                            div(class="flex flex-col items-center justify-center py-8 text-center")
-                                i(class="ti ti-folder-off text-3xl text-neutral-300 mb-2")
-                                p(class="text-sm text-neutral-500") 참여 중인 프로젝트가 없습니다
-                        ng-container(*ngFor="let item of projects")
-                            a(class="flex items-center px-4 py-2 cursor-pointer hover:bg-neutral-50 transition-colors", [routerLink]="'/project/' + item.namespace")
-                                div(class="shrink-0 w-8 h-8 rounded-md bg-neutral-100 border border-neutral-200 bg-contain bg-center bg-cover bg-no-repeat", [ngStyle]="{'background-image': 'url(' + item.icon + ')'}")
-                                div(class="flex-1 ml-2.5 min-w-0")
-                                    div(class="flex items-center")
-                                        span(class="text-[13px] font-medium text-neutral-800 truncate") {{item.title}}
-                                        span(class="text-xs rounded-full px-2 py-0.5 ml-2 shrink-0 ring-1 ring-inset", [ngClass]="displayRole(item.role).cls") {{displayRole(item.role).text}}
-                                    div(class="text-xs text-neutral-400 mt-0.5") {{displayDate(item.updated)}}
-
-                //- 배정된 이슈 섹션
-                div(class="bg-white rounded-lg border border-neutral-200 overflow-hidden")
-                    div(class="flex items-center justify-between px-4 py-2.5 border-b border-neutral-200")
-                        div(class="flex items-center gap-2")
-                            i(class="ti ti-message-circle text-[16px] text-neutral-400")
-                            span(class="text-[13px] font-semibold text-neutral-800") 배정된 이슈
-                        a(class="text-xs text-blue-600 cursor-pointer hover:underline", routerLink="/issues") 전체보기
-                    div(class="divide-y divide-neutral-100", style="max-height: 320px; overflow-y: auto")
-                        ng-container(*ngIf="issues.recent.length === 0")
-                            div(class="flex flex-col items-center justify-center py-8 text-center")
-                                i(class="ti ti-message-circle-off text-3xl text-neutral-300 mb-2")
-                                p(class="text-sm text-neutral-500") 배정된 이슈가 없습니다
-                        ng-container(*ngFor="let item of issues.recent")
-                            a(class="flex items-start px-4 py-2 cursor-pointer hover:bg-neutral-50 transition-colors", routerLink="/issues")
-                                div(class="flex-1 min-w-0")
-                                    div(class="flex items-center")
-                                        span(class="text-xs rounded-full px-2 py-0.5 shrink-0 ring-1 ring-inset", [ngClass]="displayStatus(item.status).cls") {{displayStatus(item.status).text}}
-                                        span(class="text-[13px] text-neutral-700 truncate ml-2") {{item.title}}
-                                    div(class="flex items-center mt-0.5 text-xs text-neutral-400")
-                                        span(class="truncate max-w-[120px]") {{item.project?.title}}
-                                        span(class="mx-1") ·
-                                        span {{displayDate(item.updated)}}
-                                        ng-container(*ngIf="item.planend")
+                    //- 내가 생성한 미완료 이슈
+                    div(class="bg-white rounded-lg border border-neutral-200 overflow-hidden")
+                        div(class="flex items-center justify-between px-4 py-2.5 border-b border-neutral-200")
+                            div(class="flex items-center gap-2")
+                                i(class="ti ti-edit text-[16px] text-neutral-400")
+                                span(class="text-[13px] font-semibold text-neutral-800") 내가 생성한 이슈
+                            span(class="text-xs text-neutral-400") {{createdIssues.length}}건
+                        div(class="divide-y divide-neutral-100", style="max-height: 320px; overflow-y: auto")
+                            ng-container(*ngIf="createdIssues.length === 0")
+                                div(class="flex flex-col items-center justify-center py-8 text-center")
+                                    i(class="ti ti-checkbox text-3xl text-neutral-300 mb-2")
+                                    p(class="text-sm text-neutral-500") 미완료 이슈가 없습니다
+                            ng-container(*ngFor="let item of createdIssues")
+                                div(class="flex items-start px-4 py-2 cursor-pointer hover:bg-neutral-50 transition-colors", (click)="openIssue(item)")
+                                    div(class="flex-1 min-w-0")
+                                        div(class="flex items-center")
+                                            span(class="text-xs rounded-full px-2 py-0.5 shrink-0 ring-1 ring-inset", [ngClass]="displayStatus(item.status).cls") {{displayStatus(item.status).text}}
+                                            span(class="text-[13px] text-neutral-700 truncate ml-2") {{item.title}}
+                                        div(class="flex items-center mt-0.5 text-xs text-neutral-400")
+                                            span(class="truncate max-w-[120px]") {{item.project?.title}}
                                             span(class="mx-1") ·
-                                            span([ngClass]="isOverdue(item.planend) ? 'text-red-500 font-medium' : ''") 마감 {{displayShortDate(item.planend)}}
+                                            span {{displayDate(item.updated)}}
 
-                //- 내가 생성한 미완료 이슈
-                div(class="bg-white rounded-lg border border-neutral-200 overflow-hidden")
-                    div(class="flex items-center justify-between px-4 py-2.5 border-b border-neutral-200")
-                        div(class="flex items-center gap-2")
-                            i(class="ti ti-edit text-[16px] text-neutral-400")
-                            span(class="text-[13px] font-semibold text-neutral-800") 내가 생성한 이슈
-                        span(class="text-xs text-neutral-400") {{createdIssues.length}}건
-                    div(class="divide-y divide-neutral-100", style="max-height: 320px; overflow-y: auto")
-                        ng-container(*ngIf="createdIssues.length === 0")
-                            div(class="flex flex-col items-center justify-center py-8 text-center")
-                                i(class="ti ti-checkbox text-3xl text-neutral-300 mb-2")
-                                p(class="text-sm text-neutral-500") 미완료 이슈가 없습니다
-                        ng-container(*ngFor="let item of createdIssues")
-                            a(class="flex items-start px-4 py-2 cursor-pointer hover:bg-neutral-50 transition-colors", routerLink="/issues")
-                                div(class="flex-1 min-w-0")
-                                    div(class="flex items-center")
-                                        span(class="text-xs rounded-full px-2 py-0.5 shrink-0 ring-1 ring-inset", [ngClass]="displayStatus(item.status).cls") {{displayStatus(item.status).text}}
-                                        span(class="text-[13px] text-neutral-700 truncate ml-2") {{item.title}}
-                                    div(class="flex items-center mt-0.5 text-xs text-neutral-400")
-                                        span(class="truncate max-w-[120px]") {{item.project?.title}}
-                                        span(class="mx-1") ·
-                                        span {{displayDate(item.updated)}}
-
-                //- 최근 회의록 섹션
-                div(class="bg-white rounded-lg border border-neutral-200 overflow-hidden")
-                    div(class="flex items-center justify-between px-4 py-2.5 border-b border-neutral-200")
-                        div(class="flex items-center gap-2")
-                            i(class="ti ti-notes text-[16px] text-neutral-400")
-                            span(class="text-[13px] font-semibold text-neutral-800") 최근 회의록
-                        span(class="text-xs text-neutral-400") {{meetings.length}}건
-                    div(class="divide-y divide-neutral-100", style="max-height: 320px; overflow-y: auto")
-                        ng-container(*ngIf="meetings.length === 0")
-                            div(class="flex flex-col items-center justify-center py-8 text-center")
-                                i(class="ti ti-notes-off text-3xl text-neutral-300 mb-2")
-                                p(class="text-sm text-neutral-500") 최근 회의록이 없습니다
-                        ng-container(*ngFor="let item of meetings")
-                            a(class="flex items-start px-4 py-2 cursor-pointer hover:bg-neutral-50 transition-colors", [routerLink]="'/project/' + item.project?.namespace + '/meeting'")
-                                div(class="flex-1 min-w-0")
-                                    div(class="flex items-center")
-                                        span(class="text-[13px] text-neutral-700 truncate") {{item.title}}
-                                    div(class="flex items-center mt-0.5 text-xs text-neutral-400")
-                                        span(class="truncate max-w-[120px]") {{item.project?.title}}
-                                        span(class="mx-1") ·
-                                        span {{displayShortDate(item.meetdate)}}
-                                        span(class="mx-1") ·
-                                        span {{getUserName(item.user_id)}}
-
-            //- 내 계획 섹션 (전체 너비)
-            div(class="mt-3")
-                div(class="bg-white rounded-lg border border-neutral-200 overflow-hidden")
-                    div(class="flex items-center justify-between px-4 py-2.5 border-b border-neutral-200")
-                        div(class="flex items-center gap-2")
-                            i(class="ti ti-calendar text-[16px] text-neutral-400")
-                            span(class="text-[13px] font-semibold text-neutral-800") 내 계획
-                        span(class="text-xs text-neutral-400") {{plans.length}}건
-                    div(class="divide-y divide-neutral-100", style="max-height: 260px; overflow-y: auto")
-                        ng-container(*ngIf="plans.length === 0")
-                            div(class="flex flex-col items-center justify-center py-8 text-center")
-                                i(class="ti ti-calendar-off text-3xl text-neutral-300 mb-2")
-                                p(class="text-sm text-neutral-500") 진행 중인 계획이 없습니다
-                        ng-container(*ngFor="let item of plans")
-                            a(class="flex items-center px-4 py-2 cursor-pointer hover:bg-neutral-50 transition-colors", [routerLink]="'/project/' + item.project?.namespace + '/info'")
-                                div(class="flex-1 min-w-0")
-                                    div(class="flex items-center")
-                                        span(class="text-xs rounded-full px-2 py-0.5 shrink-0 ring-1 ring-inset", [ngClass]="displayPlanStatus(item.status).cls") {{displayPlanStatus(item.status).text}}
-                                        span(class="text-[13px] text-neutral-700 truncate ml-2") {{item.title}}
-                                    div(class="flex items-center mt-0.5 text-xs text-neutral-400")
-                                        span(class="truncate max-w-[120px]") {{item.project?.title}}
-                                        ng-container(*ngIf="item.start || item.end")
+                    //- 최근 회의록 섹션
+                    div(class="bg-white rounded-lg border border-neutral-200 overflow-hidden")
+                        div(class="flex items-center justify-between px-4 py-2.5 border-b border-neutral-200")
+                            div(class="flex items-center gap-2")
+                                i(class="ti ti-notes text-[16px] text-neutral-400")
+                                span(class="text-[13px] font-semibold text-neutral-800") 최근 회의록
+                            span(class="text-xs text-neutral-400") {{meetings.length}}건
+                        div(class="divide-y divide-neutral-100", style="max-height: 320px; overflow-y: auto")
+                            ng-container(*ngIf="meetings.length === 0")
+                                div(class="flex flex-col items-center justify-center py-8 text-center")
+                                    i(class="ti ti-notes-off text-3xl text-neutral-300 mb-2")
+                                    p(class="text-sm text-neutral-500") 최근 회의록이 없습니다
+                            ng-container(*ngFor="let item of meetings")
+                                a(class="flex items-start px-4 py-2 cursor-pointer hover:bg-neutral-50 transition-colors", [routerLink]="'/project/' + item.project?.namespace + '/meeting'")
+                                    div(class="flex-1 min-w-0")
+                                        div(class="flex items-center")
+                                            span(class="text-[13px] text-neutral-700 truncate") {{item.title}}
+                                        div(class="flex items-center mt-0.5 text-xs text-neutral-400")
+                                            span(class="truncate max-w-[120px]") {{item.project?.title}}
                                             span(class="mx-1") ·
-                                            span {{displayShortDate(item.start)}} ~ {{displayShortDate(item.end)}}
+                                            span {{displayShortDate(item.meetdate)}}
+                                            span(class="mx-1") ·
+                                            span {{getUserName(item.user_id)}}
 
+    //- 이슈 상세 팝업
+    ng-container(*ngIf="issue.id")
+        div(class="absolute inset-0 z-40 hidden md:block", style="background:rgba(0,0,0,0.1)")
+        div(class="absolute inset-0 md:inset-x-8 md:inset-y-4 lg:inset-x-16 lg:inset-y-8 z-50")
+            div(class="relative w-full h-full overflow-hidden md:rounded-xl")
+                wiz-portal-works-project-issueboard-issue([issue]="issue",
+                    [isMovable]="false",
+                    [hidden]="!issue.loaded")

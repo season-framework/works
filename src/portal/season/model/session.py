@@ -13,6 +13,7 @@ class Session:
     def set(self, **kwargs):
         for key in kwargs:
             self.flask.session[key] = kwargs[key]
+        self.flask.session.permanent = True
     
     def get(self, key=None, default=None):
         if key is None:

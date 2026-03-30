@@ -8,9 +8,10 @@ html(lang="en", class="overflow-hidden")
         meta(http-equiv='X-UA-Compatible' content='ie=edge')
 
         link(rel="shortcut icon", href="/assets/portal/season/brand/icon.ico")
-        link(rel="apple-touch-icon" sizes="72x72" href="/assets/portal/season/brand/icon.ico")
-        link(rel="apple-touch-icon" sizes="114x114" href="/assets/portal/season/brand/icon.ico")
-        link(rel="apple-touch-icon" href="/assets/portal/season/brand/icon.ico")
+        link(rel="apple-touch-icon" sizes="72x72" href="/assets/portal/season/brand/icon-192.png")
+        link(rel="apple-touch-icon" sizes="114x114" href="/assets/portal/season/brand/icon-192.png")
+        link(rel="apple-touch-icon" sizes="192x192" href="/assets/portal/season/brand/icon-192.png")
+        link(rel="apple-touch-icon" href="/assets/portal/season/brand/icon-192.png")
         link(rel="icon" sizes="72x72" href="/assets/portal/season/brand/icon.ico")
         link(rel="icon" sizes="114x114" href="/assets/portal/season/brand/icon.ico")
         link(rel="icon" sizes="192x192" href="/assets/portal/season/brand/icon.ico")
@@ -29,7 +30,67 @@ html(lang="en", class="overflow-hidden")
 
         script(type="text/javascript").
             if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('/sw.js', {scope: '/'}).then((reg) => {});
+                navigator.serviceWorker.register('/sw.js', {scope: '/'}).then(function(reg) {
+                    if ('PushManager' in window) {
+                        var vapidKey = 'BJqCYNQuaW8l-UAuWX9xcnrBpMQfJBqM2gFyu2bxB9o4HpWiae4O5upxC131ES3EdlSxHrs0Xb6HJ-X6McqjhaM';
+
+                        function urlBase64ToUint8Array(base64String) {
+                            var padding = '='.repeat((4 - base64String.length % 4) % 4);
+                            var base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+                            var raw = atob(base64);
+                            var arr = new Uint8Array(raw.length);
+                            for (var i = 0; i < raw.length; i++) arr[i] = raw.charCodeAt(i);
+                            return arr;
+                        }
+
+                        function sendSubscription(sub) {
+                            var subJson = sub.toJSON();
+                            var fd = new FormData();
+                            fd.append('endpoint', subJson.endpoint);
+                            fd.append('p256dh', subJson.keys.p256dh);
+                            fd.append('auth', subJson.keys.auth);
+                            fd.append('user_agent', navigator.userAgent);
+                            fetch('/wiz/api/component.nav.aside/push_subscribe', { method: 'POST', body: fd });
+                        }
+
+                        window.__swRegistration = reg;
+                        window.__vapidKey = vapidKey;
+                        window.__urlBase64ToUint8Array = urlBase64ToUint8Array;
+                        window.__sendPushSubscription = sendSubscription;
+
+                        function createSubscription(r) {
+                            r.pushManager.subscribe({
+                                userVisibleOnly: true,
+                                applicationServerKey: urlBase64ToUint8Array(vapidKey)
+                            }).then(function(newSub) {
+                                sendSubscription(newSub);
+                                window.__pushSubscribed = true;
+                            }).catch(function(err) {
+                                console.warn('Push subscription failed:', err);
+                            });
+                        }
+
+                        reg.pushManager.getSubscription().then(function(sub) {
+                            if (sub) {
+                                var currentKey = sub.options && sub.options.applicationServerKey;
+                                if (currentKey) {
+                                    var bytes = new Uint8Array(currentKey);
+                                    var b64 = btoa(String.fromCharCode.apply(null, bytes)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
+                                    if (b64 !== vapidKey) {
+                                        sub.unsubscribe().then(function() {
+                                            createSubscription(reg);
+                                        });
+                                        return;
+                                    }
+                                }
+                                sendSubscription(sub);
+                                window.__pushSubscribed = true;
+                            } else if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+                                createSubscription(reg);
+                            }
+                        });
+                    }
+                });
             }
 
     body(class="overflow-hidden")

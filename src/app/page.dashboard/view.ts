@@ -15,12 +15,14 @@ export class Component implements OnInit {
     public issues: any = { counts: { open: 0, work: 0, finish: 0 }, total: 0, recent: [] };
     public createdIssues: any[] = [];
     public meetings: any[] = [];
-    public plans: any[] = [];
     public users: any = {};
 
-    // 안읽은 이슈
-    public unreadIssues: any[] = [];
-    public unreadTotal: number = 0;
+    // 알림
+    public notifications: any[] = [];
+    public notifTotal: number = 0;
+
+    // 이슈 상세 팝업
+    public issue: any = { id: null, modal: false, event: {} };
 
     // 활동 통계
     public issuesByProject: any[] = [];
@@ -55,7 +57,6 @@ export class Component implements OnInit {
             this.issues = data.issues || { counts: { open: 0, work: 0, finish: 0 }, total: 0, recent: [] };
             this.createdIssues = data.created_issues || [];
             this.meetings = data.meetings || [];
-            this.plans = data.plans || [];
             this.users = data.users || {};
             this.issuesByProject = data.issues_by_project || [];
             this.activityTrend = data.activity_trend || [];
@@ -65,17 +66,65 @@ export class Component implements OnInit {
         this.loaded = true;
         await this.service.render();
 
-        // 안읽은 이슈 로드 (비동기)
-        await this.loadUnreadIssues();
+        // 알림 로드 (비동기)
+        await this.loadNotifications();
     }
 
-    public async loadUnreadIssues() {
-        const { code, data } = await wiz.call("unread_issues", { page: 1, dump: 10 });
+    public async loadNotifications() {
+        const { code, data } = await wiz.call("notifications", { dump: 10 });
         if (code == 200) {
-            this.unreadIssues = data.items || [];
-            this.unreadTotal = data.total || 0;
+            this.notifications = data.items || [];
+            this.notifTotal = data.total || 0;
         }
         await this.service.render();
+    }
+
+    public async onNotifClick(item: any) {
+        if (item.ref_type === 'issue') {
+            await this.openIssue(item);
+        } else if (item.ref_type === 'calendar') {
+            if (item.project && item.project.namespace) {
+                this.service.href(`/project/${item.project.namespace}/calendar`);
+            }
+        } else {
+            this.service.href('/notification');
+        }
+    }
+
+    public async openIssue(item: any) {
+        await this.project.init(item.project_id);
+
+        this.issue.id = item.ref_id || item.issue_id || item.id;
+        this.issue.event = {};
+        this.issue.modal = true;
+        this.issue.parent = this;
+        this.issue.loaded = false;
+
+        this.issue.event.hide = (async () => {
+            this.issue.id = null;
+            this.issue.modal = false;
+            this.issue.loaded = false;
+            await this.service.render();
+            await this.loadNotifications();
+        }).bind(this);
+
+        this.issue.event.onLoad = (async () => {
+            this.issue.loaded = true;
+            await this.service.render();
+        }).bind(this);
+
+        await this.service.render();
+    }
+
+    public notifTypeLabel(type: string) {
+        const labels: any = {
+            'calendar_invited': '캘린더 초대',
+            'calendar_updated': '캘린더 수정',
+            'calendar_deleted': '캘린더 삭제',
+            'issue_assigned': '이슈',
+            'issue_mentioned': '멘션',
+        };
+        return labels[type] || type;
     }
 
     // ── 캘린더 로직 ──
@@ -270,13 +319,6 @@ export class Component implements OnInit {
         if (role == 'user') return { text: '멤버', cls: 'bg-green-50 text-green-700 ring-green-200' };
         if (role == 'guest') return { text: '게스트', cls: 'bg-neutral-100 text-neutral-500 ring-neutral-200' };
         return { text: role, cls: 'bg-neutral-100 text-neutral-500 ring-neutral-200' };
-    }
-
-    public displayPlanStatus(status: string) {
-        if (status == 'ready') return { text: '준비', cls: 'bg-amber-50 text-amber-700 ring-amber-200' };
-        if (status == 'active') return { text: '진행', cls: 'bg-blue-50 text-blue-700 ring-blue-200' };
-        if (status == 'finish') return { text: '완료', cls: 'bg-green-50 text-green-700 ring-green-200' };
-        return { text: status, cls: 'bg-neutral-100 text-neutral-500 ring-neutral-200' };
     }
 
     public isOverdue(planend: any) {

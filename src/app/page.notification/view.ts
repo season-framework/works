@@ -12,8 +12,10 @@ export class Component implements OnInit {
     public page: number = 1;
     public dump: number = 20;
     public loading: boolean = false;
-    public tab: string = 'all'; // 'all' | 'mention'
+    public tab: string = 'all';
     public users: any = {};
+
+    // 이슈 상세 팝업
     public issue: any = { id: null, modal: false, event: {} };
 
     public async ngOnInit() {
@@ -37,14 +39,76 @@ export class Component implements OnInit {
     public async loadPage() {
         this.loading = true;
         await this.service.render();
-        const apiName = this.tab === 'mention' ? 'mentioned_issues' : 'all_issues';
-        const { code, data } = await wiz.call(apiName, { page: this.page, dump: this.dump });
+
+        let params: any = { page: this.page, dump: this.dump };
+        if (this.tab === 'issue') params.ref_type = 'issue';
+        else if (this.tab === 'calendar') params.ref_type = 'calendar';
+
+        const { code, data } = await wiz.call('list', params);
         if (code == 200) {
             this.items = data.items || [];
             this.total = data.total || 0;
             this.users = data.users || {};
         }
         this.loading = false;
+        await this.service.render();
+    }
+
+    public async markRead(item: any) {
+        if (item.is_read) return;
+        await wiz.call('mark_read', { notification_id: item.id });
+        item.is_read = true;
+        await this.service.render();
+    }
+
+    public async markAllRead() {
+        const res = await this.service.alert.show({
+            title: "모두 읽음",
+            message: "모든 알림을 읽음 처리하시겠습니까?",
+            action: "확인",
+            cancel: "취소",
+        });
+        if (!res) return;
+        await wiz.call('mark_all_read');
+        for (let item of this.items) {
+            item.is_read = true;
+        }
+        await this.service.render();
+    }
+
+    public async onClickItem(item: any) {
+        await this.markRead(item);
+        if (item.ref_type === 'issue') {
+            await this.openIssue(item);
+        } else if (item.ref_type === 'calendar') {
+            if (item.project && item.project.namespace) {
+                this.service.href(`/project/${item.project.namespace}/calendar`);
+            }
+        }
+    }
+
+    public async openIssue(item: any) {
+        await this.project.init(item.project_id);
+
+        this.issue.id = item.ref_id || item.issue_id;
+        this.issue.event = {};
+        this.issue.modal = true;
+        this.issue.parent = this;
+        this.issue.loaded = false;
+
+        this.issue.event.hide = (async () => {
+            this.issue.id = null;
+            this.issue.modal = false;
+            this.issue.loaded = false;
+            await this.service.render();
+            await this.loadPage();
+        }).bind(this);
+
+        this.issue.event.onLoad = (async () => {
+            this.issue.loaded = true;
+            await this.service.render();
+        }).bind(this);
+
         await this.service.render();
     }
 
@@ -64,36 +128,10 @@ export class Component implements OnInit {
         return Math.ceil(this.total / this.dump) || 1;
     }
 
-    public async openIssue(item: any) {
-        if (!item.project || !item.project.namespace) return;
-        try {
-            await this.project.init(item.project.namespace);
-        } catch (e) {
-            return;
-        }
-        this.issue = {
-            id: item.id,
-            modal: true,
-            event: {
-                hide: async () => {
-                    this.issue = { id: null, modal: false, event: {} };
-                    await this.loadPage();
-                    await this.service.render();
-                }
-            }
-        };
-        await this.service.render();
-    }
-
-    public getUserName(userId: string) {
-        const user = this.users[userId];
-        return user ? user.name : '-';
-    }
-
     public displayDate(date: any) {
         if (!date) return '-';
         let targetdate = moment(date);
-        let diff = new Date().getTime() - new Date(targetdate).getTime();
+        let diff = new Date().getTime() - new Date(targetdate as any).getTime();
         diff = diff / 1000 / 60 / 60;
         if (diff > 24 * 7) return targetdate.format("YY.MM.DD");
         if (diff > 24) return targetdate.format("M월 D일");
@@ -104,7 +142,7 @@ export class Component implements OnInit {
     }
 
     public displayShortDate(date: any) {
-        if (!date) return '-';
+        if (!date) return '';
         return moment(date).format("YY.MM.DD");
     }
 
@@ -123,8 +161,24 @@ export class Component implements OnInit {
             let endtime = new Date(planend).getTime();
             let now = new Date().getTime();
             return now - endtime > 1000 * 60 * 60 * 24;
-        } catch (e) {
-            return false;
-        }
+        } catch { return false; }
+    }
+
+    public typeIcon(type: string) {
+        if (type?.startsWith('calendar')) return { icon: 'ti-calendar-event', cls: 'text-green-500' };
+        if (type?.startsWith('issue_mentioned')) return { icon: 'ti-at', cls: 'text-amber-500' };
+        if (type?.startsWith('issue')) return { icon: 'ti-message-circle', cls: 'text-blue-500' };
+        return { icon: 'ti-bell', cls: 'text-neutral-400' };
+    }
+
+    public typeLabel(type: string) {
+        const labels: any = {
+            'calendar_invited': '캘린더 초대',
+            'calendar_updated': '캘린더 수정',
+            'calendar_deleted': '캘린더 삭제',
+            'issue_assigned': '이슈',
+            'issue_mentioned': '멘션',
+        };
+        return labels[type] || type;
     }
 }

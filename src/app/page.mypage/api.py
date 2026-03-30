@@ -110,3 +110,19 @@ def force_logout():
 
     session_db.update(dict(is_active=False), id=session_id)
     wiz.response.status(200, True)
+
+def force_logout_all():
+    user_id = wiz.session.get("id")
+    current_token = wiz.session.get("session_token")
+
+    session_db = orm.use("user_session", id_size=64)
+    rows = session_db.rows(user_id=user_id, is_active=True, fields="id")
+
+    count = 0
+    for row in rows:
+        if row['id'] == current_token:
+            continue
+        session_db.update(dict(is_active=False), id=row['id'])
+        count += 1
+
+    wiz.response.status(200, count=count)

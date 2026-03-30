@@ -97,7 +97,11 @@ div(class="h-full overflow-y-auto")
 
         //- ── 활성 기기 섹션 ──
         div(class="mb-8")
-            h2(class="text-[13px] font-semibold text-neutral-400 uppercase tracking-wider mb-4") 활성 기기
+            div(class="flex items-center justify-between mb-4")
+                h2(class="text-[13px] font-semibold text-neutral-400 uppercase tracking-wider") 활성 기기
+                button(*ngIf="activeSessions.length > 1",
+                    class="px-3 py-1 text-xs font-medium text-red-500 hover:text-white hover:bg-red-500 border border-red-200 hover:border-red-500 rounded-md transition-all",
+                    (click)="forceLogoutAll()") 전체 로그아웃
 
             div(*ngIf="activeSessions.length === 0",
                 class="text-[13px] text-neutral-400 py-4") 활성 세션이 없습니다.

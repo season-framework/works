@@ -82,6 +82,15 @@ export class Component implements OnInit {
         return strdate;
     }
 
+    public async toggleUntrack(event: Event, item: any) {
+        event.preventDefault();
+        event.stopPropagation();
+        let newStatus = item.untrack ? "false" : "true";
+        await wiz.call("toggle_untrack", { project_id: item.id, status: newStatus });
+        item.untrack = !item.untrack;
+        await this.service.render();
+    }
+
     public newProject: boolean = false;
 
     public async createProject() {

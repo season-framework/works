@@ -57,3 +57,12 @@ def update():
     project.update(data)
     project = projectModel.get(project_id)
     wiz.response.status(200, project.data)
+
+def toggle_untrack():
+    project_id = wiz.request.query("project_id", True)
+    status = wiz.request.query("status", True)
+    project = projectModel.get(project_id)
+    if project is None:
+        wiz.response.status(404, message="프로젝트를 찾을 수 없습니다")
+    project.untrack(status)
+    wiz.response.status(200)

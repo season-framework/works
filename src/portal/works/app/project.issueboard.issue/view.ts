@@ -110,6 +110,7 @@ export class Component implements OnInit {
         this.messageEvent.replyMessage = this.replyMessage.bind(this);
         this.messageEvent.imageGrid = this.imageGrid.bind(this);
         this.messageEvent.imageUrl = this.imageUrl.bind(this);
+        this.messageEvent.downloadFilesZip = this.downloadFilesZip.bind(this);
 
         await this.load();
 
@@ -872,12 +873,29 @@ export class Component implements OnInit {
         this.bodyElement.nativeElement.style.marginLeft = (x + this.modalStyle.x) + 'px';
     }
 
+    public async downloadFilesZip(files: any[], zipName: string = 'files') {
+        if (!files || files.length === 0) return;
+        const formData = new FormData();
+        formData.append('project_id', this.project.id());
+        formData.append('issue_id', this.issue.id);
+        formData.append('files', JSON.stringify(files.map((f: any) => ({ id: f.id, filename: f.filename }))));
+        formData.append('zip_name', zipName);
+        const url = wiz.url('download_files_zip');
+        const response = await fetch(url, { method: 'POST', body: formData });
+        if (!response.ok) return;
+        const blob = await response.blob();
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = zipName + '.zip';
+        a.click();
+        URL.revokeObjectURL(a.href);
+    }
+
     public containerClass() {
         const list = [];
-        if (this.issue.modal) { // wiz-modal
-            list.push("absolute", "top-0", "left-0", "bg-black/[.5]", "flex", "items-baseline", "justify-center", "max-sm:p-0", "z-[4000]");
+        if (this.issue.modal && this.isMovable) {
+            list.push("absolute", "inset-0", "bg-black/[.5]", "z-[4000]");
         }
-        else list.push("overflow-hidden");
         return list.join(" ");
     }
 
